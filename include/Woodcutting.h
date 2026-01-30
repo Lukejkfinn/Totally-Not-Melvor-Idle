@@ -24,24 +24,21 @@ public:
     void giveLog(const int &id);
     virtual void tick(float deltaTime, float contentY) override;
 
-    // Save/load helpers
-    // Non-const getters for writing
+    // save/load helpers
+    // non-const getters for writing
     float *getProgressArray() { return progress; }
     float *getRunningTimeArray() { return runningTime; }
 
-    // Const getters for read-only access
+    // const getters for read-only access
     const float *getProgressArray() const { return progress; }
     const float *getRunningTimeArray() const { return runningTime; }
 
 protected:
 
 private:
-
-    
     Item item;
     ItemDatabase itemDatabase;
 
-    //float xpBarWidth[12]; // optional: track individual widths
     static constexpr int MAX_TREES{9};
     static constexpr int maxLvl{99};
     float runningTime[MAX_TREES] = {0};
@@ -51,7 +48,6 @@ private:
     int index = -1;
     float treeTimer[MAX_TREES]{2.1f, 2.8f, 3.5f, 4.2f, 5.6f, 7.f, 8.4f, 10.f, 12.f};
     int xpPerTree[MAX_TREES]{500, 15, 22, 30, 40, 61, 81, 100, 150};
-    //int nodeLvl[MAX_TREES]{1, 10, 25, 35, 40, 55, 60, 75, 90};
     std::string xpPerTreeString[MAX_TREES];
     std::string treeNames[MAX_TREES];
     std::string timeToCutTree[MAX_TREES];

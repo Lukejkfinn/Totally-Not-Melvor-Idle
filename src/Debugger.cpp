@@ -9,13 +9,13 @@ bool Debugger::btn(Rectangle bounds, const char *text)
     Vector2 mouse = GetMousePosition();
     bool hovered = CheckCollisionPointRec(mouse, bounds);
 
-    // Button color states
+    // button color states
     Color bgColor = hovered ? DARKBLUE : GRAY;
 
-    // Draw button
+    // draw button
     DrawRectangleRec(bounds, bgColor);
 
-    // Center text
+    // center text
     int fontSize = 20;
     int textWidth = MeasureText(text, fontSize);
 
@@ -26,11 +26,11 @@ bool Debugger::btn(Rectangle bounds, const char *text)
         fontSize,
         WHITE);
 
-    // Return true only when clicked
+    // return true only when clicked
     return hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 }
 
-// Function will handle all elements for drawing/manipulating skills
+// function will handle all elements for drawing/manipulating skills
 void Debugger::drawSkillsTemplate()
 {
     int startX = 350;
@@ -43,7 +43,7 @@ void Debugger::drawSkillsTemplate()
     int buttonHeight = 30;
     int buttonYAdjust = -5;
 
-    // Fixed button columns
+    // fixed button columns
     int leftButtonX = 550;
     int rightButtonX = leftButtonX + buttonWidth + 15;
 
@@ -59,10 +59,10 @@ void Debugger::drawSkillsTemplate()
     {
         int y = startY + i * spacing;
 
-        // 1) Label
+        // draw labels
         DrawText(labels[i], startX, y, fontSize, BLACK);
 
-        // 2) Buttons
+        // make buttons
         Rectangle leftButton =
             {
                 (float)leftButtonX,
@@ -76,7 +76,8 @@ void Debugger::drawSkillsTemplate()
                 (float)(y + buttonYAdjust),
                 (float)buttonWidth,
                 (float)buttonHeight};
-
+        
+        // button actions
         if (btn(leftButton, "1"))
         {
             if (i == 0)
@@ -95,7 +96,7 @@ void Debugger::drawSkillsTemplate()
     }
 }
 
-// Function will handle all elements for drawing/spawning items
+// function will handle all elements for drawing/spawning items
 void Debugger::drawObjectsTemplate() 
 {
     int startX = 750;
@@ -108,7 +109,7 @@ void Debugger::drawObjectsTemplate()
     int buttonHeight = 30;
     int buttonYAdjust = -5;
 
-    // Fixed button columns
+    // fixed button columns
     int leftButtonX = 950;
     int rightButtonX = leftButtonX + buttonWidth + 15;
 
@@ -124,10 +125,10 @@ void Debugger::drawObjectsTemplate()
     {
         int y = startY + i * spacing;
 
-        // 1) Label
+        // draw labels
         DrawText(labels[i], startX, y, fontSize, BLACK);
 
-        // 2) Buttons
+        // make buttons
         Rectangle leftButton =
             {
                 (float)leftButtonX,
@@ -142,6 +143,7 @@ void Debugger::drawObjectsTemplate()
                 (float)buttonWidth,
                 (float)buttonHeight};
 
+        // button actions
         if (btn(leftButton, "1"))
         {
             if (i == 0)

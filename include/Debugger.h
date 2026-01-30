@@ -20,14 +20,14 @@ public:
     void drawObjectsTemplate();
     void tick(float deltaTime);
     bool debugging{false};
+
 protected:
+
 private:
     Texture2D debugger{LoadTexture("assets/debugger.jpg")};
     const float buttonPosX{700};
-
     BaseSkill baseSkill;
     ItemDatabase itemDatabase;
-
     Rectangle woodcuttingBtn;
     Rectangle miningBtn;
     Rectangle closeBtn;

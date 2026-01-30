@@ -1,0 +1,9 @@
+[Woodcutting]
+level=1
+xp=0
+progress=0 0 0 0 0 0 0 0 
+
+[Mining]
+level=1
+xp=0
+progress=0 0 0 0 0 0 0 0 

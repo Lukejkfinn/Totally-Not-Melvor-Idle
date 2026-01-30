@@ -2,19 +2,7 @@
 
 Woodcutting::Woodcutting(Inventory &inv) : inventory(inv)
 {
-    ItemDatabase::loadItems(); // Make sure to call this once at the beginning
     background = woodcutting;
-
-    // Loading texture for the log item
-    // Texture2D normalLog = LoadTexture("assets/bank/logs_normal.png");
-    // if (normalLog.id == 0) {std::cerr << "Failed to load log texture!\n";}
-    // Item logItem(normalLog, 10, true, 64, "");
-    // int value = 10; // The value of the item
-    // bool stackable = true; // If the item is stackable
-    // int maxStack = 64; // The maximum stack size
-
-    // Create an item (log)
-    // item = Item(normalLog, value, stackable, maxStack, "");  // This will now work fine
 
     // safety check to make sure all xp bars start at 0
     for (int row = 0; row < 3; row++)
@@ -68,10 +56,10 @@ void Woodcutting::drawTemplate(float contentY)
 {
     BaseSkill::drawTemplate(contentY);
 
-    // Draw XP bars
+    // draw XP bars
     for (int i = 0; i < MAX_TREES; i++)
     {
-        // Draw background and XP bar
+        // draw background and XP bar
         DrawRectangleRec(skillBg[i], GRAY); // gray padding
 
         if (curLvl < getNodeLevel(i))
@@ -93,16 +81,16 @@ void Woodcutting::drawTemplate(float contentY)
         // draw tree
         DrawTextureEx(treeTextures[i], Vector2{skillBg[i].x + 80, skillBg[i].y + 70}, 0, 0.15f, WHITE);
 
-        // Center tree name text on the skill background
+        // centre tree name text on the skill background
         int treeNameTextWidth = MeasureText(treeNames[i].c_str(), 20);
         int treeNameTextX = skillBg[i].x + (skillBg[i].width - treeNameTextWidth) / 2;
         int treeNameTextY = skillBg[i].y + 20;
         DrawText(treeNames[i].c_str(), treeNameTextX, treeNameTextY, 20, WHITE);
 
-        // Concatenate XP and time into a single string
+        // concatenate XP and time into a single string
         std::string combinedText = xpPerTreeString[i] + timeToCutTree[i];
 
-        // Centre the combined text
+        // centre the combined text
         int combinedTextWidth = MeasureText(combinedText.c_str(), 20);
         int combinedTextX = skillBg[i].x + (skillBg[i].width - combinedTextWidth) / 2;
         int combinedTextY = skillBg[i].y + 40; // Same line under tree name
@@ -147,8 +135,8 @@ int Woodcutting::chopTrees(int i)
         xpAccumulated = xpPerTree[i];
         BaseSkill::updateXPBar(xpAccumulated);
 
-        // Pass the correct log name based on the tree index
-        int treeID = getTreeID(i); // This function returns the log id
+        // pass the correct log name based on the tree index
+        int treeID = getTreeID(i); // this function returns the log id
         giveLog(treeID);
     }
 
@@ -178,7 +166,7 @@ int Woodcutting::getTreeID(const int i)
     case 8:
         return 9;
     default:
-        return 0; // Fallback for unknown trees, which returns nothing
+        return 0; // fallback for unknown trees, which returns nothing
     }
 }
 
@@ -192,7 +180,7 @@ void Woodcutting::giveLog(const int& id)
         return;
     }
 
-    inventory.addItem(logItem); // Add the log item to the inventory
+    inventory.addItem(logItem); // add the log item to the inventory
 }
 
 void Woodcutting::tick(float deltaTime, float contentY)
@@ -214,14 +202,14 @@ void Woodcutting::tick(float deltaTime, float contentY)
             50                                     // button height
         };
 
-        // Check if button pressed
+        // check if button pressed
         if (BaseSkill::btn(button, "Chop Tree") && curLvl >= getNodeLevel(i))
         {
             index = (index == i) ? -1 : i;
         }
     }
 
-    // Only chop the active tree
+    // only chop the active tree
     if (index >= 0 && index < MAX_TREES)
     {
         chopTrees(index);

@@ -21,28 +21,14 @@ public:
     virtual void tick(float deltaTime, float contentY) override;
 
     
-        // Save/load helpers
-    // Non-const getters for writing
+    // save/load helpers
+    // non-const getters for writing
     float *getProgressArray() { return progress; }
     float *getRunningTimeArray() { return runningTime; }
 
-    // Const getters for read-only access
+    // const getters for read-only access
     const float *getProgressArray() const { return progress; }
     const float *getRunningTimeArray() const { return runningTime; }
-
-    
-    
-    // Save/load helpers
-    // Non-const getters (for writing)
-    // float *getProgressArray() { return progress; }
-    // // Const getters (for reading)
-    // const float *getProgressArray() const { return progress; }
-    // // Setters
-    // void setProgress(int index, float value)
-    // {
-    //     if (index >= 0 && index < MAX_ROCKS)
-    //         progress[index] = value;
-    // }
 
 protected:
 
@@ -55,7 +41,6 @@ private:
     int index = -1;
     float rockTimer[MAX_ROCKS]{2.1f, 2.8f, 3.5f, 4.2f, 5.6f, 7.f, 8.4f, 10.f, 15.f, 20.f};
     int xpPerRock[MAX_ROCKS]{500, 15, 22, 30, 40, 61, 81, 100, 150, 200};
-    //int nodeLvl[MAX_ROCKS]{1, 10, 25, 35, 40, 55, 60, 75, 80, 90};
     std::string xpPerRockString[MAX_ROCKS];
     std::string rockNames[MAX_ROCKS];
     std::string timeToMineRocks[MAX_ROCKS];

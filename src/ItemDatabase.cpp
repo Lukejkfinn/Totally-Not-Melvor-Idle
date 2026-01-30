@@ -1,7 +1,7 @@
 #include "ItemDatabase.h"
 #include <iostream>
 
-// Define the static items list
+// define the static items list
 std::vector<Item> ItemDatabase::items;
 
 Item ItemDatabase::getItemByName(const std::string &skillType, const int &id)
@@ -13,7 +13,7 @@ Item ItemDatabase::getItemByName(const std::string &skillType, const int &id)
             return item;
         }
     }
-    // Return a default item if not found (or handle it differently)
+    // return a default item if not found (or handle it differently)
     return Item();
 }
 
@@ -159,73 +159,7 @@ void ItemDatabase::loadItems()
     items.push_back(Item(dragoniteOreTexture, rockAmount, true, oresMaxStack, "Dragonite Ore", "mining", 10));
 }
 
-
-
 void ItemDatabase::addItem(const Item &item)
 {
     items.push_back(item);
 }
-
-
-
-// static const char* logNames[] =
-// {
-//     "normal", "oak", "willow", "teak",
-//     "maple", "mahogany", "yew", "magic", "redwood"
-// };
-
-// static const char* rockNames[] =
-// {
-//     "copper", "tin", "iron", "coal",
-//     "silver", "gold", "mithril", "adamantite", "runite", "dragonite"
-// };
-
-// int logCount = sizeof(logNames) / sizeof(logNames[0]);
-// int rockCount = sizeof(rockNames) / sizeof(rockNames[0]);
-//
-// std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill)
-// {
-//     // local modifiers
-//     std::vector<Item> spawned;
-//     const int logAmount{64};
-//     const int rockAmount{64};
-//
-//     switch (skill)
-//     {
-//         case SkillType::Woodcutting: //* WOODCUTTING *//
-//         {
-//
-//             for (int i = 0; i < logCount; ++i)
-//             {
-//                 std::string path = "assets/bank/woodcutting/logs_" + std::string(logNames[i]) + ".png";
-//                 Texture2D texture = LoadTexture(path.c_str());
-//
-//                 if (texture.id == 0)
-//                     std::cerr << "Failed to load woodcutting texture: " << path << std::endl;
-//
-//                 spawned.push_back(Item(texture, logAmount, true, logsMaxStack, "woodcutting", i + 1));
-//             }
-//             break;
-//         }
-//
-//         case SkillType::Mining: //* MINING *//
-//         {
-//             for (int i = 0; i < rockCount; ++i)
-//             {
-//                 std::string path = "assets/bank/mining/ore_" + std::string(rockNames[i]) + ".png";
-//                 Texture2D texture = LoadTexture(path.c_str());
-//
-//                 if (texture.id == 0)
-//                     std::cerr << "Failed to load mining texture: " << path << std::endl;
-//
-//                 spawned.push_back(Item(texture, rockAmount, true, oresMaxStack, "mining", i + 1));
-//             }
-//             break;
-//         }
-//
-//         default:
-//             std::cerr << "Unknown SkillType passed to ItemSpawner!" << std::endl;
-//             break;
-//     }
-//     return spawned; // ← MUST return the vector
-// }

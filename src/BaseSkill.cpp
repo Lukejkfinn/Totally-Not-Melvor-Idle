@@ -11,14 +11,13 @@ bool BaseSkill::btn(Rectangle bounds, const char *text)
     Vector2 mouse = GetMousePosition();
     bool hovered = CheckCollisionPointRec(mouse, bounds);
 
-    // Button color states
+    // button color states
     Color bgColor = hovered ? DARKBLUE : DARKGRAY;
 
-    // Draw button
-    //DrawRectangleRec(bounds, bgColor);
+    // draw button
     DrawRectangleRounded(bounds, 1.f, 16, bgColor);
 
-    // Center text
+    // center text
     int fontSize = 20;
     int textWidth = MeasureText(text, fontSize);
 
@@ -29,7 +28,7 @@ bool BaseSkill::btn(Rectangle bounds, const char *text)
         fontSize,
         WHITE);
 
-    // Return true only when clicked
+    // return true only when clicked
     return hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 }
 
@@ -37,25 +36,22 @@ void BaseSkill::getWindowSize(int width, int height)
 {
     winWidth = width;
     winHeight = height;
-    //std::cout << "DIMENSIONS " << winWidth << " " << winHeight << '\n';
 }
 
 void BaseSkill::updateXPBar(int currentXP)
 {
     xp += currentXP; // accumulate XP
-    //std::cout << "XP in: " << xp << '\n';
-
     float xpBarMaxWidth = xpBarWidth - 2; // available width for bar
 
-    // Level up loop in case XP exceeds max
+    // level up loop in case XP exceeds max
     while (xp >= maxXP)
     {
         xp -= maxXP;    // carry over excess XP
-        curLvl++;        // increase level
+        curLvl++;       // increase level
         maxXP *= 1.1f;  // optional: increase maxXP for next level
     }
     
-    // Map XP to width of bar
+    // map XP to width of bar
     float ratio = xp / maxXP;
     ratio = Clamp(ratio, 0.f, 1.f);
     xpBarFill = {325, 40, xpBarMaxWidth * ratio, 50};
@@ -64,15 +60,18 @@ void BaseSkill::updateXPBar(int currentXP)
 void BaseSkill::drawXPBar()
 {
     
+    // draw the background around the text and xp bar
     Rectangle xpBarBorder{324, 0, xpBarWidth, 91};
     DrawRectangleRec(xpBarBorder, BLACK);
     
+    // draw the text above the xp bar
     DrawText("XP Bar", 330, 10, 30, WHITE);
     
+    // draw the background of the xp bar
     Rectangle xpBarBG{325, 40, xpBarWidth -2.f, 50};
     DrawRectangleRec(xpBarBG, DARKGRAY);
   
-    // Draw filled bar
+    // draw the fill for the xp bar
     DrawRectangleRec(xpBarFill, BLUE);
 }
 
@@ -97,6 +96,7 @@ void BaseSkill::drawTemplate(float contentY)
         {
             int i = row * numCols + col;
 
+            // individual skill background data
             skillBg[i] = {0};
             skillBg[i].width = rectWidth;
             skillBg[i].height = rectHeight;
@@ -107,17 +107,17 @@ void BaseSkill::drawTemplate(float contentY)
             if (curLvl < nodeLvl[i])
                 continue;
 
+            // individual skills xp bar border
             xpBarBG[i] = {0};
             xpBarBG[i].width = xpWidth;
             xpBarBG[i].height = xpBarBGHeight;
             xpBarBG[i].x = skillBg[i].x + xpWidthOffset;
             xpBarBG[i].y = skillBg[i].y + xpHeightOffset;
 
+            // individual skills xp bars
             xpBar[i].height = xpBarBGHeight;
             xpBar[i].x = skillBg[i].x + xpWidthOffset;
             xpBar[i].y = skillBg[i].y + xpHeightOffset;
-
-            // std::cout << skillBg[i].x << '\n';
         }
     }
 }

@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 // forward declarations
 void saveGame(const Woodcutting &wood, const Mining &mine, const std::string &filename);
@@ -20,13 +21,13 @@ bool Button(Rectangle bounds, const char *text)
     Vector2 mouse = GetMousePosition();
     bool hovered = CheckCollisionPointRec(mouse, bounds);
 
-    // Button color states
+    // button color states
     Color bgColor = hovered ? DARKBLUE : GRAY;
 
-    // Draw button
+    // draw button
     DrawRectangleRec(bounds, bgColor);
 
-    // Center text
+    // center text
     int fontSize = 20;
     int textWidth = MeasureText(text, fontSize);
 
@@ -37,7 +38,7 @@ bool Button(Rectangle bounds, const char *text)
         fontSize,
         WHITE);
 
-    // Return true only when clicked
+    // return true only when clicked
     return hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 }
 
@@ -45,10 +46,10 @@ float ScrollBar(Rectangle track, float value)
 {
     const float thumbHeight = 40.0f;
 
-    // Clamp value
+    // clamp value
     value = Clamp(value, 0.0f, 1.0f);
 
-    // Calculate thumb position
+    // calculate thumb position
     float thumbY = track.y + value * (track.height - thumbHeight);
     Rectangle thumb = {track.x, thumbY, track.width, thumbHeight};
 
@@ -56,20 +57,20 @@ float ScrollBar(Rectangle track, float value)
 
     static bool dragging = false;
 
-    // Mouse press on thumb
+    // mouse press on thumb
     if (CheckCollisionPointRec(mouse, thumb) &&
         IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
     {
         dragging = true;
     }
 
-    // Release drag
+    // release drag
     if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
     {
         dragging = false;
     }
 
-    // Drag logic
+    // drag logic
     if (dragging)
     {
         float newY = mouse.y - thumbHeight / 2;
@@ -84,7 +85,7 @@ float ScrollBar(Rectangle track, float value)
         value -= wheel * 0.05f;
     }
 
-    // Draw
+    // draw
     DrawRectangleRec(track, LIGHTGRAY);
     DrawRectangleRec(thumb, DARKGRAY);
 
@@ -116,7 +117,7 @@ void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY,
 
     if (Button(Rectangle{0, 670 + contentY, winWidth / scale, buttonHeight}, "Quit"))
     {
-        saveGame(woodcutting, mining, "save.txt");
+        saveGame(woodcutting, mining, "data/save.txt");
         running = false;
     }
 }
@@ -130,14 +131,20 @@ void saveGame(const Woodcutting &wood, const Mining &mine, const std::string &fi
         return;
     }
 
-    // Woodcutting
-    file << wood.getLevel() << ' ' << wood.getXP() << ' ';
+    // woodcutting
+    file << "[Woodcutting]\n";
+    file << "level=" << wood.getLevel() << '\n';
+    file << "xp=" << wood.getXP() << '\n';
+    file << "progress=";
     for (int i = 0; i < 8; i++)
         file << wood.getProgressArray()[i] << ' ';
-    file << '\n';
+    file << "\n\n";
 
-    // Mining
-    file << mine.getLevel() << ' ' << mine.getXP() << ' ';
+    // mining
+    file << "[Mining]\n";
+    file << "level=" << mine.getLevel() << '\n';
+    file << "xp=" << mine.getXP() << '\n';
+    file << "progress=";
     for (int i = 0; i < 8; i++)
         file << mine.getProgressArray()[i] << ' ';
     file << '\n';
@@ -145,8 +152,10 @@ void saveGame(const Woodcutting &wood, const Mining &mine, const std::string &fi
     std::cout << "Game saved!\n";
 }
 
+
 void loadGame(Woodcutting &wood, Mining &mine, const std::string &filename)
 {
+    // open the file
     std::ifstream file(filename);
     if (!file.is_open())
     {
@@ -154,39 +163,91 @@ void loadGame(Woodcutting &wood, Mining &mine, const std::string &filename)
         return;
     }
 
-    int lvl, xp;
-    float prog;
+    // preparation for reading the file (line by line and by sections of data)
+    std::string line;
+    enum class Section { None, Woodcutting, Mining };
+    Section currentSection = Section::None;
 
-    // Woodcutting
-    file >> lvl >> xp;
-    wood.setLevel(lvl);
-    wood.setXP(xp);      // set BaseSkill::xp
-    wood.updateXPBar(0); // refresh visual XP bar
-
-    for (int i = 0; i < 8; i++)
+    // loop over each line of data
+    while (std::getline(file, line))
     {
-        file >> prog;
-        wood.getProgressArray()[i] = prog;
-    }
+        if (line.empty()) // if this line is empty, then skip
+            continue;
 
-    // Mining
-    file >> lvl >> xp;
-    mine.setLevel(lvl);
-    mine.setXP(xp);
-    mine.updateXPBar(0);
+        // section headers
+        if (line == "[Woodcutting]")
+        {
+            currentSection = Section::Woodcutting;
+            continue;
+        }
+        if (line == "[Mining]")
+        {
+            currentSection = Section::Mining;
+            continue;
+        }
 
-    for (int i = 0; i < 8; i++)
-    {
-        file >> prog;
-        mine.getProgressArray()[i] = prog;
+        // split the data by key=value
+        size_t equals = line.find('=');
+        if (equals == std::string::npos) // if there is no equals then skip the line
+            continue;
+
+        std::string key = line.substr(0, equals);
+        std::string value = line.substr(equals + 1);
+
+        std::stringstream ss(value); // convert the value string into numbers
+
+        if (currentSection == Section::Woodcutting)
+        {
+            if (key == "level")
+            {
+                int lvl;
+                ss >> lvl;
+                wood.setLevel(lvl);
+            }
+            else if (key == "xp")
+            {
+                int xp;
+                ss >> xp;
+                wood.setXP(xp);
+                wood.updateXPBar(0);
+            }
+            else if (key == "progress")
+            {
+                for (int i = 0; i < 8; i++)
+                    ss >> wood.getProgressArray()[i];
+            }
+        }
+        else if (currentSection == Section::Mining)
+        {
+            if (key == "level")
+            {
+                int lvl;
+                ss >> lvl;
+                mine.setLevel(lvl);
+            }
+            else if (key == "xp")
+            {
+                int xp;
+                ss >> xp;
+                mine.setXP(xp);
+                mine.updateXPBar(0);
+            }
+            else if (key == "progress")
+            {
+                for (int i = 0; i < 8; i++)
+                    ss >> mine.getProgressArray()[i];
+            }
+        }
     }
 
     std::cout << "Game loaded!\n";
 }
 
+
+
 int main()
 {
-    // initialis the window
+    // initialise the window
     const static int winDimensions[2]{1280, 720};
     InitWindow(winDimensions[0], winDimensions[1], "Totally Not Melvor Idle...");
 
@@ -200,11 +261,9 @@ int main()
     woodcutting.getWindowSize(winDimensions[0], winDimensions[1]);
     mining.getWindowSize(winDimensions[0], winDimensions[1]);
     Debugger debugger(inventory, woodcutting, mining);
+    ItemDatabase::loadItems();
 
-   // Initialize the inventory with some items
-    //inventory.initializeInventory();  // Populating inventory right away
-
-    loadGame(woodcutting, mining, "save.txt");
+    loadGame(woodcutting, mining, "data/save.txt");
 
     // variable declarations
     int scale{4};
@@ -218,17 +277,16 @@ int main()
     {
         BeginDrawing();
         ClearBackground(BLACK);
+
         // draw background
         if (indexPage == 0)
         {
             DrawTextureEx(background, Vector2{(float)winDimensions[0] / scale, 0}, 0, 1, WHITE);
-            float chazScale = 1.0f + sin(GetTime()) * 0.1f; // Pulsing effect
+            float chazScale = 1.0f + sin(GetTime()) * 0.1f; // pulsing effect
             DrawTextureEx(chaz, Vector2{(float)winDimensions[0] / 2 - 50, (float)winDimensions[1] / 2}, 0, chazScale, WHITE);
         }
         else if (indexPage == 1)
         {
-            //std::cout << "Drawing inventory..." << std::endl;
-            //const float invPosX{325.f};
             const float invPosY{100.f};
             const int cellSize{64};
             inventory.drawInventory(inventory, winDimensions[0] / scale + 20, invPosY, cellSize);
@@ -248,7 +306,7 @@ int main()
             debugger.tick(GetFrameTime());
         }
 
-        // Drawing side panel
+        // drawing side panel
         DrawRectangle(0, 0, winDimensions[0] / scale, winDimensions[1], GRAY);
 
         // text on left to get a vague idea of positioning TEMP
@@ -272,7 +330,7 @@ int main()
 
     if (!running || WindowShouldClose())
     {
-        saveGame(woodcutting, mining, "save.txt");
+        saveGame(woodcutting, mining, "data/save.txt");
         std::cout << "Game saved!\n";
     }
 

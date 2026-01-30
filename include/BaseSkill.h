@@ -2,7 +2,6 @@
 #define BASE_SKILL_H
 #include "raylib.h"
 
-
 class BaseSkill
 {
 public:
@@ -15,14 +14,13 @@ public:
     virtual void tick(float deltaTime, float contentY);
     virtual int getNodeLevel(int index) const { return nodeLvl[index]; }
 
-
     // save/load helpers
     int getLevel() const { return curLvl; }
     int getXP() const { return xp; }
     void setLevel(int lvl) { curLvl = lvl; }
     void setXP(int newXP) { xp = newXP; }
     
-    protected:
+protected:
     Texture2D background{LoadTexture("assets/background.jpg")};
     Texture2D woodcutting{LoadTexture("assets/woodcuttingBG.png")};
     Texture2D mining{LoadTexture("assets/miningBG.jpg")};
@@ -31,9 +29,7 @@ public:
     Rectangle xpBarBG[12]; // XP bar backgrounds
     int curLvl{1};
     
-    // float contentY{};
-    
-    private:
+private:
     int winWidth{0};
     int winHeight{0};
     Rectangle xpBarFill{325, 40, 0, 50};

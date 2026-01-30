@@ -58,10 +58,10 @@ void Mining::drawTemplate(float contentY)
 {
     BaseSkill::drawTemplate(contentY);
 
-    // Draw XP bars
+    // draw XP bars
     for (int i = 0; i < MAX_ROCKS; i++)
     {
-        // Draw background and XP bar
+        // draw background and XP bar
         DrawRectangleRec(skillBg[i], GRAY);
         
         if (curLvl < getNodeLevel(i))
@@ -83,16 +83,16 @@ void Mining::drawTemplate(float contentY)
         // draw rocks
         DrawTextureEx(rockTextures[i], Vector2{skillBg[i].x + 80, skillBg[i].y + 70}, 0, 0.15f, WHITE);
 
-        // Center rock name text on the skill background
+        // centre rock name text on the skill background
         int rockNameTextWidth = MeasureText(rockNames[i].c_str(), 20);
         int rockNameTextX = skillBg[i].x + (skillBg[i].width - rockNameTextWidth) / 2;
         int rockNameTextY = skillBg[i].y + 20;
         DrawText(rockNames[i].c_str(), rockNameTextX, rockNameTextY, 20, WHITE);
 
-        // Concatenate XP and time into a single string
+        // concatenate XP and time into a single string
         std::string combinedText = xpPerRockString[i] + timeToMineRocks[i];
 
-        // Center the combined text
+        // centre the combined text
         int combinedTextWidth = MeasureText(combinedText.c_str(), 20);
         int combinedTextX = skillBg[i].x + (skillBg[i].width - combinedTextWidth) / 2;
         int combinedTextY = skillBg[i].y + 40; // Same line under rock name
@@ -154,7 +154,7 @@ void Mining::tick(float deltaTime, float contentY)
         if (curLvl < getNodeLevel(i))
             continue;
 
-        // Use the skillBg[i] rectangle for button placement
+        // use the skillBg[i] rectangle for button placement
         Rectangle button = {
             skillBg[i].x + 2.5f,                   // 2.5f offset as the button width changed
             skillBg[i].y + skillBg[i].height - 53, // put button near bottom of card
@@ -162,37 +162,17 @@ void Mining::tick(float deltaTime, float contentY)
             50                                     // button height
         };
 
-        // Check if button pressed
+        // check if button pressed
         if (BaseSkill::btn(button, "Mine Ore") && curLvl >= getNodeLevel(i))
         {
             index = (index == i) ? -1 : i;
         }
     }
 
-    // Only chop the active tree
+    // only chop the active tree
     if (index >= 0 && index < MAX_ROCKS)
     {
         // do stuff
         mineRocks(index);
     }
 }
-
-// void Mining::treeButtons(float contentY)
-// {
-//     for (int i = 0; i < MAX_ROCKS; i++)
-//     {
-//         // Use the skillBg[i] rectangle for button placement
-//         Rectangle button = {
-//             skillBg[i].x + 2.5f,                   // 2.5f offset as the button width changed
-//             skillBg[i].y + skillBg[i].height - 53, // put button near bottom of card
-//             skillBg[i].width - 5,                  // reduced the width of the button
-//             50                                     // button height
-//         };
-//
-//         // Check if button pressed
-//         if (BaseSkill::btn(button, "Chop Tree"))
-//         {
-//             index = (index == i) ? -1 : i;
-//         }
-//     }
-// }
