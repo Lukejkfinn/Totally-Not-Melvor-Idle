@@ -1,0 +1,35 @@
+#include "raylib.h"
+#include "ItemDatabase.h"
+#include "Inventory.h"
+#include "BaseSkill.h"
+#include "Woodcutting.h"
+#include "Mining.h"
+#include <fstream>
+#include <iostream>
+#include <cstddef>
+
+class Debugger
+{
+    Inventory &inventory;
+    Woodcutting &woodcutting;
+    Mining &mining;
+public:
+    Debugger(Inventory &inv, Woodcutting &wc, Mining &mine);
+    bool btn(Rectangle bounds, const char *text);
+    void drawSkillsTemplate();
+    void drawObjectsTemplate();
+    void tick(float deltaTime);
+    bool debugging{false};
+protected:
+private:
+    Texture2D debugger{LoadTexture("assets/debugger.jpg")};
+    const float buttonPosX{700};
+
+    BaseSkill baseSkill;
+    ItemDatabase itemDatabase;
+
+    Rectangle woodcuttingBtn;
+    Rectangle miningBtn;
+    Rectangle closeBtn;
+    
+};
