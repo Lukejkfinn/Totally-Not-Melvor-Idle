@@ -1,6 +1,10 @@
 #ifndef BASE_SKILL_H
 #define BASE_SKILL_H
 #include "raylib.h"
+#include "raymath.h"
+#include <vector>
+#include <string>
+#include <iostream>
 
 class BaseSkill
 {

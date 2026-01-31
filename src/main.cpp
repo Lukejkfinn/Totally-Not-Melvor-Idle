@@ -13,8 +13,8 @@
 #include <sstream>
 
 // forward declarations
-void saveGame(const Woodcutting &wood, const Mining &mine, const std::string &filename);
-void loadGame(Woodcutting &wood, Mining &mine, const std::string &filename);
+void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining &mine, const std::string &filename);
+void loadGame(const Inventory &inventory, const Woodcutting &wood, const Mining &mine, const std::string &filename);
 
 bool Button(Rectangle bounds, const char *text)
 {
@@ -92,7 +92,7 @@ float ScrollBar(Rectangle track, float value)
     return value;
 }
 
-void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY, int winWidth, Texture &background, const Woodcutting &woodcutting, const Mining &mining)
+void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY, int winWidth, Texture &background, const Inventory &inventory, const Woodcutting &woodcutting, const Mining &mining)
 {
     float buttonHeight = 30.f;
     float scale = 4.f;
@@ -117,12 +117,12 @@ void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY,
 
     if (Button(Rectangle{0, 670 + contentY, winWidth / scale, buttonHeight}, "Quit"))
     {
-        saveGame(woodcutting, mining, "data/save.txt");
+        saveGame(inventory, woodcutting, mining, "data/save.txt");
         running = false;
     }
 }
 
-void saveGame(const Woodcutting &wood, const Mining &mine, const std::string &filename)
+void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining &mine, const std::string &filename)
 {
     std::ofstream file(filename);
     if (!file.is_open())
@@ -147,13 +147,21 @@ void saveGame(const Woodcutting &wood, const Mining &mine, const std::string &fi
     file << "progress=";
     for (int i = 0; i < 8; i++)
         file << mine.getProgressArray()[i] << ' ';
-    file << '\n';
+    file << "\n\n";
+
+    // inventory
+    file << "[Inventory]\n";
+    for (const Item &item : inventory.items)
+    {
+        file << item.getSkillType() << "="
+            << item.getId() << ","
+            << item.getAmount() << '\n';
+    }
 
     std::cout << "Game saved!\n";
 }
 
-
-void loadGame(Woodcutting &wood, Mining &mine, const std::string &filename)
+void loadGame(Inventory &inventory, Woodcutting &wood, Mining &mine, const std::string &filename)
 {
     // open the file
     std::ifstream file(filename);
@@ -165,8 +173,11 @@ void loadGame(Woodcutting &wood, Mining &mine, const std::string &filename)
 
     // preparation for reading the file (line by line and by sections of data)
     std::string line;
-    enum class Section { None, Woodcutting, Mining };
+    enum class Section { None, Woodcutting, Mining, Inventory };
     Section currentSection = Section::None;
+
+    // clear inventory
+    inventory.items.clear();
 
     // loop over each line of data
     while (std::getline(file, line))
@@ -183,6 +194,11 @@ void loadGame(Woodcutting &wood, Mining &mine, const std::string &filename)
         if (line == "[Mining]")
         {
             currentSection = Section::Mining;
+            continue;
+        }
+        if (line == "[Inventory]")
+        {
+            currentSection = Section::Inventory;
             continue;
         }
 
@@ -238,12 +254,33 @@ void loadGame(Woodcutting &wood, Mining &mine, const std::string &filename)
                     ss >> mine.getProgressArray()[i];
             }
         }
-    }
+        else if (currentSection == Section::Inventory)
+        {
 
+            std::string skillType = line.substr(0, equals);
+            std::string rest = line.substr(equals + 1);
+
+            size_t comma = rest.find(',');
+            if (comma == std::string::npos)
+                continue;
+
+            int id = std::stoi(rest.substr(0, comma));
+            int amount = std::stoi(rest.substr(comma + 1));
+
+            Item item = ItemDatabase::getItemByName(skillType, id);
+
+            if (item.getTexture().id == 0)
+                std::cerr << "Failed to load item: " << skillType << " id=" << id << '\n';
+            else
+            {
+                item.setAmount(amount);
+                inventory.addItem(item);
+                std::cout << "Item loaded into bank: " << item.getName() << '\n'; 
+            }
+        }
+    }
     std::cout << "Game loaded!\n";
 }
-
-
 
 int main()
 {
@@ -263,7 +300,7 @@ int main()
     Debugger debugger(inventory, woodcutting, mining);
     ItemDatabase::loadItems();
 
-    loadGame(woodcutting, mining, "data/save.txt");
+    loadGame(inventory, woodcutting, mining, "data/save.txt");
 
     // variable declarations
     int scale{4};
@@ -311,7 +348,7 @@ int main()
 
         // text on left to get a vague idea of positioning TEMP
         DrawText("Scrollable content", 50, contentY + 100, 20, BLACK);
-        menuButtons(running, debugger.debugging, indexPage, contentY, winDimensions[0], background, woodcutting, mining);
+        menuButtons(running, debugger.debugging, indexPage, contentY, winDimensions[0], background, inventory, woodcutting, mining);
 
         // bank and shop panel/background
         DrawRectangle(0, 0, winDimensions[0] / scale, 100, GRAY);
@@ -330,7 +367,7 @@ int main()
 
     if (!running || WindowShouldClose())
     {
-        saveGame(woodcutting, mining, "data/save.txt");
+        saveGame(inventory, woodcutting, mining, "data/save.txt");
         std::cout << "Game saved!\n";
     }
 

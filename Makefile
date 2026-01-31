@@ -11,8 +11,8 @@ BUILD_MODE   ?= RELEASE
 SRC_DIR := src
 INC_DIR := include
 OBJ_DIR := build/obj
-BIN_DIR := build
-DIRS := $(BIN_DIR) $(OBJ_DIR)
+BIN_DIR := .         # EXE will be in root
+DIRS := $(OBJ_DIR)
 
 # =========================================================
 # Raylib
@@ -26,6 +26,8 @@ COMPILER_PATH ?= C:/raylib/w64devkit/bin
 ifeq ($(OS),Windows_NT)
     PLATFORM_OS := WINDOWS
     EXE := .exe
+    MKDIR := mkdir
+    RMDIR := rmdir /s /q
     export PATH := $(COMPILER_PATH):$(PATH)
 else
     UNAME := $(shell uname)
@@ -33,6 +35,8 @@ else
         PLATFORM_OS := LINUX
     endif
     EXE :=
+    MKDIR := mkdir -p
+    RMDIR := rm -rf
 endif
 
 # =========================================================
@@ -81,20 +85,20 @@ endif
 # =========================================================
 .PHONY: all clean
 
-all: $(BIN_DIR)/$(PROJECT_NAME)$(EXE)
+all: $(PROJECT_NAME)$(EXE)
 
-$(BIN_DIR)/$(PROJECT_NAME)$(EXE): $(OBJS) | $(BIN_DIR)
+$(PROJECT_NAME)$(EXE): $(OBJS) | $(DIRS)
 	$(CC) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	$(CC) -c $< -o $@ $(CFLAGS) $(INCLUDE_PATHS) -D$(PLATFORM)
 
-$(BIN_DIR) $(OBJ_DIR):
-	mkdir $@
+$(OBJ_DIR):
+	$(MKDIR) $@
 
 # =========================================================
 # Clean
 # =========================================================
 clean:
-	rmdir /s /q build 2>nul || true
-	@echo Cleaning done
+	$(RMDIR) $(OBJ_DIR) 2>nul || true
+	@echo "Cleaning done"

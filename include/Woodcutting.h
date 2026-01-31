@@ -19,9 +19,8 @@ public:
     void initTreeDetails();
     virtual void drawTemplate(float contentY) override;
     int getNodeLevel(int index) const override;
-    int chopTrees(int i);
-    int getTreeID(int i);
-    void giveLog(const int &id);
+    int useNode(int i);
+    void onNodeComplete(const int &id);
     virtual void tick(float deltaTime, float contentY) override;
 
     // save/load helpers

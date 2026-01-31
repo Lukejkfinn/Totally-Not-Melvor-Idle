@@ -5,14 +5,9 @@ Woodcutting::Woodcutting(Inventory &inv) : inventory(inv)
     background = woodcutting;
 
     // safety check to make sure all xp bars start at 0
-    for (int row = 0; row < 3; row++)
-    {
-        for (int col = 0; col < 4; col++)
-        {
-            int i = row * 4 + col;
-            xpBar[i].width = 0;
-        }
-    }
+    for (size_t i = 0; i < MAX_TREES; i++)
+        xpBar[i].width = 0;
+
     initTreeDetails();
 };
 
@@ -97,8 +92,6 @@ void Woodcutting::drawTemplate(float contentY)
 
         DrawText(combinedText.c_str(), combinedTextX, combinedTextY, 20, WHITE);
     }
-
-   
 }
 
 int Woodcutting::getNodeLevel(int index) const
@@ -107,7 +100,7 @@ int Woodcutting::getNodeLevel(int index) const
     return nodeLvls[index];
 }
 
-int Woodcutting::chopTrees(int i)
+int Woodcutting::useNode(int i)
 {
     for (int x = 0; x < MAX_TREES; x++)
     {
@@ -135,52 +128,24 @@ int Woodcutting::chopTrees(int i)
         xpAccumulated = xpPerTree[i];
         BaseSkill::updateXPBar(xpAccumulated);
 
-        // pass the correct log name based on the tree index
-        int treeID = getTreeID(i); // this function returns the log id
-        giveLog(treeID);
+    int treeID = i + 1;         // (i + 1) (node index 1 = Tree iD 1)
+        onNodeComplete(treeID); // pass the index in
     }
 
     return xpAccumulated;
 }
 
-int Woodcutting::getTreeID(const int i)
+void Woodcutting::onNodeComplete(const int& id)
 {
-    switch (i)
-    {
-    case 0:
-        return  1;
-    case 1:
-        return 2;
-    case 2:
-        return 3;
-    case 3:
-        return 4;
-    case 4:
-        return 5;
-    case 5:
-        return 6;
-    case 6:
-        return 7;
-    case 7:
-        return 8;
-    case 8:
-        return 9;
-    default:
-        return 0; // fallback for unknown trees, which returns nothing
-    }
-}
+    Item nodeItem = ItemDatabase::getItemByName("woodcutting", id);
 
-void Woodcutting::giveLog(const int& id)
-{
-    Item logItem = ItemDatabase::getItemByName("woodcutting", id);
-
-    if (logItem.getTexture().id == 0)
+    if (nodeItem.getTexture().id == 0)
     {
         std::cerr << "Failed to load log item: " << "woodcutting" << " from ItemDatabase!" << std::endl;
         return;
     }
 
-    inventory.addItem(logItem); // add the log item to the inventory
+    inventory.addItem(nodeItem); // add the log item to the inventory
 }
 
 void Woodcutting::tick(float deltaTime, float contentY)
@@ -212,6 +177,6 @@ void Woodcutting::tick(float deltaTime, float contentY)
     // only chop the active tree
     if (index >= 0 && index < MAX_TREES)
     {
-        chopTrees(index);
+        useNode(index);
     }
 }

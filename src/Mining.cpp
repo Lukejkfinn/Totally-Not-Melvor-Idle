@@ -5,14 +5,9 @@ Mining::Mining(Inventory &inv) : inventory(inv)
     background = mining;
 
     // safety check to make sure all xp bars start at 0
-    for (int row = 0; row < 3; row++)
-    {
-        for (int col = 0; col < 4; col++)
-        {
-            int i = row * 4 + col;
-            xpBar[i].width = 0;
-        }
-    }
+    for (size_t i = 0; i < MAX_ROCKS; i++)
+        xpBar[i].width = 0;
+
     initRockDetails();
 }
 
@@ -109,8 +104,7 @@ int Mining::getNodeLevel(int index) const
     return nodeLvls[index];
 }
 
-
-int Mining::mineRocks(int i)
+int Mining::useNode(int i)
 {
     for (int x = 0; x < MAX_ROCKS; x++)
     {
@@ -137,9 +131,25 @@ int Mining::mineRocks(int i)
 
         xpAccumulated = xpPerRock[i];
         BaseSkill::updateXPBar(xpAccumulated);
+
+        int rockID = i + 1;     // (i + 1) (node index 1 = Tree iD 1)
+        onNodeComplete(rockID); // pass the index in
     }
 
     return xpAccumulated;
+}
+
+void Mining::onNodeComplete(const int& id)
+{
+    Item nodeItem = ItemDatabase::getItemByName("mining", id);
+
+    if (nodeItem.getTexture().id == 0)
+    {
+        std::cerr << "Failed to load ore item: " << "mining" << " from ItemDatabase!" << std::endl;
+        return;
+    }
+
+    inventory.addItem(nodeItem); // add the ore item to the inventory
 }
 
 void Mining::tick(float deltaTime, float contentY)
@@ -149,7 +159,7 @@ void Mining::tick(float deltaTime, float contentY)
     // treeButtons(contentY);
     BaseSkill::drawXPBar();
 
-        for (int i = 0; i < MAX_ROCKS; i++)
+    for (int i = 0; i < MAX_ROCKS; i++)
     {
         if (curLvl < getNodeLevel(i))
             continue;
@@ -173,6 +183,6 @@ void Mining::tick(float deltaTime, float contentY)
     if (index >= 0 && index < MAX_ROCKS)
     {
         // do stuff
-        mineRocks(index);
+        useNode(index);
     }
 }

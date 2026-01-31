@@ -1,6 +1,4 @@
 #include "BaseSkill.h"
-#include "raymath.h"
-#include <iostream>
 
 BaseSkill::BaseSkill()
 {
