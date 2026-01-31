@@ -14,13 +14,14 @@ public:
     std::string name;       // name of the item
     std::string skillType;  // name of the skill
     int id;                 // id of the item
+    int value;              // value of the item
 
     // WHEN ADDING TO THIS MAKE SURE TO MAKE THE RESPECTIVE GETTER / SETTER
-    Item(Texture2D img, int amount, bool stackable, int max_stack, const std::string &name, const std::string &skillType, int id)
-        : texture(img), amount(amount), stackable(stackable), max_stack(max_stack), name(name), skillType(skillType), id(id) {}
+    Item(Texture2D img, int amount, bool stackable, int max_stack, const std::string &name, const std::string &skillType, int id, int value)
+        : texture(img), amount(amount), stackable(stackable), max_stack(max_stack), name(name), skillType(skillType), id(id), value(value) {}
 
     // UPDATE THIS TO MATCH THE ABOVE 
-    Item() : texture({0}), amount(0), stackable(true), max_stack(64), name(""), skillType(""), id(0) {}
+    Item() : texture({0}), amount(0), stackable(true), max_stack(64), name(""), skillType(""), id(0), value(0) {}
 
 
     Texture2D getTexture() const { return texture; }                // getter for texture
@@ -32,6 +33,7 @@ public:
     std::string getName() const { return name; }                    // getter for item name
     std::string getSkillType() const { return skillType; }          // getter for skill type
     int getId() const { return id; }                                // getter for the id
+    int getValue() const { return value; }
 };
 
 #endif

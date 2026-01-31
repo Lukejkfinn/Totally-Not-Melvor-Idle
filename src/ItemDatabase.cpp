@@ -61,47 +61,47 @@ void ItemDatabase::loadItems()
     // Normal log
     Texture2D normalLogTexture = LoadTexture("assets/bank/woodcutting/logs_normal.png");
     if (normalLogTexture.id == 0) std::cerr << "Failed to load normal log texture!" << std::endl;
-    items.push_back(Item(normalLogTexture, logAmount, true, logsMaxStack, "Normal Logs", "woodcutting", 1));
+    items.push_back(Item(normalLogTexture, logAmount, true, logsMaxStack, "Normal Logs", "woodcutting", 1, 1));
 
     // Oak log
     Texture2D oakLogTexture = LoadTexture("assets/bank/woodcutting/logs_oak.png");
     if (oakLogTexture.id == 0) std::cerr << "Failed to load oak log texture!" << std::endl;
-    items.push_back(Item(oakLogTexture, logAmount, true, logsMaxStack, "Oak Logs", "woodcutting", 2));
+    items.push_back(Item(oakLogTexture, logAmount, true, logsMaxStack, "Oak Logs", "woodcutting", 2, 5));
 
     // Willow log
     Texture2D willowLogTexture = LoadTexture("assets/bank/woodcutting/logs_willow.png");
     if (willowLogTexture.id == 0) std::cerr << "Failed to load willow log texture!" << std::endl;
-    items.push_back(Item(willowLogTexture, logAmount, true, logsMaxStack, "Willow Logs", "woodcutting", 3));
+    items.push_back(Item(willowLogTexture, logAmount, true, logsMaxStack, "Willow Logs", "woodcutting", 3, 10));
 
     // Teak log
     Texture2D teakLogTexture = LoadTexture("assets/bank/woodcutting/logs_teak.png");
     if (teakLogTexture.id == 0) std::cerr << "Failed to load teak log texture!" << std::endl;
-    items.push_back(Item(teakLogTexture, logAmount, true, logsMaxStack, "Teak Logs", "woodcutting", 4));
+    items.push_back(Item(teakLogTexture, logAmount, true, logsMaxStack, "Teak Logs", "woodcutting", 4, 20));
 
     // Maple log
     Texture2D mapleLogTexture = LoadTexture("assets/bank/woodcutting/logs_maple.png");
     if (mapleLogTexture.id == 0) std::cerr << "Failed to load maple log texture!" << std::endl;
-    items.push_back(Item(mapleLogTexture, logAmount, true, logsMaxStack, "Maple Logs", "woodcutting", 5));
+    items.push_back(Item(mapleLogTexture, logAmount, true, logsMaxStack, "Maple Logs", "woodcutting", 5, 35));
 
     // Mahogany log
     Texture2D mahoganyLogTexture = LoadTexture("assets/bank/woodcutting/logs_mahogany.png");
     if (mahoganyLogTexture.id == 0) std::cerr << "Failed to load mahogany log texture!" << std::endl;
-    items.push_back(Item(mahoganyLogTexture, logAmount, true, logsMaxStack, "Mahogany Logs", "woodcutting", 6));
+    items.push_back(Item(mahoganyLogTexture, logAmount, true, logsMaxStack, "Mahogany Logs", "woodcutting", 6, 50));
 
     // Yew log
     Texture2D yewLogTexture = LoadTexture("assets/bank/woodcutting/logs_yew.png");
     if (yewLogTexture.id == 0) std::cerr << "Failed to load yew log texture!" << std::endl;
-    items.push_back(Item(yewLogTexture, logAmount, true, logsMaxStack, "Yew Logs", "woodcutting", 7));
+    items.push_back(Item(yewLogTexture, logAmount, true, logsMaxStack, "Yew Logs", "woodcutting", 7, 75));
 
     // Magic log
     Texture2D magicLogTexture = LoadTexture("assets/bank/woodcutting/logs_magic.png");
     if (magicLogTexture.id == 0) std::cerr << "Failed to load magic log texture!" << std::endl;
-    items.push_back(Item(magicLogTexture, logAmount, true, logsMaxStack, "Magic Logs", "woodcutting", 8));
+    items.push_back(Item(magicLogTexture, logAmount, true, logsMaxStack, "Magic Logs", "woodcutting", 8, 400));
 
     // Redwood log
     Texture2D redwoodLogTexture = LoadTexture("assets/bank/woodcutting/logs_redwood.png");
     if (redwoodLogTexture.id == 0) std::cerr << "Failed to load redwood log texture!" << std::endl;
-    items.push_back(Item(redwoodLogTexture, logAmount, true, logsMaxStack, "Redwood Logs", "woodcutting", 9));
+    items.push_back(Item(redwoodLogTexture, logAmount, true, logsMaxStack, "Redwood Logs", "woodcutting", 9, 25));
 
 
     //* MINING *//
@@ -111,52 +111,64 @@ void ItemDatabase::loadItems()
     // Copper ore
     Texture2D copperOreTexture = LoadTexture("assets/bank/mining/ore_copper.png");
     if (copperOreTexture.id == 0) std::cerr << "Failed to load copper ore texture!" << std::endl;
-    items.push_back(Item(copperOreTexture, rockAmount, true, oresMaxStack, "Copper Ore", "mining", 1));
+    items.push_back(Item(copperOreTexture, rockAmount, true, oresMaxStack, "Copper Ore", "mining", 1, 2));
 
     // Tin ore
     Texture2D tinOreTexture = LoadTexture("assets/bank/mining/ore_tin.png");
     if (tinOreTexture.id == 0) std::cerr << "Failed to load tin ore texture!" << std::endl;
-    items.push_back(Item(tinOreTexture, rockAmount, true, oresMaxStack, "Tin Ore", "mining", 2));
+    items.push_back(Item(tinOreTexture, rockAmount, true, oresMaxStack, "Tin Ore", "mining", 2, 2));
 
     // Iron ore
     Texture2D ironOreTexture = LoadTexture("assets/bank/mining/ore_iron.png");
     if (ironOreTexture.id == 0) std::cerr << "Failed to load iron ore texture!" << std::endl;
-    items.push_back(Item(ironOreTexture, rockAmount, true, oresMaxStack, "Iron Ore", "mining", 3));
+    items.push_back(Item(ironOreTexture, rockAmount, true, oresMaxStack, "Iron Ore", "mining", 3, 5));
 
     // Coal ore
     Texture2D coalOreTexture = LoadTexture("assets/bank/mining/ore_coal.png");
     if (coalOreTexture.id == 0) std::cerr << "Failed to load coal ore texture!" << std::endl;
-    items.push_back(Item(coalOreTexture, rockAmount, true, oresMaxStack, "Coal Ore", "mining", 4));
+    items.push_back(Item(coalOreTexture, rockAmount, true, oresMaxStack, "Coal Ore", "mining", 4, 15));
 
     // Silver ore
     Texture2D silverOreTexture = LoadTexture("assets/bank/mining/ore_silver.png");
     if (silverOreTexture.id == 0) std::cerr << "Failed to load silver ore texture!" << std::endl;
-    items.push_back(Item(silverOreTexture, rockAmount, true, oresMaxStack, "Silver Ore", "mining", 5));
+    items.push_back(Item(silverOreTexture, rockAmount, true, oresMaxStack, "Silver Ore", "mining", 5, 25));
 
     // Gold ore
     Texture2D goldOreTexture = LoadTexture("assets/bank/mining/ore_gold.png");
     if (goldOreTexture.id == 0) std::cerr << "Failed to load gold ore texture!" << std::endl;
-    items.push_back(Item(goldOreTexture, rockAmount, true, oresMaxStack, "Gold ore", "mining", 6));
+    items.push_back(Item(goldOreTexture, rockAmount, true, oresMaxStack, "Gold ore", "mining", 6, 30));
 
     // Mithril ore
     Texture2D mithrilOreTexture = LoadTexture("assets/bank/mining/ore_mithril.png");
     if (mithrilOreTexture.id == 0) std::cerr << "Failed to load mithril ore texture!" << std::endl;
-    items.push_back(Item(mithrilOreTexture, rockAmount, true, oresMaxStack, "Mithril Ore", "mining", 7));
+    items.push_back(Item(mithrilOreTexture, rockAmount, true, oresMaxStack, "Mithril Ore", "mining", 7, 65));
 
     // Adamantite ore
     Texture2D adamantiteOreTexture = LoadTexture("assets/bank/mining/ore_adamantite.png");
     if (adamantiteOreTexture.id == 0) std::cerr << "Failed to load adamantite ore texture!" << std::endl;
-    items.push_back(Item(adamantiteOreTexture, rockAmount, true, oresMaxStack, "Adamantite Ore", "mining", 8));
+    items.push_back(Item(adamantiteOreTexture, rockAmount, true, oresMaxStack, "Adamantite Ore", "mining", 8, 88));
 
     // Runite ore
     Texture2D runiteOreTexture = LoadTexture("assets/bank/mining/ore_runite.png");
     if (runiteOreTexture.id == 0) std::cerr << "Failed to load runite ore texture!" << std::endl;
-    items.push_back(Item(runiteOreTexture, rockAmount, true, oresMaxStack, "Runite Ore", "mining", 9));
+    items.push_back(Item(runiteOreTexture, rockAmount, true, oresMaxStack, "Runite Ore", "mining", 9, 100));
 
     // Dragonite ore
     Texture2D dragoniteOreTexture = LoadTexture("assets/bank/mining/ore_dragonite.png");
     if (dragoniteOreTexture.id == 0) std::cerr << "Failed to load dragonite ore texture!" << std::endl;
-    items.push_back(Item(dragoniteOreTexture, rockAmount, true, oresMaxStack, "Dragonite Ore", "mining", 10));
+    items.push_back(Item(dragoniteOreTexture, rockAmount, true, oresMaxStack, "Dragonite Ore", "mining", 10, 135));
+}
+
+void ItemDatabase::unloadItems()
+{
+    for (Item &item : items)
+    {
+        Texture2D tex = item.getTexture();
+        if (tex.id != 0)
+            UnloadTexture(tex);
+    }
+
+    items.clear();
 }
 
 void ItemDatabase::addItem(const Item &item)

@@ -57,7 +57,6 @@ void BaseSkill::updateXPBar(int currentXP)
 
 void BaseSkill::drawXPBar()
 {
-    
     // draw the background around the text and xp bar
     Rectangle xpBarBorder{324, 0, xpBarWidth, 91};
     DrawRectangleRec(xpBarBorder, BLACK);

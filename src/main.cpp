@@ -99,23 +99,23 @@ void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY,
     float padding = 10.f;
 
     std::string woodText = "Woodcutting (" + std::to_string(woodcutting.getLevel()) + "/99)";
-    if (Button(Rectangle{0, 25 + contentY, winWidth / scale, buttonHeight}, woodText.c_str()))
+    if (Button(Rectangle{5, 25 + contentY, winWidth / scale -10, buttonHeight}, woodText.c_str()))
     {
         indexPage = 3;
     }
 
     std::string miningText = "Mining (" + std::to_string(mining.getLevel()) + "/99)";
-    if (Button(Rectangle{0, 50 + padding + contentY, winWidth / scale, buttonHeight}, miningText.c_str()))
+    if (Button(Rectangle{5, 50 + padding + contentY, winWidth / scale -10, buttonHeight}, miningText.c_str()))
     {
         indexPage = 4;
     }
 
-    if (Button(Rectangle{0, 630 + contentY, winWidth / scale, buttonHeight}, "Debugger"))
+    if (Button(Rectangle{5, 630 + contentY, winWidth / scale -10, buttonHeight}, "Debugger"))
     {
         debugging = true;
     }
 
-    if (Button(Rectangle{0, 670 + contentY, winWidth / scale, buttonHeight}, "Quit"))
+    if (Button(Rectangle{5, 670 + contentY, winWidth / scale -10, buttonHeight}, "Quit"))
     {
         saveGame(inventory, woodcutting, mining, "data/save.txt");
         running = false;
@@ -130,6 +130,25 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining 
         std::cerr << "Failed to open save file!\n";
         return;
     }
+
+    // currency
+    file << "[Currency]\n";
+    file << "gold=" << inventory.getGold();
+    file << "\n\n";
+
+    // inventory
+    file << "[Inventory]\n";
+    for (const auto &slot : inventory.getSlots())
+    {
+        if (slot)
+        {   
+            const Item &item = *slot;
+            file << item.getSkillType() << "="
+                << item.getId() << ","
+                << item.getAmount();
+        }
+    }
+    file << "\n\n";
 
     // woodcutting
     file << "[Woodcutting]\n";
@@ -149,15 +168,6 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining 
         file << mine.getProgressArray()[i] << ' ';
     file << "\n\n";
 
-    // inventory
-    file << "[Inventory]\n";
-    for (const Item &item : inventory.items)
-    {
-        file << item.getSkillType() << "="
-            << item.getId() << ","
-            << item.getAmount() << '\n';
-    }
-
     std::cout << "Game saved!\n";
 }
 
@@ -173,11 +183,12 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Mining &mine, const std::
 
     // preparation for reading the file (line by line and by sections of data)
     std::string line;
-    enum class Section { None, Woodcutting, Mining, Inventory };
+    enum class Section { None, Currency, Inventory, Woodcutting, Mining };
     Section currentSection = Section::None;
 
-    // clear inventory
-    inventory.items.clear();
+    // clear inventory slots
+    for (auto &slot : inventory.getSlots())
+    slot.reset();
 
     // loop over each line of data
     while (std::getline(file, line))
@@ -186,6 +197,16 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Mining &mine, const std::
             continue;
 
         // section headers
+        if (line == "[Currency]")
+        {
+            currentSection = Section::Currency;
+            continue;
+        }
+        if (line == "[Inventory]")
+        {
+            currentSection = Section::Inventory;
+            continue;
+        }
         if (line == "[Woodcutting]")
         {
             currentSection = Section::Woodcutting;
@@ -194,11 +215,6 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Mining &mine, const std::
         if (line == "[Mining]")
         {
             currentSection = Section::Mining;
-            continue;
-        }
-        if (line == "[Inventory]")
-        {
-            currentSection = Section::Inventory;
             continue;
         }
 
@@ -212,7 +228,35 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Mining &mine, const std::
 
         std::stringstream ss(value); // convert the value string into numbers
 
-        if (currentSection == Section::Woodcutting)
+        if (currentSection == Section::Currency)
+        {
+
+        }
+        else if (currentSection == Section::Inventory)
+        {
+
+            std::string skillType = line.substr(0, equals);
+            std::string rest = line.substr(equals + 1);
+
+            size_t comma = rest.find(',');
+            if (comma == std::string::npos)
+                continue;
+
+            int id = std::stoi(rest.substr(0, comma));
+            int amount = std::stoi(rest.substr(comma + 1));
+
+            Item item = ItemDatabase::getItemByName(skillType, id);
+
+            if (item.getTexture().id == 0)
+                std::cerr << "Failed to load item: " << skillType << " id=" << id << '\n';
+            else
+            {
+                item.setAmount(amount);
+                inventory.addItem(item);
+                std::cout << "Item loaded into bank: " << item.getName() << '\n'; 
+            }
+        }
+        else if (currentSection == Section::Woodcutting)
         {
             if (key == "level")
             {
@@ -254,30 +298,6 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Mining &mine, const std::
                     ss >> mine.getProgressArray()[i];
             }
         }
-        else if (currentSection == Section::Inventory)
-        {
-
-            std::string skillType = line.substr(0, equals);
-            std::string rest = line.substr(equals + 1);
-
-            size_t comma = rest.find(',');
-            if (comma == std::string::npos)
-                continue;
-
-            int id = std::stoi(rest.substr(0, comma));
-            int amount = std::stoi(rest.substr(comma + 1));
-
-            Item item = ItemDatabase::getItemByName(skillType, id);
-
-            if (item.getTexture().id == 0)
-                std::cerr << "Failed to load item: " << skillType << " id=" << id << '\n';
-            else
-            {
-                item.setAmount(amount);
-                inventory.addItem(item);
-                std::cout << "Item loaded into bank: " << item.getName() << '\n'; 
-            }
-        }
     }
     std::cout << "Game loaded!\n";
 }
@@ -286,10 +306,14 @@ int main()
 {
     // initialise the window
     const static int winDimensions[2]{1280, 720};
-    InitWindow(winDimensions[0], winDimensions[1], "Totally Not Melvor Idle...");
+    InitWindow(winDimensions[0], winDimensions[1], "Totally Not Melvor Idle");
+
+    // load your icon
+    Image icon = LoadImage("assets/logo.png"); 
+    SetWindowIcon(icon);
+    UnloadImage(icon);
 
     Texture2D background = LoadTexture("assets/background.jpg");
-    Texture2D chaz = LoadTexture("assets/icons/chaz.jpg");
 
     // class declarations
     Inventory inventory;
@@ -299,6 +323,7 @@ int main()
     mining.getWindowSize(winDimensions[0], winDimensions[1]);
     Debugger debugger(inventory, woodcutting, mining);
     ItemDatabase::loadItems();
+    inventory.loadTextures();
 
     loadGame(inventory, woodcutting, mining, "data/save.txt");
 
@@ -319,14 +344,15 @@ int main()
         if (indexPage == 0)
         {
             DrawTextureEx(background, Vector2{(float)winDimensions[0] / scale, 0}, 0, 1, WHITE);
-            float chazScale = 1.0f + sin(GetTime()) * 0.1f; // pulsing effect
-            DrawTextureEx(chaz, Vector2{(float)winDimensions[0] / 2 - 50, (float)winDimensions[1] / 2}, 0, chazScale, WHITE);
+            //float chazScale = 1.0f + sin(GetTime()) * 0.1f; // pulsing effect
+            //DrawTextureEx(chaz, Vector2{(float)winDimensions[0] / 2 - 50, (float)winDimensions[1] / 2}, 0, chazScale, WHITE);
         }
         else if (indexPage == 1)
         {
             const float invPosY{100.f};
             const int cellSize{64};
-            inventory.drawInventory(inventory, winDimensions[0] / scale + 20, invPosY, cellSize);
+            inventory.drawInventory(winDimensions[0] / scale + 20, invPosY + contentY-100, cellSize);
+
         }
         else if (indexPage == 3)
         {
@@ -342,26 +368,36 @@ int main()
         {
             debugger.tick(GetFrameTime());
         }
+        
+        const float panelW{320.f};
+        const int fontSize = 20;
+        // LEFT SIDE PANEL
+        DrawRectangle(0, 0, panelW, winDimensions[1], GRAY);
+        DrawRectangleLines(0, 0, panelW, winDimensions[1], BLACK);
 
-        // drawing side panel
-        DrawRectangle(0, 0, winDimensions[0] / scale, winDimensions[1], GRAY);
-
-        // text on left to get a vague idea of positioning TEMP
+        // SIDE PANEL TEXT
         DrawText("Scrollable content", 50, contentY + 100, 20, BLACK);
         menuButtons(running, debugger.debugging, indexPage, contentY, winDimensions[0], background, inventory, woodcutting, mining);
 
-        // bank and shop panel/background
-        DrawRectangle(0, 0, winDimensions[0] / scale, 100, GRAY);
-        DrawRectangleLines(0, 0, winDimensions[0] / scale, 100, BLACK);
+        // TOP LEFT PANEL
+        DrawRectangle(0, 0, panelW, 100, GRAY);
+        DrawRectangleLines(0, 0, panelW, 100, BLACK);
 
-        // drawing bank button
-        if (Button(Rectangle{0, 10, (float)winDimensions[0] / scale -1, 30.f}, "Bank")) indexPage = 1;
-        // draw the scroll bar
+        // BANK TEXT
+        std::string bankSlots = "Bank " + std::to_string(inventory.getFilledSlots()) + "/" + std::to_string(inventory.SIZE);
+        if (Button(Rectangle{0, 10, (float)winDimensions[0] / scale -1, 30.f}, bankSlots.c_str())) indexPage = 1;
+
+        // CURRENCY TEXT     
+        std::string currencyText = "Gold: " + std::to_string(inventory.getGold());
+        int currencyTextWidth = MeasureText(currencyText.c_str(), fontSize); // centre text
+        DrawText(currencyText.c_str(), (panelW - currencyTextWidth)/2, 50, fontSize, GOLD);
+
+        // SCROLL BAR
         scrollValue = ScrollBar({static_cast<float>(winDimensions[0]) - 20, 0, 20, static_cast<float>(winDimensions[1])}, scrollValue);
 
         // scrollable content WIP
         contentY = 100 - scrollValue * 400;
-
+        
         EndDrawing();
     }
 
@@ -370,7 +406,9 @@ int main()
         saveGame(inventory, woodcutting, mining, "data/save.txt");
         std::cout << "Game saved!\n";
     }
-
+    ItemDatabase::unloadItems();
+    inventory.unloadTextures();
     UnloadTexture(background);
     CloseWindow();
+    return 0;
 }

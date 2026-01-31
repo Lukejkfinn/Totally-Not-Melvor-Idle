@@ -45,20 +45,7 @@ private:
     std::string xpPerRockString[MAX_ROCKS];
     std::string rockNames[MAX_ROCKS];
     std::string timeToMineRocks[MAX_ROCKS];
-
-    Texture2D rockTextures[MAX_ROCKS]
-    {
-        LoadTexture("assets/icons/mining/rock_copper.png"),
-        LoadTexture("assets/icons/mining/rock_tin.png"),
-        LoadTexture("assets/icons/mining/rock_iron.png"),
-        LoadTexture("assets/icons/mining/rock_coal.png"),
-        LoadTexture("assets/icons/mining/rock_silver.png"),
-        LoadTexture("assets/icons/mining/rock_gold.png"),
-        LoadTexture("assets/icons/mining/rock_mithril.png"),
-        LoadTexture("assets/icons/mining/rock_adamantite.png"),
-        LoadTexture("assets/icons/mining/rock_runite.png"),
-        LoadTexture("assets/icons/mining/rock_dragonite.png"),
-    };
+    Texture2D rockTextures[MAX_ROCKS];
 };
 
 #endif

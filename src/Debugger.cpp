@@ -117,6 +117,7 @@ void Debugger::drawObjectsTemplate()
         {
             "All Woodcutting logs:",
             "All Mining ores:",
+            "Clear Inventory:"
         };
 
     int numLabels = sizeof(labels) / sizeof(labels[0]);
@@ -127,6 +128,7 @@ void Debugger::drawObjectsTemplate()
 
         // draw labels
         DrawText(labels[i], startX, y, fontSize, BLACK);
+
 
         // make buttons
         Rectangle leftButton =
@@ -143,36 +145,55 @@ void Debugger::drawObjectsTemplate()
                 (float)buttonWidth,
                 (float)buttonHeight};
 
-        // button actions
-        if (btn(leftButton, "1"))
+        Rectangle singleButton =
+            {
+                (float)leftButtonX,
+                (float)(y + buttonYAdjust),
+                (float)buttonWidth,
+                (float)buttonHeight};
+
+        // if it's the last item in the array (clear Inventory)
+        if (i == numLabels - 1)
         {
-            if (i == 0)
+            // draw the clear button and clear the inventory
+            if (btn(singleButton, "Clear"))
             {
-                auto spawned = itemDatabase.ItemSpawner(SkillType::Woodcutting, 1);
-                for (const auto &item : spawned)
-                    inventory.addItem(item);
-            }
-            if (i == 1)
-            {
-                auto spawned = itemDatabase.ItemSpawner(SkillType::Mining, 1);
-                for (const auto &item : spawned)
-                    inventory.addItem(item);
+                inventory.clearInventory(); // clear the inventory but keep the slots
             }
         }
-
-        if (btn(rightButton, "64"))
+        else
         {
-            if (i == 0)
+            // draw and handle both left and right buttons for the other items
+            if (btn(leftButton, "1"))
             {
-                auto spawned = itemDatabase.ItemSpawner(SkillType::Woodcutting, 64);
-                for (const auto &item : spawned)
-                    inventory.addItem(item);
+                if (i == 0)
+                {
+                    auto spawned = itemDatabase.ItemSpawner(SkillType::Woodcutting, 1);
+                    for (const auto &item : spawned)
+                        inventory.addItem(item);
+                }
+                if (i == 1)
+                {
+                    auto spawned = itemDatabase.ItemSpawner(SkillType::Mining, 1);
+                    for (const auto &item : spawned)
+                        inventory.addItem(item);
+                }
             }
-            if (i == 1)
+
+            if (btn(rightButton, "64"))
             {
-                auto spawned = itemDatabase.ItemSpawner(SkillType::Mining, 64);
-                for (const auto &item : spawned)
-                    inventory.addItem(item);
+                if (i == 0)
+                {
+                    auto spawned = itemDatabase.ItemSpawner(SkillType::Woodcutting, 64);
+                    for (const auto &item : spawned)
+                        inventory.addItem(item);
+                }
+                if (i == 1)
+                {
+                    auto spawned = itemDatabase.ItemSpawner(SkillType::Mining, 64);
+                    for (const auto &item : spawned)
+                        inventory.addItem(item);
+                }
             }
         }
     }

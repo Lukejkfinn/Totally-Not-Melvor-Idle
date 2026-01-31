@@ -1,152 +1,293 @@
-
 #include "Inventory.h"
 
-
-
-void Inventory::initializeInventory() // not used since we have a debugger to spawn in items
+Inventory::Inventory()
 {
-    // example of populating with a few items
-    // Texture2D normalLog = LoadTexture("assets/bank/woodcutting/logs_normal.png");
-    // Item normalLogItem(normalLog, 1, true, 64, "Normal Log", 1); // Example item: stackable log
-
-    // Texture2D oakLog = LoadTexture("assets/bank/woodcutting/logs_oak.png");
-    // Item oakLogItem(oakLog, 1, true, 64, "Oak Log", 2); // Example item: stackable log
-
-    // Texture2D pickaxeTexture = LoadTexture("assets/icons/pickaxe.png");
-    // Item pickaxeItem(pickaxeTexture, 20, false, 1);  // Example item: non-stackable pickaxe
-
-    // Add the items to the inventory
-
-    //addItem(oakLogItem);
-    
-
-    // addItem(pickaxeItem);
+    slots.resize(SIZE); // 64 empty slots
 }
 
-// add item to inventory
-void Inventory::addItem(const Item &item)
+void Inventory::loadTextures()
 {
-    if (item.isStackable()) // check if the item is stackable
-    {
-        for (auto &existingItem : items)
-        {
-            // check if the existing item is stackable and matches the item type
-            if (existingItem.getTexture().id == item.getTexture().id && existingItem.isStackable())
-            {
-                int newAmount = existingItem.getAmount() + item.getAmount();
+    // bank slots texture
+    slotTexture = LoadTexture("assets/ui/bankBorder.png");
+    if (slotTexture.id == 0)
+        std::cerr << "Failed to load bankBorder.png\n";
+}
 
-                // if item can be stacked, increase the amount
-                if (newAmount > existingItem.getMaxStack())
-                    newAmount = existingItem.getMaxStack();
-                
-                existingItem.setAmount(newAmount); // increase the amount (not max stack)
-                return;                            // exit after adding to the existing item
-                
+void Inventory::unloadTextures()
+{
+    if (slotTexture.id != 0)
+        UnloadTexture(slotTexture);
+}
+
+void Inventory::initializeInventory()
+{
+    // used for spawning items in at the start
+    // Item item = ItemDatabase::getItemByName("woodcutting", 1);
+    // addItem(item);
+}
+
+bool Inventory::button(Rectangle bounds, const char *text)
+{
+    Vector2 mouse = GetMousePosition();
+    bool hovered = CheckCollisionPointRec(mouse, bounds);
+
+    // button color states
+    Color bgColor = hovered ? DARKBLUE : DARKGRAY;
+
+    // draw button
+    DrawRectangleRec(bounds, bgColor);
+
+    // centre text
+    int fontSize = 20;
+    int textWidth = MeasureText(text, fontSize);
+
+    DrawText(
+        text,
+        bounds.x + (bounds.width - textWidth) / 2,
+        bounds.y + (bounds.height - fontSize) / 2,
+        fontSize,
+        WHITE);
+
+    // return true only when clicked
+    return hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+}
+
+int Inventory::getFilledSlots() const
+{
+    int count = 0;
+    for (auto &slot : slots)
+        if (slot)
+            count++;
+    return count;
+}
+
+bool Inventory::addItem(const Item &item)
+{
+    // try stacking first
+    if (item.isStackable())
+    {
+        for (auto &slot : slots)
+        {
+            if (slot && slot->getSkillType() == item.getSkillType() && slot->getId() == item.getId() &&  slot->isStackable())
+            {
+                int newAmount = slot->getAmount() + item.getAmount();
+                newAmount = std::min(newAmount, slot->getMaxStack());
+                slot->setAmount(newAmount);
+                return true;
             }
         }
     }
-    // if item isn't stackable or doesn't already exist, add it as a new item
-    items.push_back(item);
-}
 
-void Inventory::drawInventory(const Inventory &inventory, int startX, int startY, int cellSize)
-{
-    const int itemsPerRow{8}; // number of items per row in the inventory
-    const int paddingX{10};   // space between items
-    const int paddingY{30};
-    const int textPaddingY{5};
-
-    // get mouse position
-    Vector2 mousePos = GetMousePosition();
-
-    // iterate over all items in the inventory
-    for (size_t i = 0; i < inventory.items.size(); ++i)
+    // find first empty slot
+    for (auto &slot : slots)
     {
-        int row = i / itemsPerRow; // determine the row
-        int col = i % itemsPerRow; // determine the column
-
-        // calculate position to draw the item (spacing between items)
-        int posX = startX + col * (cellSize + paddingX);
-        int posY = startY + row * (cellSize + paddingY);
-
-        // get the texture for the item
-        Texture2D texture = inventory.items[i].getTexture();
-
-        // centre the image within the cell
-        if (texture.id != 0)
+        if (!slot)
         {
-            float scale = (float)cellSize / (float)texture.width; // scaling the texture
-            int imgWidth = texture.width * scale;
-            int imgHeight = texture.height * scale;
-
-            // draw the texture (icon), center the image in the cell
-            DrawTextureEx(texture, Vector2{(float)(posX + (cellSize - imgWidth) / 2), (float)posY}, 0.0f, scale, WHITE);
-
-            // check if the mouse is clicking the item
-            Rectangle itemRect = {(float)(posX), (float)posY, (float)imgWidth, (float)imgHeight};
-            if (CheckCollisionPointRec(mousePos, itemRect) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-            {
-                // handle the action when the item is clicked (e.g., open a UI, select the item)
-                // call a function to handle this item click action
-                onItemClick(i); // +1 to adjust item index to be 1-based
-            }
-        }
-
-        // draw a border around the cell to help visualize it
-        DrawRectangleLines(posX, posY, cellSize, cellSize, BLUE); // draw cell border (blue)
-
-        // draw the item amount
-        std::string text = std::to_string(inventory.items[i].amount);
-        int textWidth = MeasureText(text.c_str(), 20); // use font size 20 for text width measurement
-        int textHeight = 20;                           // set height for the text (this should match your font size)
-
-        // adjust the vertical position of the text to add enough space under the image
-        int textY = posY + cellSize + textPaddingY; // move the text further down based on cell size + padding
-
-        // centre the text under the image (and adjust if needed for large numbers)
-        DrawText(text.c_str(), posX + (cellSize / 2) - (textWidth / 2), textY, textHeight, WHITE);
-
-        // if the info panel is visible, draw it
-        if (infoPanelVisible)
-        {
-            const float iPBGPosX{940.f};
-            const float iPBGPosY{100.f};
-            const float iPBGWidth{300.f};
-            const float iPBGHeight{300.f};
-
-            // draw the info panel (background rectangle)
-            Rectangle infoPanelBG{iPBGPosX, iPBGPosY, iPBGWidth, iPBGHeight};
-            DrawRectangleRec(infoPanelBG, GRAY);
-
-            // draw item name
-            std::string itemName = inventory.items[currentItemIndex].getName();
-            DrawText(itemName.c_str(), 950, 110, 20, WHITE);
-            
-            // draw item skill type
-            std::string itemSkillType = "Skill: " + inventory.items[currentItemIndex].getSkillType();
-            DrawText(itemSkillType.c_str(), 950, 150, 20, WHITE);
-
-            // draw item ID
-            std::string itemID = "ID: " + std::to_string(inventory.items[currentItemIndex].getId());
-            DrawText(itemID.c_str(), 950, 190, 20, WHITE);
+            slot = std::make_optional<Item>(item);
+            return true;
         }
     }
+
+    // inventory is full
+    std::cerr << "Inventory is full! Cannot add item: " << item.getName() << "\n";
+    return false;
 }
 
-// function that gets called when an item is clicked
-void Inventory::onItemClick(int itemIndex)
+void Inventory::sellItem(int slotIndex, int amountToSell, int value)
 {
-    std::cout << "Item " << itemIndex << " clicked!" << std::endl;
+    if (slotIndex < 0 || slotIndex >= SIZE || !slots[slotIndex])
+        return;  // nothing to remove if the slot is invalid
 
-    // if the clicked item is the same as the currently displayed one, leave the panel open.
-    // if a different item is clicked, open the panel with new information.
-    if (infoPanelVisible && itemIndex == currentItemIndex)
+    Item &item = *slots[slotIndex];
+    int amountInSlot = item.getAmount();  // get the current amount of the item
+
+    if (amountInSlot <= 0 || amountToSell <= 0)
+        return;  // no item to sell or invalid amount
+
+    // ensure we are selling an amount that doesn't exceed the available items
+    amountToSell = std::min(amountToSell, amountInSlot);  
+
+    std::cout << "Selling " << amountToSell << " " << item.getName() << "(s)\n";
+
+    item.setAmount(amountInSlot - amountToSell);  // reduce the amount in the inventory
+
+    // if the item amount is zero, remove the item from the slot
+    if (item.getAmount() == 0)
     {
-        // if the same item is clicked, do nothing (keep the panel open)
+        slots[slotIndex].reset();  // reset slot if no items left
+
+        // shift all subsequent items to the left
+        for (int i = slotIndex; i < SIZE - 1; ++i)
+        {
+            // if the next slot contains an item, move it to the current position
+            if (slots[i + 1])
+            {
+                slots[i] = std::move(slots[i + 1]);  // move the item to the left
+                slots[i + 1].reset();  // clear the original slot
+            }
+        }
+    }
+    gold += amountToSell * value;
+}
+
+void Inventory::onItemClick(int slotIndex)
+{
+    if (!slots[slotIndex])
         return;
+
+    infoPanelVisible = true;
+    currentSlotIndex = slotIndex;
+
+    std::cout << "Clicked slot " << slotIndex << " containing item: " << (*slots[slotIndex]).getName() << "\n";
+}
+
+void Inventory::clearInventory()
+{
+    for (auto &slot : slots)
+    {
+        slot.reset();  // removes the item but keeps the slot
+    }
+}
+
+float Inventory::ScrollBar(Rectangle track, float value)
+{
+    const float thumbWidth = 25.0f;  // thumb width for horizontal scrollbar
+    //const float maxValue = 64.0f;    // max value of items in stack (could be adjusted based on item properties)
+    
+    // clamp value to between 0.0 and 1.0
+    value = Clamp(value, 0.0f, 1.0f);
+    
+    // calculate thumb X position based on the scroll value
+    float thumbX = track.x + value * (track.width - thumbWidth);
+    Rectangle thumb = {thumbX, track.y, thumbWidth, track.height};  // horizontal thumb
+    
+    Vector2 mouse = GetMousePosition();
+    static bool dragging = false;
+
+    // if the mouse is on the thumb, allow dragging
+    if (CheckCollisionPointRec(mouse, thumb) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+    {
+        dragging = true;
     }
 
-    // show the info panel and update the current item index
-    infoPanelVisible = true;
-    currentItemIndex = itemIndex; // store the clicked item's index for display
+    // if dragging, update the thumb position
+    if (dragging)
+    {
+        float newX = mouse.x - thumbWidth / 2;
+        newX = Clamp(newX, track.x, track.x + track.width - thumbWidth);
+
+        value = (newX - track.x) / (track.width - thumbWidth);  // update scroll value (0.0 to 1.0)
+    }
+
+    // release dragging
+    if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+    {
+        dragging = false;
+    }
+
+    // draw the scrollbar (track and thumb)
+    DrawRectangleRounded(track, 1.f, 50, LIGHTGRAY);  // draw track
+    DrawRectangleRounded(thumb, 1.f, 50, DARKBLUE);   // draw thumb
+
+    return value;  // return the updated scroll value (0.0 to 1.0)
+}
+
+void Inventory::drawInvPanel()
+{
+    const float panelX{940.f};
+    const float panelY{100.f};
+    const float panelW{300.f};
+    const float panelH{300.f};
+    const float buttonW{75.f};
+    const float buttonH{50.f};
+    
+    Item &item = *slots[currentSlotIndex];
+
+    // scrollbar for adjusting item quantity (1 -> max stack size based on selected item)
+    static float scrollValue = 0.0f;  // initialize scroll value
+    const int maxItemAmount = item.getAmount();  // Get the amount of the current item in the slot
+    
+    // clamp the scrollbar value between 1 and maxItemAmount
+    int itemAmount = static_cast<int>(scrollValue * maxItemAmount);  // scale the value to match item range
+    itemAmount = std::max(1, itemAmount);  // ensure we have at least 1 item selected
+    
+    DrawRectangle(panelX, panelY, panelW, panelH, GRAY);                                                                // draw panel background
+    DrawText(item.getName().c_str(), panelX + 10, panelY + 10, 20, WHITE);                                              // item name
+    DrawText(("Skill: " + item.getSkillType()).c_str(), panelX + 10, panelY + 50, 20, WHITE);                           // item skillType
+    DrawText(("ID: " + std::to_string(item.getId())).c_str(), panelX + 10, panelY + 90, 20, WHITE);                     // item ID
+    DrawText(("Value: " + std::to_string(item.getValue() * itemAmount)).c_str(), panelX + 10, panelY + 130, 20, WHITE); // item value
+    std::string amountText = "Sell Item: " + std::to_string(itemAmount);                                                // item sell price
+    DrawText(amountText.c_str(), panelX + 10, panelY + panelH - 120, 20, WHITE);                                        // draw the sell price text
+    scrollValue = ScrollBar({panelX+5, panelY + panelH - 90, panelW-10, 20}, scrollValue);                              // draw horizontal scrollbar
+
+    // "Sell" button
+    if (button(Rectangle{panelX + buttonW + 30, panelY + panelH - 50, buttonW + 10, buttonH}, "Sell"))
+    {
+        // pass the selected amount from the scrollbar to sellItem
+        sellItem(currentSlotIndex, itemAmount, item.getValue());  // perform the selling action based on the current slot index and the selected amount
+    }
+}
+
+void Inventory::drawInventory(int startX, int startY, int cellSize)
+{
+    Vector2 mouse = GetMousePosition();
+    const int hPadding = 10;       // horizontal padding
+    const int vPadding = 20;       // vertical padding (increased)
+    const int textureInset = 5;    // texture inset inside slot
+
+    for (int i = 0; i < SIZE; i++)
+    {
+        int row = i / WIDTH;
+        int col = i % WIDTH;
+
+        int x = startX + col * (cellSize + hPadding);
+        int y = startY + row * (cellSize + vPadding);
+
+        // draw slot background
+        DrawTextureEx(slotTexture,
+            Vector2{ (float)x, (float)y },
+            0.0f,
+            (float)cellSize / slotTexture.width,
+            WHITE);
+
+        // draw item in slot if exists
+        if (slots[i])
+        {
+            Item &item = *slots[i];
+            Texture2D tex = item.getTexture();
+
+            // draw item slightly smaller than the slot
+            float scaleX = (float)(cellSize - 2 * textureInset) / tex.width;
+            float scaleY = (float)(cellSize - 2 * textureInset) / tex.height;
+            DrawTextureEx(tex,
+                Vector2{ (float)x + textureInset, (float)y + textureInset },
+                0.0f,
+                std::min(scaleX, scaleY),
+                WHITE);
+
+            // draw item amount under the cell, centered horizontally
+            if (item.isStackable())
+            {
+                std::string amountText = std::to_string(item.getAmount());
+                int textWidth = MeasureText(amountText.c_str(), 14);
+                DrawText(amountText.c_str(),
+                         x + (cellSize - textWidth) / 2,
+                         y + cellSize + 2, // 2 pixels below the slot
+                         14,
+                         WHITE);
+            }
+
+            // detect click
+            Rectangle slotRect{ (float)x, (float)y, (float)cellSize, (float)cellSize };
+            if (CheckCollisionPointRec(mouse, slotRect) &&
+                IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+            {
+                onItemClick(i);
+            }
+        }
+    }
+
+    // draw info panel if visible
+    if (infoPanelVisible && currentSlotIndex >= 0 && slots[currentSlotIndex])
+        drawInvPanel();
 }

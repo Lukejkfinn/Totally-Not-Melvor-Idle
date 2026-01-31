@@ -13,6 +13,17 @@ Mining::Mining(Inventory &inv) : inventory(inv)
 
 void Mining::initRockDetails()
 {
+    rockTextures[0] = LoadTexture("assets/icons/mining/rock_copper.png");
+    rockTextures[1] = LoadTexture("assets/icons/mining/rock_tin.png");
+    rockTextures[2] = LoadTexture("assets/icons/mining/rock_iron.png");
+    rockTextures[3] = LoadTexture("assets/icons/mining/rock_coal.png");
+    rockTextures[4] = LoadTexture("assets/icons/mining/rock_silver.png");
+    rockTextures[5] = LoadTexture("assets/icons/mining/rock_gold.png");
+    rockTextures[6] = LoadTexture("assets/icons/mining/rock_mithril.png");
+    rockTextures[7] = LoadTexture("assets/icons/mining/rock_adamantite.png");
+    rockTextures[8] = LoadTexture("assets/icons/mining/rock_runite.png");
+    rockTextures[9] = LoadTexture("assets/icons/mining/rock_dragonite.png");
+
     const char *names[] =
         {
             "Copper",

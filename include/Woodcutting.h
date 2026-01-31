@@ -50,20 +50,7 @@ private:
     std::string xpPerTreeString[MAX_TREES];
     std::string treeNames[MAX_TREES];
     std::string timeToCutTree[MAX_TREES];
-
-    Texture2D treeTextures[MAX_TREES]
-    {
-        LoadTexture("assets/icons/woodcutting/normal_tree.png"),
-        LoadTexture("assets/icons/woodcutting/oak_tree.png"),
-        LoadTexture("assets/icons/woodcutting/willow_tree.png"),
-        LoadTexture("assets/icons/woodcutting/teak_tree.png"),
-        LoadTexture("assets/icons/woodcutting/maple_tree.png"),
-        LoadTexture("assets/icons/woodcutting/mahogany_tree.png"),
-        LoadTexture("assets/icons/woodcutting/yew_tree.png"),
-        LoadTexture("assets/icons/woodcutting/magic_tree.png"),
-        LoadTexture("assets/icons/woodcutting/redwood_tree.png")
-
-    };
+    Texture2D treeTextures[MAX_TREES];
 };
 
 #endif

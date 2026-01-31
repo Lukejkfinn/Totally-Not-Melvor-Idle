@@ -13,6 +13,16 @@ Woodcutting::Woodcutting(Inventory &inv) : inventory(inv)
 
 void Woodcutting::initTreeDetails()
 {
+    treeTextures[0] = LoadTexture("assets/icons/woodcutting/normal_tree.png");
+    treeTextures[1] = LoadTexture("assets/icons/woodcutting/oak_tree.png");
+    treeTextures[2] = LoadTexture("assets/icons/woodcutting/willow_tree.png");
+    treeTextures[3] = LoadTexture("assets/icons/woodcutting/teak_tree.png");
+    treeTextures[4] = LoadTexture("assets/icons/woodcutting/maple_tree.png");
+    treeTextures[5] = LoadTexture("assets/icons/woodcutting/mahogany_tree.png");
+    treeTextures[6] = LoadTexture("assets/icons/woodcutting/yew_tree.png");
+    treeTextures[7] = LoadTexture("assets/icons/woodcutting/magic_tree.png");
+    treeTextures[8] = LoadTexture("assets/icons/woodcutting/redwood_tree.png");
+
     const char *names[] =
         {
             "Normal Tree",
@@ -88,7 +98,7 @@ void Woodcutting::drawTemplate(float contentY)
         // centre the combined text
         int combinedTextWidth = MeasureText(combinedText.c_str(), 20);
         int combinedTextX = skillBg[i].x + (skillBg[i].width - combinedTextWidth) / 2;
-        int combinedTextY = skillBg[i].y + 40; // Same line under tree name
+        int combinedTextY = skillBg[i].y + 40; // same line under tree name
 
         DrawText(combinedText.c_str(), combinedTextX, combinedTextY, 20, WHITE);
     }
