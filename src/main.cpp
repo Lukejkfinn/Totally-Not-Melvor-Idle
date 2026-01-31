@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 
 // forward declarations
 void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining &mine, const std::string &filename);
@@ -124,6 +125,10 @@ void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY,
 
 void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining &mine, const std::string &filename)
 {
+    
+    // ensure the data folder exists
+    std::filesystem::create_directory("data");
+    
     std::ofstream file(filename);
     if (!file.is_open())
     {

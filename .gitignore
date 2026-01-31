@@ -1,7 +1,12 @@
+# Ignore build files
 build/
 *.o
 *.exe
 *.dll
 *.dsym
+
+# Ignore everything inside the data folder
 data/*
+
+# Ignore the main executable
 main
