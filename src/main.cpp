@@ -125,10 +125,6 @@ void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY,
 
 void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining &mine, const std::string &filename)
 {
-    
-    // ensure the data folder exists
-    std::filesystem::create_directory("data");
-    
     std::ofstream file(filename);
     if (!file.is_open())
     {
@@ -150,10 +146,10 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining 
             const Item &item = *slot;
             file << item.getSkillType() << "="
                 << item.getId() << ","
-                << item.getAmount();
+                << item.getAmount() << "\n";
         }
     }
-    file << "\n\n";
+    file << "\n";
 
     // woodcutting
     file << "[Woodcutting]\n";
@@ -317,6 +313,9 @@ int main()
     Image icon = LoadImage("assets/logo.png"); 
     SetWindowIcon(icon);
     UnloadImage(icon);
+
+    // ensure the data folder exists
+    std::filesystem::create_directory("data");
 
     Texture2D background = LoadTexture("assets/background.jpg");
 
