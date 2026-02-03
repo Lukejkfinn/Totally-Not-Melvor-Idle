@@ -1,3 +1,6 @@
+#ifndef MINING_H
+#define MINING_H
+
 #include "raylib.h"
 #include "ItemDatabase.h"
 #include "Inventory.h"
@@ -6,8 +9,6 @@
 #include <string>
 #include "raymath.h"
 
-#ifndef MINING_H
-#define MINING_H
 
 class Mining : public BaseSkill
 {

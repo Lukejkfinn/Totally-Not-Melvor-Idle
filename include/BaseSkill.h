@@ -10,24 +10,26 @@ class BaseSkill
 {
 public:
     BaseSkill();
-    bool btn(Rectangle bounds, const char *text);
+    bool rbtn(Rectangle bounds, const char *text);
+    bool sbtn(Rectangle bounds, const char *text);
     void getWindowSize(int width, int height);
     void drawXPBar();
     void updateXPBar(int xpAmount);
     virtual void drawTemplate(float contentY);
     virtual void tick(float deltaTime, float contentY);
-    virtual int getNodeLevel(int index) const { return nodeLvl[index]; }
-
+    
     // save/load helpers
+    virtual int getNodeLevel(int index) const { return nodeLvl[index]; }
     int getLevel() const { return curLvl; }
     int getXP() const { return xp; }
     void setLevel(int lvl) { curLvl = lvl; }
     void setXP(int newXP) { xp = newXP; }
-    
-protected:
     Texture2D background{LoadTexture("assets/background.jpg")};
-    Texture2D woodcutting{LoadTexture("assets/woodcuttingBG.png")};
-    Texture2D mining{LoadTexture("assets/miningBG.jpg")};
+
+protected:
+    Texture2D woodcuttingBG{LoadTexture("assets/woodcuttingBG.png")};
+    Texture2D miningBG{LoadTexture("assets/miningBG.jpg")};
+    Texture2D smithingBG{LoadTexture("assets/smithingBG.jpg")};
     Rectangle skillBg[12]; // 3 rows * 4 cols
     Rectangle xpBar[12];   // XP bars
     Rectangle xpBarBG[12]; // XP bar backgrounds
@@ -42,7 +44,7 @@ private:
     float maxXP{1000.f};
     const int MAX_SKILLS{28};
     static constexpr int maxLvl{99};
-    float xpBarWidth{924};
+    float xpBarWidth{930};
     int nodeLvl[maxLvl]{};
 };
 

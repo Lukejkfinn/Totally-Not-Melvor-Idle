@@ -24,7 +24,7 @@ public:
 protected:
 
 private:
-    Texture2D debugger{LoadTexture("assets/debugger.jpg")};
+    Texture2D debuggerBG{LoadTexture("assets/debuggerBG.jpg")};
     const float buttonPosX{700};
     BaseSkill baseSkill;
     ItemDatabase itemDatabase;

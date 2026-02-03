@@ -39,7 +39,6 @@ private:
     ItemDatabase itemDatabase;
 
     static constexpr int MAX_TREES{9};
-    static constexpr int maxLvl{99};
     float runningTime[MAX_TREES] = {0};
     float progress[MAX_TREES]{0};
     float maxWidth[MAX_TREES]{0};

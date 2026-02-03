@@ -130,6 +130,27 @@ void Inventory::sellItem(int slotIndex, int amountToSell, int value)
     gold += amountToSell * value;
 }
 
+bool Inventory::removeItem(const std::string &skillType, int id, int amount)
+{
+    for (auto &slot : slots)
+    {
+        if (slot && slot->getSkillType() == skillType && slot->getId() == id)
+        {
+            int slotAmount = slot->getAmount();
+
+            if (slotAmount >= amount)
+            {
+                slot->setAmount(slotAmount - amount);
+                if (slot->getAmount() == 0)
+                    slot.reset();
+                return true; // successfully removed
+            }
+        }
+    }
+    return false; // not enough items
+}
+
+
 void Inventory::onItemClick(int slotIndex)
 {
     if (!slots[slotIndex])
@@ -225,6 +246,12 @@ void Inventory::drawInvPanel()
     {
         // pass the selected amount from the scrollbar to sellItem
         sellItem(currentSlotIndex, itemAmount, item.getValue());  // perform the selling action based on the current slot index and the selected amount
+        
+        if (itemAmount <= 0)
+        {
+            currentSlotIndex = 999; // arbitrary number
+            infoPanelVisible = false;
+        }
     }
 }
 
@@ -279,11 +306,16 @@ void Inventory::drawInventory(int startX, int startY, int cellSize)
 
             // detect click
             Rectangle slotRect{ (float)x, (float)y, (float)cellSize, (float)cellSize };
+            
             if (CheckCollisionPointRec(mouse, slotRect) &&
                 IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
             {
                 onItemClick(i);
             }
+            
+            if (currentSlotIndex == i)
+            DrawRectangleLinesEx(slotRect, 5, BLUE);
+
         }
     }
 

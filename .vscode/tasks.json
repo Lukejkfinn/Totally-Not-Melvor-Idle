@@ -48,7 +48,8 @@
             "type": "process",
             "command": "make",
             "args": [
-                "PLATFORM=PLATFORM_DESKTOP"
+                "PLATFORM=PLATFORM_DESKTOP",
+                "BUILD_MODE=RELEASE"
             ],
             "windows": {
                 "command": "C:/raylib/w64devkit/bin/mingw32-make.exe",

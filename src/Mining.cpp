@@ -2,7 +2,7 @@
 
 Mining::Mining(Inventory &inv) : inventory(inv)
 {
-    background = mining;
+    background = miningBG;
 
     // safety check to make sure all xp bars start at 0
     for (size_t i = 0; i < MAX_ROCKS; i++)
@@ -13,46 +13,61 @@ Mining::Mining(Inventory &inv) : inventory(inv)
 
 void Mining::initRockDetails()
 {
-    rockTextures[0] = LoadTexture("assets/icons/mining/rock_copper.png");
-    rockTextures[1] = LoadTexture("assets/icons/mining/rock_tin.png");
-    rockTextures[2] = LoadTexture("assets/icons/mining/rock_iron.png");
-    rockTextures[3] = LoadTexture("assets/icons/mining/rock_coal.png");
-    rockTextures[4] = LoadTexture("assets/icons/mining/rock_silver.png");
-    rockTextures[5] = LoadTexture("assets/icons/mining/rock_gold.png");
-    rockTextures[6] = LoadTexture("assets/icons/mining/rock_mithril.png");
-    rockTextures[7] = LoadTexture("assets/icons/mining/rock_adamantite.png");
-    rockTextures[8] = LoadTexture("assets/icons/mining/rock_runite.png");
-    rockTextures[9] = LoadTexture("assets/icons/mining/rock_dragonite.png");
+    // list of textures to load
+    const char * rockTexturePaths[MAX_ROCKS] = 
+    {
+        "assets/icons/mining/rock_copper.png",
+        "assets/icons/mining/rock_tin.png",
+        "assets/icons/mining/rock_iron.png",
+        "assets/icons/mining/rock_coal.png",
+        "assets/icons/mining/rock_silver.png",
+        "assets/icons/mining/rock_gold.png",
+        "assets/icons/mining/rock_mithril.png",
+        "assets/icons/mining/rock_adamantite.png",
+        "assets/icons/mining/rock_runite.png",
+        "assets/icons/mining/rock_dragonite.png"
+    };
+
+    // load textures for rocks
+    for (int i = 0; i < MAX_ROCKS; ++i)
+    {
+        rockTextures[i] = LoadTexture(rockTexturePaths[i]);
+
+        // check if the texture loaded successfully
+        if (rockTextures[i].id == 0)
+            std::cerr << "Failed to load texture for rock: " << rockTexturePaths[i] << std::endl; // report the failure
+
+    }
 
     const char *names[] =
-        {
-            "Copper",
-            "Tin",
-            "Iron",
-            "Coal",
-            "Silver",
-            "Gold",
-            "Mithril",
-            "Adamantite",
-            "Runite",
-            "Chaz why"};
+    {
+        "Copper",
+        "Tin",
+        "Iron",
+        "Coal",
+        "Silver",
+        "Gold",
+        "Mithril",
+        "Adamantite",
+        "Runite",
+        "Chaz why"
+    };
 
     const char *xpAmount[] =
-        {
-            "10 XP/",
-            "15 XP/",
-            "22 XP/",
-            "30 XP/",
-            "40 XP/",
-            "61 XP/",
-            "81 XP/",
-            "100 XP/",
-            "150 XP/",
-            "200 XP/"};
+    {
+        "10 XP/",
+        "15 XP/",
+        "22 XP/",
+        "30 XP/",
+        "40 XP/",
+        "61 XP/",
+        "81 XP/",
+        "100 XP/",
+        "150 XP/",
+        "200 XP/"
+    };
 
-    const int rockCount = 10;
-
-    for (int i = 0; i < rockCount; i++)
+    for (int i = 0; i < MAX_ROCKS; i++)
     {
         rockNames[i] = names[i];
         xpPerRockString[i] = xpAmount[i];
@@ -105,8 +120,6 @@ void Mining::drawTemplate(float contentY)
 
         DrawText(combinedText.c_str(), combinedTextX, combinedTextY, 20, WHITE);
     }
-
-
 }
 
 int Mining::getNodeLevel(int index) const
@@ -168,7 +181,6 @@ void Mining::tick(float deltaTime, float contentY)
     BaseSkill::tick(deltaTime, contentY);
     drawTemplate(contentY);
     // treeButtons(contentY);
-    BaseSkill::drawXPBar();
 
     for (int i = 0; i < MAX_ROCKS; i++)
     {
@@ -184,7 +196,7 @@ void Mining::tick(float deltaTime, float contentY)
         };
 
         // check if button pressed
-        if (BaseSkill::btn(button, "Mine Ore") && curLvl >= getNodeLevel(i))
+        if (BaseSkill::rbtn(button, "Mine Ore") && curLvl >= getNodeLevel(i))
         {
             index = (index == i) ? -1 : i;
         }
@@ -196,4 +208,6 @@ void Mining::tick(float deltaTime, float contentY)
         // do stuff
         useNode(index);
     }
+
+    BaseSkill::drawXPBar();
 }

@@ -4,7 +4,7 @@ BaseSkill::BaseSkill()
 {
 };
 
-bool BaseSkill::btn(Rectangle bounds, const char *text)
+bool BaseSkill::rbtn(Rectangle bounds, const char *text)
 {
     Vector2 mouse = GetMousePosition();
     bool hovered = CheckCollisionPointRec(mouse, bounds);
@@ -14,6 +14,32 @@ bool BaseSkill::btn(Rectangle bounds, const char *text)
 
     // draw button
     DrawRectangleRounded(bounds, 1.f, 16, bgColor);
+
+    // center text
+    int fontSize = 20;
+    int textWidth = MeasureText(text, fontSize);
+
+    DrawText(
+        text,
+        bounds.x + (bounds.width - textWidth) / 2,
+        bounds.y + (bounds.height - fontSize) / 2,
+        fontSize,
+        WHITE);
+
+    // return true only when clicked
+    return hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+}
+
+bool BaseSkill::sbtn(Rectangle bounds, const char *text)
+{
+    Vector2 mouse = GetMousePosition();
+    bool hovered = CheckCollisionPointRec(mouse, bounds);
+
+    // button color states
+    Color bgColor = hovered ? DARKBLUE : DARKGRAY;
+
+    // draw button
+    DrawRectangleRec(bounds, bgColor);
 
     // center text
     int fontSize = 20;

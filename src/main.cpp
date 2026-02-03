@@ -6,6 +6,7 @@
 #include "BaseSkill.h"
 #include "Woodcutting.h"
 #include "Mining.h"
+#include "Smithing.h"
 #include "debugger.h"
 #include <iostream>
 #include <fstream>
@@ -93,7 +94,7 @@ float ScrollBar(Rectangle track, float value)
     return value;
 }
 
-void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY, int winWidth, Texture &background, const Inventory &inventory, const Woodcutting &woodcutting, const Mining &mining)
+void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY, int winWidth, Texture &background, const Inventory &inventory, const Woodcutting &woodcutting, const Mining &mining, const Smithing &smithing)
 {
     float buttonHeight = 30.f;
     float scale = 4.f;
@@ -109,6 +110,12 @@ void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY,
     if (Button(Rectangle{5, 50 + padding + contentY, winWidth / scale -10, buttonHeight}, miningText.c_str()))
     {
         indexPage = 4;
+    }
+
+    std::string smithingText = "Smithing (" + std::to_string(smithing.getLevel()) + "/99)";
+    if (Button(Rectangle{5, 75 + 20 + contentY, winWidth / scale -10, buttonHeight}, smithingText.c_str()))
+    {
+        indexPage = 5;
     }
 
     if (Button(Rectangle{5, 630 + contentY, winWidth / scale -10, buttonHeight}, "Debugger"))
@@ -309,7 +316,7 @@ int main()
     const static int winDimensions[2]{1280, 720};
     InitWindow(winDimensions[0], winDimensions[1], "Totally Not Melvor Idle");
 
-    // load your icon
+    // load icon
     Image icon = LoadImage("assets/logo.png"); 
     SetWindowIcon(icon);
     UnloadImage(icon);
@@ -319,16 +326,23 @@ int main()
 
     Texture2D background = LoadTexture("assets/background.jpg");
 
+    // load meta data
+    ItemDatabase::loadItems();
+
     // class declarations
     Inventory inventory;
     Woodcutting woodcutting(inventory);
     Mining mining(inventory);
+    Smithing smithing(inventory);
+    Debugger debugger(inventory, woodcutting, mining);
+    //BaseSkill baseSkill;
+    //baseSkill.loadBackground(); // load background image after InitWindow
+
+    // set up window sizes after all objects exist
     woodcutting.getWindowSize(winDimensions[0], winDimensions[1]);
     mining.getWindowSize(winDimensions[0], winDimensions[1]);
-    Debugger debugger(inventory, woodcutting, mining);
-    ItemDatabase::loadItems();
-    inventory.loadTextures();
 
+    inventory.loadTextures();
     loadGame(inventory, woodcutting, mining, "data/save.txt");
 
     // variable declarations
@@ -346,27 +360,19 @@ int main()
 
         // draw background
         if (indexPage == 0)
-        {
             DrawTextureEx(background, Vector2{(float)winDimensions[0] / scale, 0}, 0, 1, WHITE);
-            //float chazScale = 1.0f + sin(GetTime()) * 0.1f; // pulsing effect
-            //DrawTextureEx(chaz, Vector2{(float)winDimensions[0] / 2 - 50, (float)winDimensions[1] / 2}, 0, chazScale, WHITE);
-        }
         else if (indexPage == 1)
         {
             const float invPosY{100.f};
             const int cellSize{64};
             inventory.drawInventory(winDimensions[0] / scale + 20, invPosY + contentY-100, cellSize);
-
         }
-        else if (indexPage == 3)
-        {
+        else if (indexPage == 3) 
             woodcutting.tick(GetFrameTime(), contentY);
-        }
-        else if (indexPage == 4)
-        {
-            // mining code goes here
+        else if (indexPage == 4) 
             mining.tick(GetFrameTime(), contentY);
-        }
+        else if (indexPage == 5) 
+            smithing.tick(GetFrameTime(), contentY);
 
         if (debugger.debugging)
         {
@@ -375,13 +381,14 @@ int main()
         
         const float panelW{320.f};
         const int fontSize = 20;
+        
         // LEFT SIDE PANEL
         DrawRectangle(0, 0, panelW, winDimensions[1], GRAY);
         DrawRectangleLines(0, 0, panelW, winDimensions[1], BLACK);
 
         // SIDE PANEL TEXT
-        DrawText("Scrollable content", 50, contentY + 100, 20, BLACK);
-        menuButtons(running, debugger.debugging, indexPage, contentY, winDimensions[0], background, inventory, woodcutting, mining);
+        DrawText("Scrollable content", 50, contentY + 200, 20, BLACK);
+        menuButtons(running, debugger.debugging, indexPage, contentY, winDimensions[0], background, inventory, woodcutting, mining, smithing);
 
         // TOP LEFT PANEL
         DrawRectangle(0, 0, panelW, 100, GRAY);

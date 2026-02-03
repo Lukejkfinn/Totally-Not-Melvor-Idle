@@ -2,7 +2,7 @@
 
 Woodcutting::Woodcutting(Inventory &inv) : inventory(inv)
 {
-    background = woodcutting;
+    background = woodcuttingBG;
 
     // safety check to make sure all xp bars start at 0
     for (size_t i = 0; i < MAX_TREES; i++)
@@ -13,43 +13,58 @@ Woodcutting::Woodcutting(Inventory &inv) : inventory(inv)
 
 void Woodcutting::initTreeDetails()
 {
-    treeTextures[0] = LoadTexture("assets/icons/woodcutting/normal_tree.png");
-    treeTextures[1] = LoadTexture("assets/icons/woodcutting/oak_tree.png");
-    treeTextures[2] = LoadTexture("assets/icons/woodcutting/willow_tree.png");
-    treeTextures[3] = LoadTexture("assets/icons/woodcutting/teak_tree.png");
-    treeTextures[4] = LoadTexture("assets/icons/woodcutting/maple_tree.png");
-    treeTextures[5] = LoadTexture("assets/icons/woodcutting/mahogany_tree.png");
-    treeTextures[6] = LoadTexture("assets/icons/woodcutting/yew_tree.png");
-    treeTextures[7] = LoadTexture("assets/icons/woodcutting/magic_tree.png");
-    treeTextures[8] = LoadTexture("assets/icons/woodcutting/redwood_tree.png");
+    // list of textures to load
+    const char * treeTexturePaths[MAX_TREES] =
+    {
+        "assets/icons/woodcutting/normal_tree.png",
+        "assets/icons/woodcutting/oak_tree.png",
+        "assets/icons/woodcutting/willow_tree.png",
+        "assets/icons/woodcutting/teak_tree.png",
+        "assets/icons/woodcutting/maple_tree.png",
+        "assets/icons/woodcutting/mahogany_tree.png",
+        "assets/icons/woodcutting/yew_tree.png",
+        "assets/icons/woodcutting/magic_tree.png",
+        "assets/icons/woodcutting/redwood_tree.png"
+    };
+
+    // load textures for trees
+    for (int i = 0; i < MAX_TREES; ++i)
+    {
+        treeTextures[i] = LoadTexture(treeTexturePaths[i]);
+
+        // check if the texture loaded successfully
+        if (treeTextures[i].id == 0)
+            std::cerr << "Failed to load texture for tree: " << treeTexturePaths[i] << std::endl; // report the failure
+
+    }
 
     const char *names[] =
-        {
-            "Normal Tree",
-            "Oak Tree",
-            "Willow Tree",
-            "Teak Tree",
-            "Maple Tree",
-            "Mahogany Tree",
-            "Yew Tree",
-            "Magic Tree",
-            "Redwood Tree"};
+    {
+        "Normal Tree",
+        "Oak Tree",
+        "Willow Tree",
+        "Teak Tree",
+        "Maple Tree",
+        "Mahogany Tree",
+        "Yew Tree",
+        "Magic Tree",
+        "Redwood Tree"
+    };
 
     const char *xpAmount[] =
-        {
-            "10 XP/",
-            "15 XP/",
-            "22 XP/",
-            "30 XP/",
-            "40 XP/",
-            "61 XP/",
-            "81 XP/",
-            "100 XP/",
-            "150 XP/"};
+    {
+        "10 XP/",
+        "15 XP/",
+        "22 XP/",
+        "30 XP/",
+        "40 XP/",
+        "61 XP/",
+        "81 XP/",
+        "100 XP/",
+        "150 XP/"
+    };
 
-    const int treeCount = 9;
-
-    for (int i = 0; i < treeCount; i++)
+    for (int i = 0; i < MAX_TREES; i++)
     {
         treeNames[i] = names[i];
         xpPerTreeString[i] = xpAmount[i];
@@ -162,15 +177,15 @@ void Woodcutting::tick(float deltaTime, float contentY)
 {
     BaseSkill::tick(deltaTime, contentY);
     drawTemplate(contentY);
-    BaseSkill::drawXPBar(); // draws xp bar last so everything hides underneath it as you scroll
 
-     for (int i = 0; i < MAX_TREES; i++)
+    for (int i = 0; i < MAX_TREES; i++)
     {
         if (curLvl < getNodeLevel(i))
             continue;
 
         // Use the skillBg[i] rectangle for button placement
-        Rectangle button = {
+        Rectangle button = 
+        {
             skillBg[i].x + 2.5f,                   // 2.5f offset as the button width changed
             skillBg[i].y + skillBg[i].height - 53, // put button near bottom of card
             skillBg[i].width - 5,                  // reduced the width of the button
@@ -178,7 +193,7 @@ void Woodcutting::tick(float deltaTime, float contentY)
         };
 
         // check if button pressed
-        if (BaseSkill::btn(button, "Chop Tree") && curLvl >= getNodeLevel(i))
+        if (BaseSkill::rbtn(button, "Chop Tree") && curLvl >= getNodeLevel(i))
         {
             index = (index == i) ? -1 : i;
         }
@@ -187,6 +202,9 @@ void Woodcutting::tick(float deltaTime, float contentY)
     // only chop the active tree
     if (index >= 0 && index < MAX_TREES)
     {
+        // do stuff
         useNode(index);
     }
+
+    BaseSkill::drawXPBar(); // draws xp bar last so everything hides underneath it as you scroll
 }

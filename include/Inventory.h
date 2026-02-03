@@ -12,11 +12,12 @@
 class Inventory
 {
 public:
-    Inventory();                                                // constructor
-    void initializeInventory();                                 // optional initial items
-    bool addItem(const Item &item);                             // add item
-    void sellItem(int slotIndex, int amountToSell, int value);  // sell item
-    void onItemClick(int slotIndex);                            // click logic
+    Inventory();                                                        // constructor
+    void initializeInventory();                                         // optional initial items
+    bool addItem(const Item &item);                                     // add item
+    void sellItem(int slotIndex, int amountToSell, int value);          // sell item
+    bool removeItem(const std::string &skillType, int id, int amount);  // remove item, used in smithing
+    void onItemClick(int slotIndex);                                    // click logic
     void clearInventory();
     float ScrollBar(Rectangle track, float value);
     void drawInvPanel();

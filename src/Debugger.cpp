@@ -201,7 +201,7 @@ void Debugger::drawObjectsTemplate()
 
 void Debugger::tick(float deltaTime)
 {
-    DrawTextureEx(debugger, Vector2{320, 0}, 0, 1.1, WHITE);
+    DrawTextureEx(debuggerBG, Vector2{320, 0}, 0, 1.1, WHITE);
     DrawRectangle(340, 20, 900, 650, Fade(DARKGRAY, 0.9f));
     drawSkillsTemplate();
     drawObjectsTemplate();
