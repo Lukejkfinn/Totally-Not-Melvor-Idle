@@ -150,6 +150,21 @@ bool Inventory::removeItem(const std::string &skillType, int id, int amount)
     return false; // not enough items
 }
 
+int Inventory::getItemAmount(const std::string& skillType, int id) const
+{
+    int total = 0;
+
+    for (const auto& slot : slots)
+    {
+        if (slot &&
+            slot->getSkillType() == skillType &&
+            slot->getId() == id)
+        {
+            total += slot->getAmount();
+        }
+    }
+    return total;
+}
 
 void Inventory::onItemClick(int slotIndex)
 {

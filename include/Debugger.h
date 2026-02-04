@@ -4,6 +4,7 @@
 #include "BaseSkill.h"
 #include "Woodcutting.h"
 #include "Mining.h"
+#include "Smithing.h"
 #include <fstream>
 #include <iostream>
 #include <cstddef>
@@ -13,8 +14,10 @@ class Debugger
     Inventory &inventory;
     Woodcutting &woodcutting;
     Mining &mining;
+    Smithing &smithing;
+
 public:
-    Debugger(Inventory &inv, Woodcutting &wc, Mining &mine);
+    Debugger(Inventory &inv, Woodcutting &wc, Mining &mine, Smithing &smith);
     bool btn(Rectangle bounds, const char *text);
     void drawSkillsTemplate();
     void drawObjectsTemplate();

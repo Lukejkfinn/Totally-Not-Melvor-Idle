@@ -33,6 +33,10 @@ std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill, int spawnAmount)
         skillName = "mining";
         break;
 
+    case SkillType::Smithing:
+        skillName = "smithing";
+        break;
+
     default:
         std::cerr << "Unknown skill in ItemSpawner!\n";
         return spawned;
@@ -117,15 +121,15 @@ void ItemDatabase::loadItems()
     std::vector<ItemData> smithingItems = 
     {
         // texture, name, skillType, ID, value, amount, maxStack, isStackable
-        {"assets/bank/smithing/bronze_bar.png", "Bronze Bar", "smithing", 1, 2, 1, 64, true},
-        {"assets/bank/smithing/iron_bar.png", "Iron Bar", "smithing", 2, 2, 1, 64, true},
-        {"assets/bank/smithing/steel_bar.png", "Steel Bar", "smithing", 3, 2, 1, 64, true},
-        {"assets/bank/smithing/silver_bar.png", "Silver Bar", "smithing", 4, 2, 1, 64, true},
-        {"assets/bank/smithing/gold_bar.png", "Gold Bar", "smithing", 5, 2, 1, 64, true},
-        {"assets/bank/smithing/mithril_bar.png", "Mithril Bar", "smithing", 6, 2, 1, 64, true},
-        {"assets/bank/smithing/adamantite_bar.png", "Adamantite Bar", "smithing", 7, 2, 1, 64, true},
-        {"assets/bank/smithing/runite_bar.png", "Runite Bar", "smithing", 8, 2, 1, 64, true},
-        {"assets/bank/smithing/dragonite_bar.png", "Dragonite Bar", "smithing", 9, 2, 1, 64, true}
+        {"assets/bank/smithing/bronze_bar.png", "Bronze Bar", "smithing", 1, 2, 1, barsMaxStack, true},
+        {"assets/bank/smithing/iron_bar.png", "Iron Bar", "smithing", 2, 2, 1, barsMaxStack, true},
+        {"assets/bank/smithing/steel_bar.png", "Steel Bar", "smithing", 3, 2, 1, barsMaxStack, true},
+        {"assets/bank/smithing/silver_bar.png", "Silver Bar", "smithing", 4, 2, 1, barsMaxStack, true},
+        {"assets/bank/smithing/gold_bar.png", "Gold Bar", "smithing", 5, 2, 1, barsMaxStack, true},
+        {"assets/bank/smithing/mithril_bar.png", "Mithril Bar", "smithing", 6, 2, 1, barsMaxStack, true},
+        {"assets/bank/smithing/adamantite_bar.png", "Adamantite Bar", "smithing", 7, 2, 1, barsMaxStack, true},
+        {"assets/bank/smithing/runite_bar.png", "Runite Bar", "smithing", 8, 2, 1, barsMaxStack, true},
+        {"assets/bank/smithing/dragonite_bar.png", "Dragonite Bar", "smithing", 9, 2, 1, barsMaxStack, true}
 
     };
 

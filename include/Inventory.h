@@ -17,6 +17,7 @@ public:
     bool addItem(const Item &item);                                     // add item
     void sellItem(int slotIndex, int amountToSell, int value);          // sell item
     bool removeItem(const std::string &skillType, int id, int amount);  // remove item, used in smithing
+    int getItemAmount(const std::string& skillType, int id) const;
     void onItemClick(int slotIndex);                                    // click logic
     void clearInventory();
     float ScrollBar(Rectangle track, float value);
@@ -33,6 +34,7 @@ public:
     // return the filled slots in the bank i.e current amount in the bank being used.
     int getFilledSlots() const;
 
+    void setGold(int newAmount) { gold = newAmount; }
     int getGold() const { return gold ;}
 
     static constexpr int WIDTH = 8;             // 8 slots per row

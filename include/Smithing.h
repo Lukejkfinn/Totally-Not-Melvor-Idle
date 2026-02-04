@@ -13,16 +13,44 @@ class Smithing : public BaseSkill
 public:
     Smithing(Inventory &invetory);
     virtual void drawTemplate(float contentY) override;
+    bool canSmeltSelected() const;
+    void onSmeltCompleted();
+    void drawSmithingPanelInfo(float contentY, int index);
+    void drawOreCombinationPanel(float contentY, int ore1ID, int ore1Amount, int ore2ID, int ore2Amount);
+    void drawOreSingularPanel(float contentY, int oreID, int oreAmount);
+    void drawProductionPanel(float contentY, int barType, int barAmount);
     void oreCombination(int ore1Amount, int ore1, int ore2Amount, int ore2, int bar);
     void oreSmelt(int oreAmount, int ore, int bar);
+    void resetCraftingProgress();
     virtual void tick(float deltaTime, float contentY) override;
+
+    // non-const getters for writing
+    float& getProgress() { return progress; }
+
+    // const getters for read-only access
+    const float& getProgress() const { return progress; }
+
 protected:
 
 private:
     ItemDatabase itemDatabase;
     Texture2D previewIcon = LoadTexture("assets/bank/smithing/bronze_bar.png");
-    int selectedItemIndex = -1;
-    
+
+    int selectedItemIndex{-1};
+    int targetW{32};
+    int targetH{32};
+    static constexpr int MAX_BARS{9};
+    float runningTime = {0};
+    //float skillProgress{0};
+    float maxWidth{0};
+    int xpAccumulated{0};
+    float barTimer{1.9f};
+    int xpPerBar[MAX_BARS]{5, 8, 12, 15, 20, 35, 42, 51, 61};
+    Rectangle xpBar;
+    bool isRunning{false};
+
+
+    float progress{0};
 };
 
 

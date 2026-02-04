@@ -7,7 +7,8 @@
 enum class SkillType
 {
     Woodcutting,
-    Mining
+    Mining,
+    Smithing
 };
 
 struct ItemData 
@@ -38,6 +39,8 @@ private:
     
     const static int logsMaxStack{999'999};
     const static int oresMaxStack{999'999};
+    const static int barsMaxStack{999'999};
+
 };
 
 #endif // ITEMDATABASE_H

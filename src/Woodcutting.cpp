@@ -125,7 +125,7 @@ int Woodcutting::getNodeLevel(int index) const
     return nodeLvls[index];
 }
 
-int Woodcutting::useNode(int i)
+void Woodcutting::useNode(int i)
 {
     for (int x = 0; x < MAX_TREES; x++)
     {
@@ -157,7 +157,7 @@ int Woodcutting::useNode(int i)
         onNodeComplete(treeID); // pass the index in
     }
 
-    return xpAccumulated;
+    //return xpAccumulated;
 }
 
 void Woodcutting::onNodeComplete(const int& id)

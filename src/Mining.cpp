@@ -128,7 +128,7 @@ int Mining::getNodeLevel(int index) const
     return nodeLvls[index];
 }
 
-int Mining::useNode(int i)
+void Mining::useNode(int i)
 {
     for (int x = 0; x < MAX_ROCKS; x++)
     {
@@ -160,7 +160,7 @@ int Mining::useNode(int i)
         onNodeComplete(rockID); // pass the index in
     }
 
-    return xpAccumulated;
+    //return xpAccumulated;
 }
 
 void Mining::onNodeComplete(const int& id)

@@ -1,6 +1,6 @@
 #include "debugger.h"
 
-Debugger::Debugger(Inventory &inv, Woodcutting &wc, Mining &mine) : inventory(inv), woodcutting(wc), mining(mine)
+Debugger::Debugger(Inventory &inv, Woodcutting &wc, Mining &mine, Smithing &smith) : inventory(inv), woodcutting(wc), mining(mine), smithing(smith)
 {
 }
 
@@ -51,6 +51,7 @@ void Debugger::drawSkillsTemplate()
         {
             "Set Woodcutting:",
             "Set Mining:",
+            "Set Smithing"
         };
 
     int numLabels = sizeof(labels) / sizeof(labels[0]);
@@ -84,6 +85,8 @@ void Debugger::drawSkillsTemplate()
                 woodcutting.setLevel(1);
             if (i == 1)
                 mining.setLevel(1);
+            if (i == 2)
+                smithing.setLevel(1);
         }
 
         if (btn(rightButton, "99"))
@@ -92,6 +95,8 @@ void Debugger::drawSkillsTemplate()
                 woodcutting.setLevel(99);
             if (i == 1)
                 mining.setLevel(99);
+            if (i == 2)
+                smithing.setLevel(99);
         }
     }
 }
@@ -117,6 +122,7 @@ void Debugger::drawObjectsTemplate()
         {
             "All Woodcutting logs:",
             "All Mining ores:",
+            "All Smithing bars",
             "Clear Inventory:"
         };
 
@@ -178,6 +184,12 @@ void Debugger::drawObjectsTemplate()
                     for (const auto &item : spawned)
                         inventory.addItem(item);
                 }
+                if (i == 2)
+                                {
+                    auto spawned = itemDatabase.ItemSpawner(SkillType::Smithing, 1);
+                    for (const auto &item : spawned)
+                        inventory.addItem(item);
+                }
             }
 
             if (btn(rightButton, "64"))
@@ -191,6 +203,12 @@ void Debugger::drawObjectsTemplate()
                 if (i == 1)
                 {
                     auto spawned = itemDatabase.ItemSpawner(SkillType::Mining, 64);
+                    for (const auto &item : spawned)
+                        inventory.addItem(item);
+                }
+                if (i == 2)
+                {
+                    auto spawned = itemDatabase.ItemSpawner(SkillType::Smithing, 64);
                     for (const auto &item : spawned)
                         inventory.addItem(item);
                 }

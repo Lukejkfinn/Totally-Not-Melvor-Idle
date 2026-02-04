@@ -18,7 +18,7 @@ public:
     void initRockDetails();
     virtual void drawTemplate(float contentY) override;
     int getNodeLevel(int index) const override;
-    int useNode(int i);
+    void useNode(int i);
     void onNodeComplete(const int &id);
     virtual void tick(float deltaTime, float contentY) override;
 
