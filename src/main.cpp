@@ -5,8 +5,19 @@
 #include "Inventory.h"
 #include "BaseSkill.h"
 #include "Woodcutting.h"
+#include "Fishing.h"
+#include "Firemaking.h"
+#include "Cooking.h"
 #include "Mining.h"
 #include "Smithing.h"
+#include "Thieving.h"
+#include "Fletching.h"
+#include "Crafting.h"
+#include "Runecrafting.h"
+#include "Herblore.h"
+#include "Agility.h"
+#include "Summoning.h"
+#include "Astrology.h"
 #include "debugger.h"
 #include <iostream>
 #include <fstream>
@@ -15,8 +26,8 @@
 #include <filesystem>
 
 // forward declarations
-void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining &mine, const Smithing &smithing, const std::string &filename);
-void loadGame(const Inventory &inventory, const Woodcutting &wood, const Mining &mine, const Smithing &smithing, const std::string &filename);
+void saveGame(const Inventory &inventory, const Woodcutting &wood, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename);
+void loadGame(const Inventory &inventory, const Woodcutting &wood, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename);
 
 bool Button(Rectangle bounds, const char *text)
 {
@@ -94,43 +105,78 @@ float ScrollBar(Rectangle track, float value)
     return value;
 }
 
-void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY, int winWidth, Texture &background, const Inventory &inventory, const Woodcutting &woodcutting, const Mining &mining, const Smithing &smithing)
+void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY, int winWidth, Texture &background, const Inventory &inventory, 
+            const Woodcutting &woodcutting, const Fishing &fishing, const Firemaking &firemaking, const Cooking &cooking, const Mining &mining, 
+            const Smithing &smithing, const Thieving &thieving, const Fletching &fletching, const Crafting &crafting, const Runecrafting &runecrafting,
+            const Herblore &herblore, const Agility &agility, const Summoning &summoning, const Astrology &astrology)
 {
     float buttonHeight = 30.f;
     float scale = 4.f;
-    float padding = 10.f;
+    //float padding = 10.f;
 
-    std::string woodText = "Woodcutting (" + std::to_string(woodcutting.getLevel()) + "/99)";
-    if (Button(Rectangle{5, 25 + contentY, winWidth / scale -10, buttonHeight}, woodText.c_str()))
+    const std::string skillText[] = 
     {
-        indexPage = 3;
+        "Woodcutting",
+        "Fishing",
+        "Firemaking",
+        "Cooking",
+        "Mining",
+        "Smithing",
+        "Thieving",
+        "Fletching",
+        "Crafting",
+        "Runecrafting",
+        "Herblore",
+        "Agility",
+        "Summoning",
+        "Astrology"
+    };
+
+    std::vector<const BaseSkill*> skills =
+    {
+        &woodcutting,
+        &fishing,
+        &firemaking,
+        &cooking,
+        &mining,
+        &smithing,
+        &thieving,
+        &fletching,
+        &crafting,
+        &runecrafting,
+        &herblore,
+        &agility,
+        &summoning,
+        &astrology
+    };
+
+    float startY = 15.f;
+    float spacing = 35.f;
+    
+    for (size_t i = 0; i < skills.size(); i++)
+    {
+        float posY = startY + i * spacing;
+        std::string skillsText = skillText[i] + " (" + std::to_string(skills[i]->getLevel()) + "/99)";
+        if(Button(Rectangle{5, posY + contentY, winWidth / scale -10, buttonHeight}, skillsText.c_str()))
+        {
+            indexPage = i+2;
+        }
+
     }
 
-    std::string miningText = "Mining (" + std::to_string(mining.getLevel()) + "/99)";
-    if (Button(Rectangle{5, 50 + padding + contentY, winWidth / scale -10, buttonHeight}, miningText.c_str()))
-    {
-        indexPage = 4;
-    }
-
-    std::string smithingText = "Smithing (" + std::to_string(smithing.getLevel()) + "/99)";
-    if (Button(Rectangle{5, 75 + 20 + contentY, winWidth / scale -10, buttonHeight}, smithingText.c_str()))
-    {
-        indexPage = 5;
-    }
-
-    if (Button(Rectangle{5, 630 + contentY, winWidth / scale -10, buttonHeight}, "Debugger"))
-    {
+    // debugger button
+    if (Button(Rectangle{5, 630 + (contentY-100), winWidth / scale -10, buttonHeight}, "Debugger"))
         debugging = true;
-    }
 
-    if (Button(Rectangle{5, 670 + contentY, winWidth / scale -10, buttonHeight}, "Quit"))
+    // quit button
+    if (Button(Rectangle{5, 670 + (contentY-100), winWidth / scale -10, buttonHeight}, "Quit"))
     {
-        saveGame(inventory, woodcutting, mining, smithing, "data/save.txt");
+        saveGame(inventory, woodcutting, firemaking, mining, smithing, "data/save.txt");
         running = false;
     }
 }
 
-void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining &mine, const Smithing &smithing, const std::string &filename)
+void saveGame(const Inventory &inventory, const Woodcutting &wood, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename)
 {
     std::ofstream file(filename);
     if (!file.is_open())
@@ -169,11 +215,11 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining 
 
     // mining
     file << "[Mining]\n";
-    file << "level=" << mine.getLevel() << '\n';
-    file << "xp=" << mine.getXP() << '\n';
+    file << "level=" << mining.getLevel() << '\n';
+    file << "xp=" << mining.getXP() << '\n';
     file << "progress=";
     for (int i = 0; i < 8; i++)
-        file << mine.getProgressArray()[i] << ' ';
+        file << mining.getProgressArray()[i] << ' ';
     file << "\n\n";
 
     // smithing
@@ -187,7 +233,7 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Mining 
     std::cout << "Game saved!\n";
 }
 
-void loadGame(Inventory &inventory, Woodcutting &wood, Mining &mine, Smithing &smithing, const std::string &filename)
+void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, Mining &mining, Smithing &smithing, const std::string &filename)
 {
     // open the file
     std::ifstream file(filename);
@@ -308,19 +354,19 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Mining &mine, Smithing &s
             {
                 int lvl;
                 ss >> lvl;
-                mine.setLevel(lvl);
+                mining.setLevel(lvl);
             }
             else if (key == "xp")
             {
                 int xp;
                 ss >> xp;
-                mine.setXP(xp);
-                mine.updateXPBar(0);
+                mining.setXP(xp);
+                mining.updateXPBar(0);
             }
             else if (key == "progress")
             {
                 for (int i = 0; i < 8; i++)
-                    ss >> mine.getProgressArray()[i];
+                    ss >> mining.getProgressArray()[i];
             }
         }
         else if (currentSection == Section::Smithing)
@@ -369,9 +415,20 @@ int main()
     // class declarations
     Inventory inventory;
     Woodcutting woodcutting(inventory);
+    Fishing fishing;
+    Firemaking firemaking(inventory);
+    Cooking cooking;
     Mining mining(inventory);
     Smithing smithing(inventory);
-    Debugger debugger(inventory, woodcutting, mining, smithing);
+    Thieving thieving;
+    Fletching fletching;
+    Crafting crafting;
+    Runecrafting runecrafting;
+    Herblore herblore;
+    Agility agility;
+    Summoning summoning;
+    Astrology astrology;
+    Debugger debugger(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, thieving, fletching, crafting, runecrafting, herblore, agility, summoning, astrology);
     //BaseSkill baseSkill;
     //baseSkill.loadBackground(); // load background image after InitWindow
 
@@ -380,7 +437,7 @@ int main()
     mining.getWindowSize(winDimensions[0], winDimensions[1]);
 
     inventory.loadTextures();
-    loadGame(inventory, woodcutting, mining, smithing, "data/save.txt");
+    loadGame(inventory, woodcutting, firemaking, mining, smithing, "data/save.txt");
 
     // variable declarations
     int scale{4};
@@ -396,20 +453,24 @@ int main()
         ClearBackground(BLACK);
 
         // draw background
-        if (indexPage == 0)
+        if (indexPage == 0) // default blank page
             DrawTextureEx(background, Vector2{(float)winDimensions[0] / scale, 0}, 0, 1, WHITE);
-        else if (indexPage == 1)
+        else if (indexPage == 1) // inventory
         {
             const float invPosY{100.f};
             const int cellSize{64};
             inventory.drawInventory(winDimensions[0] / scale + 20, invPosY + contentY-100, cellSize);
         }
-        else if (indexPage == 3) 
-            woodcutting.tick(GetFrameTime(), contentY);
+        else if (indexPage == 2) 
+            woodcutting.tick(GetFrameTime(), contentY); 
         else if (indexPage == 4) 
+            firemaking.tick(GetFrameTime(), contentY);
+        else if (indexPage == 6) 
             mining.tick(GetFrameTime(), contentY);
-        else if (indexPage == 5) 
+        else if (indexPage == 7) 
             smithing.tick(GetFrameTime(), contentY);
+        else
+            indexPage = 0;
 
         if (debugger.debugging)
         {
@@ -425,7 +486,8 @@ int main()
 
         // SIDE PANEL TEXT
         DrawText("Scrollable content", 50, contentY + 200, 20, BLACK);
-        menuButtons(running, debugger.debugging, indexPage, contentY, winDimensions[0], background, inventory, woodcutting, mining, smithing);
+        menuButtons(running, debugger.debugging, indexPage, contentY, winDimensions[0], background, inventory, woodcutting, fishing, firemaking, cooking, 
+                mining, smithing, thieving, fletching, crafting, runecrafting, herblore, agility, summoning, astrology);
 
         // TOP LEFT PANEL
         DrawRectangle(0, 0, panelW, 100, GRAY);
@@ -433,7 +495,10 @@ int main()
 
         // BANK TEXT
         std::string bankSlots = "Bank " + std::to_string(inventory.getFilledSlots()) + "/" + std::to_string(inventory.SIZE);
-        if (Button(Rectangle{0, 10, (float)winDimensions[0] / scale -1, 30.f}, bankSlots.c_str())) indexPage = 1;
+        if (Button(Rectangle{0, 10, (float)winDimensions[0] / scale -1, 30.f}, bankSlots.c_str())) 
+        {
+            indexPage = 1;
+        }
 
         // CURRENCY TEXT     
         std::string currencyText = "Gold: " + std::to_string(inventory.getGold());
@@ -451,7 +516,7 @@ int main()
 
     if (!running || WindowShouldClose())
     {
-        saveGame(inventory, woodcutting, mining, smithing, "data/save.txt");
+        saveGame(inventory, woodcutting, firemaking, mining, smithing, "data/save.txt");
         std::cout << "Game saved!\n";
     }
     ItemDatabase::unloadItems();

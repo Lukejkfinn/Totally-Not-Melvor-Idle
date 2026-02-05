@@ -3,7 +3,12 @@
 Smithing::Smithing(Inventory &inv) : inventory(inv)
 {
     background = smithingBG;
-    
+}
+
+int Smithing::getNodeLevel(int index) const
+{
+    static int nodeLvls[MAX_BARS]{1, 10, 25, 35, 40, 55, 60, 75, 90};
+    return nodeLvls[index];
 }
 
 void Smithing::drawTemplate(float contentY)
@@ -68,25 +73,18 @@ void Smithing::drawTemplate(float contentY)
     Rectangle creationPreviewPanel{345, 535 + (contentY - 100), 305, 100};
     DrawRectangleRounded(creationPreviewPanel, .05f, 16, GRAY);
 
-    // button for creating the item
-    Rectangle createButton{400, 575 + (contentY-100), 200 , 50};
-
-    Rectangle xpBarBG{390, 545 + (contentY-100), 220 , 20};
+    xpBarBG = {390, 545 + (contentY-100), 220 , 20};
     DrawRectangleRounded(xpBarBG, .8f, 16, BLACK);
 
     //Rectangle skillXpBar{390, 545 + (contentY-100), xpBar.width , 20};
     DrawRectangleRounded(xpBar, .8f, 16, GREEN);
 
-    const int numCols = 2;
-    const int numRows = 5;
-    const int sizeOfSmithing{numCols * numRows};
+
     const float startX{660.f};
     const float startY{220.f + (contentY-100)};
     const float buttonWidth{285.f};
     const float buttonHeight{75.f};
     const float padding{10.f};
-
-    Rectangle buttons[sizeOfSmithing]{};
 
     const char* barNames[sizeOfSmithing] = 
     {
@@ -109,6 +107,7 @@ void Smithing::drawTemplate(float contentY)
     
     Item smithingItem;
     
+    // draws the skill panels
     for(int row = 0; row < numRows; row++)
     {   
         for (int col = 0; col < numCols; col++)
@@ -118,31 +117,45 @@ void Smithing::drawTemplate(float contentY)
             if(i == sizeOfSmithing-1) // we have 9, not 10. Skip laste
                 continue;
 
+
             buttons[i].width = buttonWidth;
             buttons[i].height = buttonHeight;
             buttons[i].x = startX + col * (buttonWidth + padding);
             buttons[i].y = startY + row * (buttonHeight + padding);
 
             DrawRectangleRoundedLinesEx(buttons[i], 0.f, 0, 1, WHITE);
-            
-            smithingItem = itemDatabase.getItemByName("smithing", index);
+
+            bool unlocked = curLvl >= getNodeLevel(i);
+
+            // ---------------- LOCKED ----------------
+            if (!unlocked)
+            {
+                const char* lockedText = "Locked";
+                int fontSize = 30;
+                int textWidth = MeasureText(lockedText, fontSize);
+
+                float textX = buttons[i].x + (buttons[i].width - textWidth) / 2;
+                float textY = buttons[i].y + (buttons[i].height - fontSize) / 2;
+
+                DrawText(lockedText, textX, textY, fontSize, Fade(BLACK, 0.5f));
+
+                index++;
+                continue;
+            }
+
+            // ---------------- UNLOCKED ----------------
+            Item smithingItem = itemDatabase.getItemByName("smithing", index);
 
             if (BaseSkill::sbtn(buttons[i], barNames[i]))
             {
-                if (selectedItemIndex != index)   // only reset if recipe actually changed
+                if (selectedItemIndex != index)
                 {
                     selectedItemIndex = index;
                     resetCraftingProgress();
                 }
-            }                
+            }             
 
-            if (smithingItem.getTexture().id != 0) 
-                DrawTextureEx(smithingItem.getTexture(), Vector2{buttons[i].x + 2, buttons[i].y}, 0.0f, barScale, WHITE);
-            else
-            {
-                std::cerr << "Texture for smithing item is not loaded! " << index << std::endl;
-                return;
-            }
+            DrawTextureEx(smithingItem.getTexture(), Vector2{buttons[i].x + 2, buttons[i].y}, 0.0f, barScale, WHITE);
             index++;
         }
     }
@@ -154,8 +167,13 @@ void Smithing::drawTemplate(float contentY)
 
         if (selectedItemIndex == i+1)
         {
+            // icon position
             DrawTextureEx(smithingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
             drawSmithingPanelInfo(contentY, i);
+
+            // xp amount value
+            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex]);
+            DrawText(xpAmount.c_str(), producesPreviewPanel.x + 210, 460 + (contentY - 100), 20, WHITE);
 
             if (selectedItemIndex == sizeOfSmithing-3) // needed as the const array has loads of spaces for this particular bar
             {
@@ -166,54 +184,9 @@ void Smithing::drawTemplate(float contentY)
             DrawText(barNames[i], 460 , 260 +(contentY - 100), 20, WHITE);
         }
     }
+    beginSmithing(contentY);
 
-    if (BaseSkill::rbtn(createButton, "Create") && selectedItemIndex != -1)
-    {
-        if (!isRunning && canSmeltSelected())
-        {
-            isRunning = true;   // start smelting
-        }
-        else
-        {
-            resetCraftingProgress(); // cancel
-        }       
-    }
-
-    if (isRunning)
-    {      
-        runningTime += GetFrameTime();
-
-        progress = runningTime / barTimer;
-        progress = Clamp(progress, 0.f, 1.f);
-
-        maxWidth = xpBarBG.width;
-        xpBar.x = 390;
-        xpBar.y = 545 + (contentY-100);
-        xpBar.height = 20;
-        xpBar.width = maxWidth * progress;
-
-        if (runningTime >= barTimer)
-        {
-            runningTime = 0.f;
-            xpBar.width = 0.f;
-
-            xpAccumulated = xpPerBar[selectedItemIndex];
-            BaseSkill::updateXPBar(xpAccumulated);
-
-            onSmeltCompleted();
-
-            if (canSmeltSelected())
-            {
-                // continue smelting
-                isRunning = true;
-            }
-            else
-            {
-                // out of ores
-                resetCraftingProgress();
-            }
-        }
-    }
+    
 }
 
 void Smithing::drawProductionPanel(float contentY, int barType, int barAmount)
@@ -312,6 +285,60 @@ void Smithing::drawOreCombinationPanel(float contentY, int ore1ID, int ore1Amoun
     DrawText(std::to_string(invOre2).c_str(), 590, 396 + (contentY-100), 20, WHITE);
 }
 
+void Smithing::beginSmithing(float contentY)
+{
+    // button for creating the item
+    Rectangle createButton{400, 575 + (contentY-100), 200 , 50};
+    if (BaseSkill::rbtn(createButton, "Create") && selectedItemIndex != -1)
+    {
+        if (!isRunning && canSmeltSelected())
+        {
+            isRunning = true;   // start smelting
+        }
+        else
+        {
+            resetCraftingProgress(); // cancel
+        }       
+    }
+
+    if (isRunning)
+    {      
+        runningTime += GetFrameTime();
+
+        progress = runningTime / barTimer;
+        progress = Clamp(progress, 0.f, 1.f);
+
+        maxWidth = xpBarBG.width;
+        xpBar.x = 390;
+        xpBar.y = 545 + (contentY-100);
+        xpBar.height = 20;
+        xpBar.width = maxWidth * progress;
+
+        if (runningTime >= barTimer)
+        {
+            runningTime = 0.f;
+            xpBar.width = 0.f;
+
+            xpAccumulated = xpPerBar[selectedItemIndex];
+            
+            BaseSkill::updateXPBar(xpAccumulated);
+
+            onSmeltCompleted();
+
+            if (canSmeltSelected())
+            {
+                // continue smelting
+                isRunning = true;
+            }
+            else
+            {
+                // out of ores
+                resetCraftingProgress();
+            }
+        }
+    }
+}
+
 
 bool Smithing::canSmeltSelected() const
 {
@@ -374,8 +401,6 @@ void Smithing::onSmeltCompleted()
     else if(selectedItemIndex == 9)
         oreCombination(1, 10, 10, 4, 9);    // (1) dragonite ore (ID=10), (10) coal (ID=4) = (1) dragonite bar (ID=9) 
 }
-
-
 
 void Smithing::drawOreSingularPanel(float contentY, int oreID, int oreAmount)
 {
@@ -469,4 +494,20 @@ void Smithing::tick(float deltaTime, float contentY)
     BaseSkill::tick(deltaTime, contentY);
     drawTemplate(contentY);
     BaseSkill::drawXPBar();
+
+     // draw XP bars
+    for (int i = 0; i < MAX_BARS; i++)
+    {
+        if (curLvl < getNodeLevel(i)) // node level index numRows * numCols
+        {
+            // drawing the locked text on the backgrounds
+            const char *lockedText = "Locked";
+            int fontSize = 30;
+            int textWidth = MeasureText(lockedText, fontSize);
+            float textX = buttons[i].x + (buttons[i].width - textWidth) / 2;
+            float textY = buttons[i].y + (buttons[i].height - fontSize) / 2;
+            DrawText(lockedText, textX, textY, fontSize, Fade(BLACK, 0.5f));
+            continue;
+        }
+    }
 }

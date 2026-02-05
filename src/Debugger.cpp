@@ -1,6 +1,9 @@
 #include "debugger.h"
 
-Debugger::Debugger(Inventory &inv, Woodcutting &wc, Mining &mine, Smithing &smith) : inventory(inv), woodcutting(wc), mining(mine), smithing(smith)
+Debugger::Debugger(Inventory &inv, Woodcutting &wc, Fishing &fish, Firemaking &fm, Cooking &cook, Mining &mine, Smithing &smith, Thieving &thieving, 
+        Fletching &fletch, Crafting &craft, Runecrafting &rc, Herblore &herb, Agility &agility, Summoning &summon, Astrology &astro) : 
+        inventory(inv), woodcutting(wc), fishing(fish), firemaking(fm), cooking(cook), mining(mine), smithing(smith), thieving(thieving), fletching(fletch), crafting(craft),
+        runecrafting(rc), herblore(herb), agility(agility), summoning(summon), astrology(astro)
 {
 }
 
@@ -50,9 +53,38 @@ void Debugger::drawSkillsTemplate()
     const char *labels[] =
         {
             "Set Woodcutting:",
+            "Set Fishing",
+            "Set Firemaking",
+            "Set Cooking",
             "Set Mining:",
-            "Set Smithing"
+            "Set Smithing",
+            "Set Thieving",
+            "Set Fletching",
+            "Set Crafting",
+            "Set Runecrafting",
+            "Set Herblore",
+            "Set Agility",
+            "Set Summoning",
+            "Set Astrology"
         };
+
+    std::vector<SkillEntry> skills =
+    {
+        { &woodcutting },
+        { &fishing },
+        { &firemaking },
+        { &cooking },
+        { &mining },
+        { &smithing },
+        { &thieving },
+        { &fletching },
+        { &crafting },
+        { &runecrafting },
+        { &herblore },
+        { &agility },
+        { &summoning },
+        { &astrology }
+    };
 
     int numLabels = sizeof(labels) / sizeof(labels[0]);
 
@@ -81,22 +113,12 @@ void Debugger::drawSkillsTemplate()
         // button actions
         if (btn(leftButton, "1"))
         {
-            if (i == 0)
-                woodcutting.setLevel(1);
-            if (i == 1)
-                mining.setLevel(1);
-            if (i == 2)
-                smithing.setLevel(1);
+            skills[i].skill->setLevel(1);
         }
 
         if (btn(rightButton, "99"))
         {
-            if (i == 0)
-                woodcutting.setLevel(99);
-            if (i == 1)
-                mining.setLevel(99);
-            if (i == 2)
-                smithing.setLevel(99);
+            skills[i].skill->setLevel(99);
         }
     }
 }
@@ -118,13 +140,17 @@ void Debugger::drawObjectsTemplate()
     int leftButtonX = 950;
     int rightButtonX = leftButtonX + buttonWidth + 15;
 
-    const char *labels[] =
-        {
-            "All Woodcutting logs:",
-            "All Mining ores:",
-            "All Smithing bars",
-            "Clear Inventory:"
-        };
+    // labels for display
+    const char* labels[] =
+    {
+        "All Woodcutting logs:",
+        "All Mining ores:",
+        "All Smithing bars",
+        "Clear Inventory:"
+    };
+
+    // map each row to a SkillType (last entry has no skill)
+    SkillType skillMap[] = { SkillType::Woodcutting, SkillType::Mining, SkillType::Smithing };
 
     int numLabels = sizeof(labels) / sizeof(labels[0]);
 
@@ -132,84 +158,29 @@ void Debugger::drawObjectsTemplate()
     {
         int y = startY + i * spacing;
 
-        // draw labels
+        // draw label
         DrawText(labels[i], startX, y, fontSize, BLACK);
 
-
-        // make buttons
-        Rectangle leftButton =
-            {
-                (float)leftButtonX,
-                (float)(y + buttonYAdjust),
-                (float)buttonWidth,
-                (float)buttonHeight};
-
-        Rectangle rightButton =
-            {
-                (float)rightButtonX,
-                (float)(y + buttonYAdjust),
-                (float)buttonWidth,
-                (float)buttonHeight};
-
-        Rectangle singleButton =
-            {
-                (float)leftButtonX,
-                (float)(y + buttonYAdjust),
-                (float)buttonWidth,
-                (float)buttonHeight};
-
-        // if it's the last item in the array (clear Inventory)
-        if (i == numLabels - 1)
+        if (i == numLabels - 1) // last row: clear inventory
         {
-            // draw the clear button and clear the inventory
-            if (btn(singleButton, "Clear"))
-            {
-                inventory.clearInventory(); // clear the inventory but keep the slots
-            }
+            Rectangle clearButton = { (float)leftButtonX, (float)(y + buttonYAdjust), (float)buttonWidth, (float)buttonHeight };
+            if (btn(clearButton, "Clear"))
+                inventory.clearInventory();
         }
-        else
+        else // other rows: spawn items
         {
-            // draw and handle both left and right buttons for the other items
-            if (btn(leftButton, "1"))
-            {
-                if (i == 0)
-                {
-                    auto spawned = itemDatabase.ItemSpawner(SkillType::Woodcutting, 1);
-                    for (const auto &item : spawned)
-                        inventory.addItem(item);
-                }
-                if (i == 1)
-                {
-                    auto spawned = itemDatabase.ItemSpawner(SkillType::Mining, 1);
-                    for (const auto &item : spawned)
-                        inventory.addItem(item);
-                }
-                if (i == 2)
-                                {
-                    auto spawned = itemDatabase.ItemSpawner(SkillType::Smithing, 1);
-                    for (const auto &item : spawned)
-                        inventory.addItem(item);
-                }
-            }
+            Rectangle leftButton  = { (float)leftButtonX,  (float)(y + buttonYAdjust), (float)buttonWidth, (float)buttonHeight };
+            Rectangle rightButton = { (float)rightButtonX, (float)(y + buttonYAdjust), (float)buttonWidth, (float)buttonHeight };
 
-            if (btn(rightButton, "64"))
+            int amounts[] = { 1, 64 };
+            Rectangle buttons[] = { leftButton, rightButton };
+
+            for (int j = 0; j < 2; j++) // loop over left/right buttons
             {
-                if (i == 0)
+                if (btn(buttons[j], std::to_string(amounts[j]).c_str()))
                 {
-                    auto spawned = itemDatabase.ItemSpawner(SkillType::Woodcutting, 64);
-                    for (const auto &item : spawned)
-                        inventory.addItem(item);
-                }
-                if (i == 1)
-                {
-                    auto spawned = itemDatabase.ItemSpawner(SkillType::Mining, 64);
-                    for (const auto &item : spawned)
-                        inventory.addItem(item);
-                }
-                if (i == 2)
-                {
-                    auto spawned = itemDatabase.ItemSpawner(SkillType::Smithing, 64);
-                    for (const auto &item : spawned)
+                    auto spawned = itemDatabase.ItemSpawner(skillMap[i], amounts[j]);
+                    for (const auto& item : spawned)
                         inventory.addItem(item);
                 }
             }
