@@ -29,6 +29,10 @@ std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill, int spawnAmount)
         skillName = "woodcutting";
         break;
 
+    case SkillType::Firemaking:
+        skillName = "firemaking";
+        break;
+
     case SkillType::Mining:
         skillName = "mining";
         break;
@@ -83,6 +87,23 @@ void ItemDatabase::loadItems()
 
     // loading woodcutting items
     for (const auto& itemData : woodcuttingItems) // loop through all items
+    {
+        Texture2D texture = LoadTexture(itemData.texturePath.c_str());
+        if (texture.id == 0) 
+            std::cerr << "Failed to load texture for " << itemData.itemName << std::endl;
+        else 
+            items.push_back(Item(texture, itemData.amount, itemData.stackable, itemData.stackAmount, 
+                            itemData.itemName, itemData.skillType, itemData.id, itemData.value));
+    }
+
+    std::vector<ItemData> firemakingItems =
+    {
+        // texture,                           name,   skillType, ID, value, amount, maxStack, isStackable
+        {"assets/bank/firemaking/ashes.png", "Ashes", "firemaking", 1, 2, rockAmount, oresMaxStack, true},
+    };
+
+    // loading firemaking items
+    for (const auto& itemData : firemakingItems) // loop through all items
     {
         Texture2D texture = LoadTexture(itemData.texturePath.c_str());
         if (texture.id == 0) 

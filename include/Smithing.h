@@ -23,7 +23,7 @@ public:
     void drawProductionPanel(float contentY, int barType, int barAmount);
     void oreCombination(int ore1Amount, int ore1, int ore2Amount, int ore2, int bar);
     void oreSmelt(int oreAmount, int ore, int bar);
-    void resetCraftingProgress();
+    virtual void resetSkillProgress();
     virtual void tick(float deltaTime, float contentY) override;
     int getNodeLevel(int index) const override;
     // non-const getters for writing
@@ -43,12 +43,12 @@ private:
     int selectedItemIndex{-1};
     int targetW{32};
     int targetH{32};
-    float runningTime = {0};
+    //float runningTime = {0};
     float maxWidth{0};
     int xpAccumulated{0};
     float barTimer{1.9f};
     int xpPerBar[MAX_BARS]{5, 8, 12, 15, 20, 35, 42, 51, 61};
-    bool isRunning{false};
+    //bool isRunning{false};
     int nodeLvl[maxLvl]{};
     Rectangle xpBar;
     Rectangle xpBarBG;
@@ -60,7 +60,7 @@ private:
     
 
 
-    float progress{0};
+    //float progress{0};
 };
 
 

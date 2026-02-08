@@ -29,18 +29,17 @@ void Smithing::drawTemplate(float contentY)
     float scaleY = targetHeight / (float)previewIcon.height;
     float scale = std::min(scaleX, scaleY);  // Maintain aspect ratio
 
-    Rectangle iconPreviewPanel{345, 220 + (contentY - 100), 100, 100};
-
-    // calculate position to center the icon inside the preview panel
-    float iconX = iconPreviewPanel.x + (iconPreviewPanel.width - targetWidth) / 2;
-    float iconY = iconPreviewPanel.y + (iconPreviewPanel.height - targetHeight) / 2;
-
     // smithing panel
     Rectangle smithingPanel{325, 200 + (contentY - 100), 930, 800};
     DrawRectangleRounded(smithingPanel, .02f, 16, DARKGRAY);
-
+    
     // icon preview panel
+    Rectangle iconPreviewPanel{345, 220 + (contentY - 100), 100, 100};
     DrawRectangleRounded(iconPreviewPanel, .05f, 16, GRAY);
+    
+    // calculate position to center the icon inside the preview panel
+    float iconX = iconPreviewPanel.x + (iconPreviewPanel.width - targetWidth) / 2;
+    float iconY = iconPreviewPanel.y + (iconPreviewPanel.height - targetHeight) / 2;
 
     // preview icon
     Vector2 iconPosition = {iconX, iconY};
@@ -151,7 +150,7 @@ void Smithing::drawTemplate(float contentY)
                 if (selectedItemIndex != index)
                 {
                     selectedItemIndex = index;
-                    resetCraftingProgress();
+                    resetSkillProgress();
                 }
             }             
 
@@ -293,11 +292,11 @@ void Smithing::beginSmithing(float contentY)
     {
         if (!isRunning && canSmeltSelected())
         {
-            isRunning = true;   // start smelting
+            isRunning = !isRunning;   // start smelting
         }
         else
         {
-            resetCraftingProgress(); // cancel
+            resetSkillProgress(); // cancel
         }       
     }
 
@@ -333,12 +332,11 @@ void Smithing::beginSmithing(float contentY)
             else
             {
                 // out of ores
-                resetCraftingProgress();
+                resetSkillProgress();
             }
         }
     }
 }
-
 
 bool Smithing::canSmeltSelected() const
 {
@@ -480,17 +478,15 @@ void Smithing::oreSmelt(int oreAmount, int ore, int bar)
     }
 }
 
-void Smithing::resetCraftingProgress()
+void Smithing::resetSkillProgress()
 {
-    isRunning = false;
-    runningTime = 0.f;
-    progress = 0.f;
-    xpBar.width = 0.f;
+    BaseSkill::resetSkillProgress();
+
+    //xpBar.width = BaseSkill::singleXpBar.width;
 }
 
 void Smithing::tick(float deltaTime, float contentY)
 {
-
     BaseSkill::tick(deltaTime, contentY);
     drawTemplate(contentY);
     BaseSkill::drawXPBar();

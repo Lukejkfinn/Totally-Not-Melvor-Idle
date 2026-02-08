@@ -159,7 +159,7 @@ void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY,
         std::string skillsText = skillText[i] + " (" + std::to_string(skills[i]->getLevel()) + "/99)";
         if(Button(Rectangle{5, posY + contentY, winWidth / scale -10, buttonHeight}, skillsText.c_str()))
         {
-            indexPage = i+2;
+            indexPage = i+1;
         }
 
     }
@@ -213,6 +213,15 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Firemak
         file << wood.getProgressArray()[i] << ' ';
     file << "\n\n";
 
+    // firemaking
+    file << "[Firemaking]\n";
+    file << "level=" << firemaking.getLevel() << '\n';
+    file << "xp=" << firemaking.getXP() << '\n';
+    file << "progress=";
+    for (int i = 0; i < 8; i++)
+        file << firemaking.getProgress() << ' ';
+    file << "\n\n";
+
     // mining
     file << "[Mining]\n";
     file << "level=" << mining.getLevel() << '\n';
@@ -245,7 +254,7 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, M
 
     // preparation for reading the file (line by line and by sections of data)
     std::string line;
-    enum class Section { None, Currency, Inventory, Woodcutting, Mining, Smithing };
+    enum class Section { None, Currency, Inventory, Woodcutting, Firemaking, Mining, Smithing };
     Section currentSection = Section::None;
 
     // clear inventory slots
@@ -272,6 +281,11 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, M
         if (line == "[Woodcutting]")
         {
             currentSection = Section::Woodcutting;
+            continue;
+        }
+        if (line == "[Firemaking]")
+        {
+            currentSection = Section::Firemaking;
             continue;
         }
         if (line == "[Mining]")
@@ -346,6 +360,27 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, M
             {
                 for (int i = 0; i < 8; i++)
                     ss >> wood.getProgressArray()[i];
+            }
+        }
+        else if (currentSection == Section::Firemaking)
+        {
+            if (key == "level")
+            {
+                int lvl;
+                ss >> lvl;
+                firemaking.setLevel(lvl);
+            }
+            else if (key == "xp")
+            {
+                int xp;
+                ss >> xp;
+                firemaking.setXP(xp);
+                firemaking.updateXPBar(0);
+            }
+            else if (key == "progress")
+            {
+                for (int i = 0; i < 8; i++)
+                    ss >> firemaking.getProgress();
             }
         }
         else if (currentSection == Section::Mining)
@@ -453,24 +488,22 @@ int main()
         ClearBackground(BLACK);
 
         // draw background
-        if (indexPage == 0) // default blank page
-            DrawTextureEx(background, Vector2{(float)winDimensions[0] / scale, 0}, 0, 1, WHITE);
-        else if (indexPage == 1) // inventory
+        DrawTextureEx(background, Vector2{(float)winDimensions[0] / scale, 0}, 0, 1, WHITE);
+
+        if (indexPage == 0) // inventory
         {
             const float invPosY{100.f};
             const int cellSize{64};
             inventory.drawInventory(winDimensions[0] / scale + 20, invPosY + contentY-100, cellSize);
         }
-        else if (indexPage == 2) 
+        else if (indexPage == 1) 
             woodcutting.tick(GetFrameTime(), contentY); 
-        else if (indexPage == 4) 
+        else if (indexPage == 3) 
             firemaking.tick(GetFrameTime(), contentY);
-        else if (indexPage == 6) 
+        else if (indexPage == 5) 
             mining.tick(GetFrameTime(), contentY);
-        else if (indexPage == 7) 
+        else if (indexPage == 6) 
             smithing.tick(GetFrameTime(), contentY);
-        else
-            indexPage = 0;
 
         if (debugger.debugging)
         {
@@ -497,7 +530,7 @@ int main()
         std::string bankSlots = "Bank " + std::to_string(inventory.getFilledSlots()) + "/" + std::to_string(inventory.SIZE);
         if (Button(Rectangle{0, 10, (float)winDimensions[0] / scale -1, 30.f}, bankSlots.c_str())) 
         {
-            indexPage = 1;
+            indexPage = 0;
         }
 
         // CURRENCY TEXT     

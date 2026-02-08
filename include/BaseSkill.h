@@ -17,6 +17,7 @@ public:
     void updateXPBar(int xpAmount);
     virtual void drawTemplate(float contentY);
     virtual void tick(float deltaTime, float contentY);
+    virtual void resetSkillProgress();
     
     // save/load helpers
     virtual int getNodeLevel(int index) const { return nodeLvl[index]; }
@@ -34,6 +35,11 @@ protected:
     Rectangle xpBar[12];   // XP bars
     Rectangle xpBarBG[12]; // XP bar backgrounds
     int curLvl{1};
+
+    Rectangle singleXpBar;
+    float progress{0};
+    bool isRunning{false};
+    float runningTime = {0};
     
 private:
     int winWidth{0};

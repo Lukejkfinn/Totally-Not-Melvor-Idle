@@ -145,6 +145,14 @@ void BaseSkill::drawTemplate(float contentY)
     }
 }
 
+void BaseSkill::resetSkillProgress()
+{
+    isRunning = false;
+    runningTime = 0.f;
+    progress = 0.f;
+    singleXpBar.width = 0.f;
+}
+
 void BaseSkill::tick(float deltaTime, float contentY)
 {
     DrawTextureEx(background, Vector2{bgPosX, 0}, 0, 1, WHITE);

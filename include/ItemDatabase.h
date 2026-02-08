@@ -7,6 +7,7 @@
 enum class SkillType
 {
     Woodcutting,
+    Firemaking,
     Mining,
     Smithing
 };

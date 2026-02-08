@@ -46,44 +46,44 @@ void Debugger::drawSkillsTemplate()
     int buttonHeight = 30;
     int buttonYAdjust = -5;
 
-    // fixed button columns
     int leftButtonX = 550;
     int rightButtonX = leftButtonX + buttonWidth + 15;
 
-    const char *labels[] =
-        {
-            "Set Woodcutting:",
-            "Set Fishing",
-            "Set Firemaking",
-            "Set Cooking",
-            "Set Mining:",
-            "Set Smithing",
-            "Set Thieving",
-            "Set Fletching",
-            "Set Crafting",
-            "Set Runecrafting",
-            "Set Herblore",
-            "Set Agility",
-            "Set Summoning",
-            "Set Astrology"
-        };
-
-    std::vector<SkillEntry> skills =
+    const char* labels[] =
     {
-        { &woodcutting },
-        { &fishing },
-        { &firemaking },
-        { &cooking },
-        { &mining },
-        { &smithing },
-        { &thieving },
-        { &fletching },
-        { &crafting },
-        { &runecrafting },
-        { &herblore },
-        { &agility },
-        { &summoning },
-        { &astrology }
+        "Set Woodcutting:",
+        "Set Fishing",
+        "Set Firemaking",
+        "Set Cooking",
+        "Set Mining:",
+        "Set Smithing",
+        "Set Thieving",
+        "Set Fletching",
+        "Set Crafting",
+        "Set Runecrafting",
+        "Set Herblore",
+        "Set Agility",
+        "Set Summoning",
+        "Set Astrology",
+        "Set All Skills"
+    };
+
+    std::vector<BaseSkill*> skills =
+    {
+        &woodcutting,
+        &fishing,
+        &firemaking,
+        &cooking,
+        &mining,
+        &smithing,
+        &thieving,
+        &fletching,
+        &crafting,
+        &runecrafting,
+        &herblore,
+        &agility,
+        &summoning,
+        &astrology
     };
 
     int numLabels = sizeof(labels) / sizeof(labels[0]);
@@ -92,33 +92,35 @@ void Debugger::drawSkillsTemplate()
     {
         int y = startY + i * spacing;
 
-        // draw labels
+        // draw label
         DrawText(labels[i], startX, y, fontSize, BLACK);
 
-        // make buttons
-        Rectangle leftButton =
-            {
-                (float)leftButtonX,
-                (float)(y + buttonYAdjust),
-                (float)buttonWidth,
-                (float)buttonHeight};
+        Rectangle leftButton = { (float)leftButtonX, (float)(y + buttonYAdjust), (float)buttonWidth, (float)buttonHeight };
+        Rectangle rightButton = { (float)rightButtonX, (float)(y + buttonYAdjust), (float)buttonWidth, (float)buttonHeight };
 
-        Rectangle rightButton =
-            {
-                (float)rightButtonX,
-                (float)(y + buttonYAdjust),
-                (float)buttonWidth,
-                (float)buttonHeight};
-        
-        // button actions
+        // determine which skills this row should affect
+        std::vector<BaseSkill*> allSkills;
+
+        if (i == numLabels - 1) // last row: "Set All"
+        {
+            allSkills = skills; // all skills
+        }
+        else
+        {
+            allSkills.push_back(skills[i]);
+        }
+
+        // handle buttons
         if (btn(leftButton, "1"))
         {
-            skills[i].skill->setLevel(1);
+            for (auto* skill : allSkills)
+                skill->setLevel(1);
         }
 
         if (btn(rightButton, "99"))
         {
-            skills[i].skill->setLevel(99);
+            for (auto* skill : allSkills)
+                skill->setLevel(99);
         }
     }
 }
