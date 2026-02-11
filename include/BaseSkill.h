@@ -6,6 +6,13 @@
 #include <string>
 #include <iostream>
 
+struct Dropdown 
+{
+    Rectangle bounds;
+    bool isOpen = false;
+    int selectedIndex = 0;
+};
+
 class BaseSkill
 {
 public:
@@ -25,12 +32,13 @@ public:
     int getXP() const { return xp; }
     void setLevel(int lvl) { curLvl = lvl; }
     void setXP(int newXP) { xp = newXP; }
-    Texture2D background{LoadTexture("assets/background.jpg")};
+    Texture2D background{LoadTexture("assets/ui/background.jpg")};
 
 protected:
-    Texture2D woodcuttingBG{LoadTexture("assets/woodcuttingBG.png")};
-    Texture2D miningBG{LoadTexture("assets/miningBG.jpg")};
-    Texture2D smithingBG{LoadTexture("assets/smithingBG.jpg")};
+    Texture2D woodcuttingBG{LoadTexture("assets/ui/woodcuttingBG.png")};
+    Texture2D fishingBG{LoadTexture("assets/ui/fishingBG.jpg")};
+    Texture2D miningBG{LoadTexture("assets/ui/miningBG.jpg")};
+    Texture2D smithingBG{LoadTexture("assets/ui/smithingBG.jpg")};
     Rectangle skillBg[12]; // 3 rows * 4 cols
     Rectangle xpBar[12];   // XP bars
     Rectangle xpBarBG[12]; // XP bar backgrounds
@@ -40,6 +48,8 @@ protected:
     float progress{0};
     bool isRunning{false};
     float runningTime = {0};
+    int iconTargetW{32};
+    int iconTargetH{32};
     
 private:
     int winWidth{0};

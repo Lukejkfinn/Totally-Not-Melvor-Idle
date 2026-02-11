@@ -18,7 +18,7 @@ bool Debugger::btn(Rectangle bounds, const char *text)
     // draw button
     DrawRectangleRec(bounds, bgColor);
 
-    // center text
+    // centre text
     int fontSize = 20;
     int textWidth = MeasureText(text, fontSize);
 
@@ -114,7 +114,11 @@ void Debugger::drawSkillsTemplate()
         if (btn(leftButton, "1"))
         {
             for (auto* skill : allSkills)
+            {
                 skill->setLevel(1);
+                skill->setXP(0);
+                skill->updateXPBar(0);
+            }
         }
 
         if (btn(rightButton, "99"))
@@ -146,13 +150,14 @@ void Debugger::drawObjectsTemplate()
     const char* labels[] =
     {
         "All Woodcutting logs:",
+        "All Fishing food",
         "All Mining ores:",
         "All Smithing bars",
         "Clear Inventory:"
     };
 
     // map each row to a SkillType (last entry has no skill)
-    SkillType skillMap[] = { SkillType::Woodcutting, SkillType::Mining, SkillType::Smithing };
+    SkillType skillMap[] = { SkillType::Woodcutting, SkillType::Fishing, SkillType::Mining, SkillType::Smithing };
 
     int numLabels = sizeof(labels) / sizeof(labels[0]);
 

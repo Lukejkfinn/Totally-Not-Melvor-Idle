@@ -29,6 +29,10 @@ std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill, int spawnAmount)
         skillName = "woodcutting";
         break;
 
+    case SkillType::Fishing:
+        skillName = "fishing";
+        break;
+    
     case SkillType::Firemaking:
         skillName = "firemaking";
         break;
@@ -69,7 +73,9 @@ Texture2D ItemDatabase::LoadItemTexture(const std::string &texturePath) {
 void ItemDatabase::loadItems()
 {
     const static int logAmount{1};
+    const static int fishAmount{1};
     const static int rockAmount{1};
+    const static int barAmount{1};
 
     std::vector<ItemData> woodcuttingItems = 
     {
@@ -87,6 +93,38 @@ void ItemDatabase::loadItems()
 
     // loading woodcutting items
     for (const auto& itemData : woodcuttingItems) // loop through all items
+    {
+        Texture2D texture = LoadTexture(itemData.texturePath.c_str());
+        if (texture.id == 0) 
+            std::cerr << "Failed to load texture for " << itemData.itemName << std::endl;
+        else 
+            items.push_back(Item(texture, itemData.amount, itemData.stackable, itemData.stackAmount, 
+                            itemData.itemName, itemData.skillType, itemData.id, itemData.value));
+    }
+
+    std::vector<ItemData> fishingItems = 
+    {
+        // texture, name, skillType, ID, value, amount, maxStack, isStackable
+        {"assets/bank/fishing/shrimp.png", "Raw Shrimp", "fishing", 1, 1, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/sardine.png", "Raw Sardine", "fishing", 2, 5, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/herring.png", "Raw Herring", "fishing", 3, 10, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/seahorse.png", "Raw Seahorse", "fishing", 4, 20, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/trout.png", "Raw Trout", "fishing", 5, 35, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/salmon.png", "Raw Salmon", "fishing", 6, 50, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/lobster.png", "Raw Lobster", "fishing", 7, 75, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/swordfish.png", "Raw Swordfish", "fishing", 8, 400, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/anglerfish.png", "Raw Anglerfish", "fishing", 9, 25, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/fanfish.png", "Raw Fanfish", "fishing", 10, 25, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/crab.png", "Raw Crab", "fishing", 11, 25, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/carp.png", "Raw Carp", "fishing", 12, 25, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/shark.png", "Raw Shark", "fishing", 13, 25, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/cavefish.png", "Raw Cave Fish", "fishing", 14, 25, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/mantaray.png", "Raw Manta Ray", "fishing", 15, 25, fishAmount, fishMaxStack, true},
+        {"assets/bank/fishing/whale.png", "Raw Whale", "fishing", 16, 25, fishAmount, fishMaxStack, true}
+    };
+
+    // loading fishing items
+    for (const auto& itemData : fishingItems) // loop through all items
     {
         Texture2D texture = LoadTexture(itemData.texturePath.c_str());
         if (texture.id == 0) 
@@ -142,15 +180,15 @@ void ItemDatabase::loadItems()
     std::vector<ItemData> smithingItems = 
     {
         // texture, name, skillType, ID, value, amount, maxStack, isStackable
-        {"assets/bank/smithing/bronze_bar.png", "Bronze Bar", "smithing", 1, 2, 1, barsMaxStack, true},
-        {"assets/bank/smithing/iron_bar.png", "Iron Bar", "smithing", 2, 2, 1, barsMaxStack, true},
-        {"assets/bank/smithing/steel_bar.png", "Steel Bar", "smithing", 3, 2, 1, barsMaxStack, true},
-        {"assets/bank/smithing/silver_bar.png", "Silver Bar", "smithing", 4, 2, 1, barsMaxStack, true},
-        {"assets/bank/smithing/gold_bar.png", "Gold Bar", "smithing", 5, 2, 1, barsMaxStack, true},
-        {"assets/bank/smithing/mithril_bar.png", "Mithril Bar", "smithing", 6, 2, 1, barsMaxStack, true},
-        {"assets/bank/smithing/adamantite_bar.png", "Adamantite Bar", "smithing", 7, 2, 1, barsMaxStack, true},
-        {"assets/bank/smithing/runite_bar.png", "Runite Bar", "smithing", 8, 2, 1, barsMaxStack, true},
-        {"assets/bank/smithing/dragonite_bar.png", "Dragonite Bar", "smithing", 9, 2, 1, barsMaxStack, true}
+        {"assets/bank/smithing/bronze_bar.png", "Bronze Bar", "smithing", 1, 2, barAmount, barsMaxStack, true},
+        {"assets/bank/smithing/iron_bar.png", "Iron Bar", "smithing", 2, 2, barAmount, barsMaxStack, true},
+        {"assets/bank/smithing/steel_bar.png", "Steel Bar", "smithing", 3, 2, barAmount, barsMaxStack, true},
+        {"assets/bank/smithing/silver_bar.png", "Silver Bar", "smithing", 4, 2, barAmount, barsMaxStack, true},
+        {"assets/bank/smithing/gold_bar.png", "Gold Bar", "smithing", 5, 2, barAmount, barsMaxStack, true},
+        {"assets/bank/smithing/mithril_bar.png", "Mithril Bar", "smithing", 6, 2, barAmount, barsMaxStack, true},
+        {"assets/bank/smithing/adamantite_bar.png", "Adamantite Bar", "smithing", 7, 2, barAmount, barsMaxStack, true},
+        {"assets/bank/smithing/runite_bar.png", "Runite Bar", "smithing", 8, 2, barAmount, barsMaxStack, true},
+        {"assets/bank/smithing/dragonite_bar.png", "Dragonite Bar", "smithing", 9, 2, barAmount, barsMaxStack, true}
 
     };
 

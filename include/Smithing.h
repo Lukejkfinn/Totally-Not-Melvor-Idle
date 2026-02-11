@@ -6,7 +6,6 @@
 #include "ItemDatabase.h"
 #include "BaseSkill.h"
 #include <iostream>
-#include <String>
 
 class Smithing : public BaseSkill
 {
@@ -14,11 +13,11 @@ class Smithing : public BaseSkill
 public:
     Smithing(Inventory &invetory);
     virtual void drawTemplate(float contentY) override;
-    void beginSmithing(float contentY);
     bool canSmeltSelected() const;
     void onSmeltCompleted();
     void drawSmithingPanelInfo(float contentY, int index);
     void drawOreCombinationPanel(float contentY, int ore1ID, int ore1Amount, int ore2ID, int ore2Amount);
+    void beginSmithing(float contentY);
     void drawOreSingularPanel(float contentY, int oreID, int oreAmount);
     void drawProductionPanel(float contentY, int barType, int barAmount);
     void oreCombination(int ore1Amount, int ore1, int ore2Amount, int ore2, int bar);
@@ -26,6 +25,7 @@ public:
     virtual void resetSkillProgress();
     virtual void tick(float deltaTime, float contentY) override;
     int getNodeLevel(int index) const override;
+
     // non-const getters for writing
     float& getProgress() { return progress; }
 
@@ -43,12 +43,12 @@ private:
     int selectedItemIndex{-1};
     int targetW{32};
     int targetH{32};
-    //float runningTime = {0};
+    float runningTime = {0};
     float maxWidth{0};
     int xpAccumulated{0};
     float barTimer{1.9f};
     int xpPerBar[MAX_BARS]{5, 8, 12, 15, 20, 35, 42, 51, 61};
-    //bool isRunning{false};
+    bool isRunning{false};
     int nodeLvl[maxLvl]{};
     Rectangle xpBar;
     Rectangle xpBarBG;
@@ -60,7 +60,7 @@ private:
     
 
 
-    //float progress{0};
+    float progress{0};
 };
 
 

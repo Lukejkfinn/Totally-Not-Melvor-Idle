@@ -7,6 +7,7 @@
 enum class SkillType
 {
     Woodcutting,
+    Fishing,
     Firemaking,
     Mining,
     Smithing
@@ -39,6 +40,7 @@ private:
     static Texture2D LoadItemTexture(const std::string &texturePath);     
     
     const static int logsMaxStack{999'999};
+    const static int fishMaxStack{999'999};
     const static int oresMaxStack{999'999};
     const static int barsMaxStack{999'999};
 

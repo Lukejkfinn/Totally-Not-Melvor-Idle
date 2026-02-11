@@ -25,9 +25,11 @@
 #include <sstream>
 #include <filesystem>
 
+static const float contentY{};
+
 // forward declarations
-void saveGame(const Inventory &inventory, const Woodcutting &wood, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename);
-void loadGame(const Inventory &inventory, const Woodcutting &wood, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename);
+void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename);
+void loadGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename);
 
 bool Button(Rectangle bounds, const char *text)
 {
@@ -171,12 +173,12 @@ void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY,
     // quit button
     if (Button(Rectangle{5, 670 + (contentY-100), winWidth / scale -10, buttonHeight}, "Quit"))
     {
-        saveGame(inventory, woodcutting, firemaking, mining, smithing, "data/save.txt");
+        saveGame(inventory, woodcutting, fishing, firemaking, mining, smithing, "data/save.txt");
         running = false;
     }
 }
 
-void saveGame(const Inventory &inventory, const Woodcutting &wood, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename)
+void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename)
 {
     std::ofstream file(filename);
     if (!file.is_open())
@@ -190,20 +192,6 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Firemak
     file << "gold=" << inventory.getGold();
     file << "\n\n";
 
-    // inventory
-    file << "[Inventory]\n";
-    for (const auto &slot : inventory.getSlots())
-    {
-        if (slot)
-        {   
-            const Item &item = *slot;
-            file << item.getSkillType() << "="
-                << item.getId() << ","
-                << item.getAmount() << "\n";
-        }
-    }
-    file << "\n";
-
     // woodcutting
     file << "[Woodcutting]\n";
     file << "level=" << wood.getLevel() << '\n';
@@ -213,6 +201,15 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Firemak
         file << wood.getProgressArray()[i] << ' ';
     file << "\n\n";
 
+    // fishing
+    file << "[Fishing]\n";
+    file << "level=" << fishing.getLevel() << '\n';
+    file << "xp=" << fishing.getXP() << '\n';
+    file << "progress=";
+    for (int i = 0; i < 8; i++)
+        file << fishing.getProgress() << ' ';
+    file << "\n\n";
+    
     // firemaking
     file << "[Firemaking]\n";
     file << "level=" << firemaking.getLevel() << '\n';
@@ -239,10 +236,24 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Firemak
     file << smithing.getProgress() << ' ';
     file << "\n\n";
 
+    // inventory
+    file << "[Inventory]\n";
+    for (const auto &slot : inventory.getSlots())
+    {
+        if (slot)
+        {   
+            const Item &item = *slot;
+            file << item.getSkillType() << "="
+                << item.getId() << ","
+                << item.getAmount() << "\n";
+        }
+    }
+    file << "\n";
+
     std::cout << "Game saved!\n";
 }
 
-void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, Mining &mining, Smithing &smithing, const std::string &filename)
+void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemaking &firemaking, Mining &mining, Smithing &smithing, const std::string &filename)
 {
     // open the file
     std::ifstream file(filename);
@@ -254,7 +265,7 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, M
 
     // preparation for reading the file (line by line and by sections of data)
     std::string line;
-    enum class Section { None, Currency, Inventory, Woodcutting, Firemaking, Mining, Smithing };
+    enum class Section { None, Currency, Woodcutting, Fishing, Firemaking, Mining, Smithing, Inventory };
     Section currentSection = Section::None;
 
     // clear inventory slots
@@ -273,14 +284,14 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, M
             currentSection = Section::Currency;
             continue;
         }
-        if (line == "[Inventory]")
-        {
-            currentSection = Section::Inventory;
-            continue;
-        }
         if (line == "[Woodcutting]")
         {
             currentSection = Section::Woodcutting;
+            continue;
+        }
+        if (line == "[Fishing]")
+        {
+            currentSection = Section::Fishing;
             continue;
         }
         if (line == "[Firemaking]")
@@ -296,6 +307,11 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, M
         if (line == "[Smithing]")
         {
             currentSection = Section::Smithing;
+            continue;
+        }
+        if (line == "[Inventory]")
+        {
+            currentSection = Section::Inventory;
             continue;
         }
 
@@ -317,30 +333,6 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, M
             int curAmount = std::stoi(rest.substr(equals + 1));
             inventory.setGold(curAmount);
         }
-        else if (currentSection == Section::Inventory)
-        {
-
-            std::string skillType = line.substr(0, equals);
-            std::string rest = line.substr(equals + 1);
-
-            size_t comma = rest.find(',');
-            if (comma == std::string::npos)
-                continue;
-
-            int id = std::stoi(rest.substr(0, comma));
-            int amount = std::stoi(rest.substr(comma + 1));
-
-            Item item = ItemDatabase::getItemByName(skillType, id);
-
-            if (item.getTexture().id == 0)
-                std::cerr << "Failed to load item: " << skillType << " id=" << id << '\n';
-            else
-            {
-                item.setAmount(amount);
-                inventory.addItem(item);
-                std::cout << "Item loaded into bank: " << item.getName() << '\n'; 
-            }
-        }
         else if (currentSection == Section::Woodcutting)
         {
             if (key == "level")
@@ -360,6 +352,27 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, M
             {
                 for (int i = 0; i < 8; i++)
                     ss >> wood.getProgressArray()[i];
+            }
+        }
+        else if (currentSection == Section::Fishing)
+        {
+            if (key == "level")
+            {
+                int lvl;
+                ss >> lvl;
+                fishing.setLevel(lvl);
+            }
+            else if (key == "xp")
+            {
+                int xp;
+                ss >> xp;
+                fishing.setXP(xp);
+                fishing.updateXPBar(0);
+            }
+            else if (key == "progress")
+            {
+                for (int i = 0; i < 8; i++)
+                    ss >> fishing.getProgress();
             }
         }
         else if (currentSection == Section::Firemaking)
@@ -424,6 +437,30 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Firemaking &firemaking, M
                 ss >> smithing.getProgress();
             }
         }
+        else if (currentSection == Section::Inventory)
+        {
+
+            std::string skillType = line.substr(0, equals);
+            std::string rest = line.substr(equals + 1);
+
+            size_t comma = rest.find(',');
+            if (comma == std::string::npos)
+                continue;
+
+            int id = std::stoi(rest.substr(0, comma));
+            int amount = std::stoi(rest.substr(comma + 1));
+
+            Item item = ItemDatabase::getItemByName(skillType, id);
+
+            if (item.getTexture().id == 0)
+                std::cerr << "Failed to load item: " << skillType << " id=" << id << '\n';
+            else
+            {
+                item.setAmount(amount);
+                inventory.addItem(item);
+                std::cout << "Item loaded into bank: " << item.getName() << '\n'; 
+            }
+        }
     }
     std::cout << "Game loaded!\n";
 }
@@ -442,7 +479,7 @@ int main()
     // ensure the data folder exists
     std::filesystem::create_directory("data");
 
-    Texture2D background = LoadTexture("assets/background.jpg");
+    Texture2D background = LoadTexture("assets/ui/background.jpg");
 
     // load meta data
     ItemDatabase::loadItems();
@@ -450,7 +487,7 @@ int main()
     // class declarations
     Inventory inventory;
     Woodcutting woodcutting(inventory);
-    Fishing fishing;
+    Fishing fishing(inventory);
     Firemaking firemaking(inventory);
     Cooking cooking;
     Mining mining(inventory);
@@ -472,12 +509,12 @@ int main()
     mining.getWindowSize(winDimensions[0], winDimensions[1]);
 
     inventory.loadTextures();
-    loadGame(inventory, woodcutting, firemaking, mining, smithing, "data/save.txt");
+    loadGame(inventory, woodcutting, fishing, firemaking, mining, smithing, "data/save.txt");
 
     // variable declarations
     int scale{4};
     float scrollValue = 0.0f;
-    int indexPage{};
+    int indexPage{-2};
     float contentY{};
     bool running{true};
 
@@ -498,6 +535,8 @@ int main()
         }
         else if (indexPage == 1) 
             woodcutting.tick(GetFrameTime(), contentY); 
+        else if (indexPage == 2)
+            fishing.tick(GetFrameTime(), contentY);
         else if (indexPage == 3) 
             firemaking.tick(GetFrameTime(), contentY);
         else if (indexPage == 5) 
@@ -549,7 +588,7 @@ int main()
 
     if (!running || WindowShouldClose())
     {
-        saveGame(inventory, woodcutting, firemaking, mining, smithing, "data/save.txt");
+        saveGame(inventory, woodcutting, fishing, firemaking, mining, smithing, "data/save.txt");
         std::cout << "Game saved!\n";
     }
     ItemDatabase::unloadItems();
