@@ -9,7 +9,6 @@ class Fishing : public BaseSkill
 public:
     Fishing(Inventory &inv);
     void drawDropdown(Dropdown& dd, const std::vector<std::string>& options);
-    void drawProductionPanel(float contentY, int itemType, int amount);
     void drawTemplate(float contentY);
     void drawInfoPanel(float contentY, int logID, int logAmount);
     int getNodeLevel(int index) const;
@@ -17,7 +16,7 @@ public:
     void onCompleted();
     void createButton(float contentY);
     void resetSkillProgress();
-    void tick(float deltaTime, float contentY);
+    virtual void tick(float deltaTime, float contentY) override;
 
     // non-const getters for writing
     float& getProgress() { return progress; }

@@ -9,6 +9,7 @@ enum class SkillType
     Woodcutting,
     Fishing,
     Firemaking,
+    Cooking,
     Mining,
     Smithing
 };
@@ -41,6 +42,8 @@ private:
     
     const static int logsMaxStack{999'999};
     const static int fishMaxStack{999'999};
+    const static int miscMaxStack{999'999};
+    const static int foodMaxStack{999'999};
     const static int oresMaxStack{999'999};
     const static int barsMaxStack{999'999};
 

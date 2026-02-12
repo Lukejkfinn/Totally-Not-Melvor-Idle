@@ -150,14 +150,16 @@ void Debugger::drawObjectsTemplate()
     const char* labels[] =
     {
         "All Woodcutting logs:",
-        "All Fishing food",
+        "All Fishing items",
+        "All Firemaking items",
+        "All Cooking items",
         "All Mining ores:",
         "All Smithing bars",
         "Clear Inventory:"
     };
 
     // map each row to a SkillType (last entry has no skill)
-    SkillType skillMap[] = { SkillType::Woodcutting, SkillType::Fishing, SkillType::Mining, SkillType::Smithing };
+    SkillType skillMap[] = { SkillType::Woodcutting, SkillType::Fishing, SkillType::Firemaking, SkillType::Cooking, SkillType::Mining, SkillType::Smithing };
 
     int numLabels = sizeof(labels) / sizeof(labels[0]);
 

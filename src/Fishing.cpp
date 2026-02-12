@@ -165,8 +165,8 @@ void Fishing::drawInfoPanel(float contentY, int fishID, int fishAmount)
     float scale = std::min(fishScaleW, fishScaleH);
 
     // draws the right fish and amount below the fish
-    Vector2 fishLocationRight{860, 365 + (contentY -100)};
-    DrawTextureEx(fish.getTexture(), fishLocationRight, 1, scale, WHITE);
+    Vector2 fishLocation{860, 365 + (contentY -100)};
+    DrawTextureEx(fish.getTexture(), fishLocation, 1, scale, WHITE);
 
     int invfish = inventory.getItemAmount("fishing", fishID); // get fish amount from inventory
     DrawText(std::to_string(invfish).c_str(), 870, 400 + (contentY-100), 20, WHITE);

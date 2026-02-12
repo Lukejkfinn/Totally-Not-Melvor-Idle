@@ -37,6 +37,10 @@ std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill, int spawnAmount)
         skillName = "firemaking";
         break;
 
+            case SkillType::Cooking:
+        skillName = "cooking";
+        break;
+
     case SkillType::Mining:
         skillName = "mining";
         break;
@@ -74,6 +78,8 @@ void ItemDatabase::loadItems()
 {
     const static int logAmount{1};
     const static int fishAmount{1};
+    const static int miscAmount{1};
+    const static int foodAmount{1};
     const static int rockAmount{1};
     const static int barAmount{1};
 
@@ -137,11 +143,60 @@ void ItemDatabase::loadItems()
     std::vector<ItemData> firemakingItems =
     {
         // texture,                           name,   skillType, ID, value, amount, maxStack, isStackable
-        {"assets/bank/firemaking/ashes.png", "Ashes", "firemaking", 1, 2, rockAmount, oresMaxStack, true},
+        {"assets/bank/firemaking/ashes.png", "Ashes", "firemaking", 1, 2, miscAmount, miscMaxStack, true},
     };
 
     // loading firemaking items
     for (const auto& itemData : firemakingItems) // loop through all items
+    {
+        Texture2D texture = LoadTexture(itemData.texturePath.c_str());
+        if (texture.id == 0) 
+            std::cerr << "Failed to load texture for " << itemData.itemName << std::endl;
+        else 
+            items.push_back(Item(texture, itemData.amount, itemData.stackable, itemData.stackAmount, 
+                            itemData.itemName, itemData.skillType, itemData.id, itemData.value));
+    }
+
+    std::vector<ItemData> cookingItems =
+    {
+        // texture,                           name,   skillType,                    ID, value, amount, maxStack, isStackable
+        {"assets/bank/cooking/shrimp_cooked.png", "Shrimp", "cooking",              1, 2, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/sardine_cooked.png", "Sardine", "cooking",            2, 5, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/herring_cooked.png", "Herring", "cooking",            3, 10, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/seahorse_cooked.png", "Seahorse", "cooking",          4, 65, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/trout_cooked.png", "Trout", "cooking",                5, 27, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/salmon_cooked.png", "Salmon", "cooking",              6, 58, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/lobster_cooked.png", "Lobster", "cooking",            7, 108, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/swordfish_cooked.png", "Swordfish", "cooking",        8, 134, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/anglerfish_cooked.png", "Anglerfish", "cooking",      9, 209, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/fanfish_cooked.png", "Fanfish", "cooking",            10, 250, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/crab_cooked.png", "Crab", "cooking",                  11, 280, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/carp_cooked.png", "Carp", "cooking",                  12, 395, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/shark_cooked.png", "Shark", "cooking",                13, 674, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/cavefish_cooked.png", "Cave Fish", "cooking",         14, 538, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/mantaray_cooked.png", "Manta Ray", "cooking",         15, 1624, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/whale_cooked.png", "Whale", "cooking",                16, 2048, foodAmount, foodMaxStack, true},
+
+        {"assets/bank/cooking/shrimp_burnt.png", "Burnt Shrimp", "cooking",         17, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/sardine_burnt.png", "Burnt Sardine", "cooking",       18, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/herring_burnt.png", "Burnt Herring", "cooking",       19, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/seahorse_burnt.png", "Burnt Seahorse", "cooking",     20, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/trout_burnt.png", "Burnt Trout", "cooking",           21, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/salmon_burnt.png", "Burnt Salmon", "cooking",         22, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/lobster_burnt.png", "Burnt Lobster", "cooking",       23, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/swordfish_burnt.png", "Burnt Swordfish", "cooking",   24, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/anglerfish_burnt.png", "Burnt Anglerfish", "cooking", 25, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/fanfish_burnt.png", "Burnt Fanfish", "cooking",       26, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/crab_burnt.png", "Burnt Crab", "cooking",             27, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/carp_burnt.png", "Burnt Carp", "cooking",             28, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/shark_burnt.png", "Burnt Shark", "cooking",           29, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/cavefish_burnt.png", "Burnt Cave Fish", "cooking",    30, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/mantaray_burnt.png", "Burnt Manta Ray", "cooking",    31, 0, foodAmount, foodMaxStack, true},
+        {"assets/bank/cooking/whale_burnt.png", "Burnt Whale", "cooking",           32, 0, foodAmount, foodMaxStack, true},
+    };
+
+    // loading cooking items
+    for (const auto& itemData : cookingItems) // loop through all items
     {
         Texture2D texture = LoadTexture(itemData.texturePath.c_str());
         if (texture.id == 0) 

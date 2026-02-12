@@ -489,7 +489,7 @@ int main()
     Woodcutting woodcutting(inventory);
     Fishing fishing(inventory);
     Firemaking firemaking(inventory);
-    Cooking cooking;
+    Cooking cooking(inventory);
     Mining mining(inventory);
     Smithing smithing(inventory);
     Thieving thieving;
@@ -539,6 +539,8 @@ int main()
             fishing.tick(GetFrameTime(), contentY);
         else if (indexPage == 3) 
             firemaking.tick(GetFrameTime(), contentY);
+        else if (indexPage == 4) 
+            cooking.tick(GetFrameTime(), contentY);
         else if (indexPage == 5) 
             mining.tick(GetFrameTime(), contentY);
         else if (indexPage == 6) 
