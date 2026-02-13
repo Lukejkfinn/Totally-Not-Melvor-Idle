@@ -45,7 +45,7 @@ private:
     int xpAccumulated{0};
     int index = -1;
     float treeTimer[MAX_TREES]{2.1f, 2.8f, 3.5f, 4.2f, 5.6f, 7.f, 8.4f, 10.f, 12.f};
-    int xpPerTree[MAX_TREES]{500, 15, 22, 30, 40, 61, 81, 100, 150};
+    int xpPerTree[MAX_TREES]{11, 15, 22, 30, 40, 61, 81, 100, 150};
     std::string xpPerTreeString[MAX_TREES];
     std::string treeNames[MAX_TREES];
     std::string timeToCutTree[MAX_TREES];

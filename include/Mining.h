@@ -42,7 +42,7 @@ private:
     int xpAccumulated{0};
     int index = -1;
     float rockTimer[MAX_ROCKS]{2.1f, 2.8f, 3.5f, 4.2f, 5.6f, 7.f, 8.4f, 10.f, 15.f, 20.f};
-    int xpPerRock[MAX_ROCKS]{500, 15, 22, 30, 40, 61, 81, 100, 150, 200};
+    int xpPerRock[MAX_ROCKS]{8, 8, 16, 20, 28, 32, 74, 81, 98, 116};
     std::string xpPerRockString[MAX_ROCKS];
     std::string rockNames[MAX_ROCKS];
     std::string timeToMineRocks[MAX_ROCKS];

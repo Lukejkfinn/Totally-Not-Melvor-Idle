@@ -14,10 +14,20 @@ public:
     void drawDropdown(Dropdown& dd, const std::vector<std::string>& options);
     void drawTemplate(float contentY);
     void drawInfoPanel(float contentY, int logID, int logAmount);
+    int getNodeLevel(int index) const;
+    int getUnlockedSkillIndex() const;
+    bool canCookSelected(int index) const;
     void onCompleted();
     void createButton(float contentY);
     void resetSkillProgress();
     virtual void tick(float deltaTime, float contentY) override;
+
+    // save/load helpers
+    // non-const getters for writing
+    float& getProgress() { return progress; }
+
+    // const getters for read-only access
+    const float& getProgress() const { return progress; }
 
 protected:
 

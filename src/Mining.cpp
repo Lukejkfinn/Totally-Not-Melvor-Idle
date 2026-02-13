@@ -50,21 +50,21 @@ void Mining::initRockDetails()
         "Mithril",
         "Adamantite",
         "Runite",
-        "Chaz why"
+        "Dragonite"
     };
 
     const char *xpAmount[] =
     {
-        "10 XP/",
-        "15 XP/",
-        "22 XP/",
-        "30 XP/",
-        "40 XP/",
-        "61 XP/",
+        "8 XP/",
+        "8 XP/",
+        "16 XP/",
+        "20 XP/",
+        "28 XP/",
+        "32 XP/",
+        "74 XP/",
         "81 XP/",
-        "100 XP/",
-        "150 XP/",
-        "200 XP/"
+        "98 XP/",
+        "116 XP/"
     };
 
     for (int i = 0; i < MAX_ROCKS; i++)

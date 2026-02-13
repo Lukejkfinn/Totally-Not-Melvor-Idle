@@ -28,8 +28,8 @@
 static const float contentY{};
 
 // forward declarations
-void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename);
-void loadGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename);
+void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Cooking &cooking, const Mining &mining, const Smithing &smithing, const std::string &filename);
+void loadGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Cooking &cooking, const Mining &mining, const Smithing &smithing, const std::string &filename);
 
 bool Button(Rectangle bounds, const char *text)
 {
@@ -173,12 +173,12 @@ void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY,
     // quit button
     if (Button(Rectangle{5, 670 + (contentY-100), winWidth / scale -10, buttonHeight}, "Quit"))
     {
-        saveGame(inventory, woodcutting, fishing, firemaking, mining, smithing, "data/save.txt");
+        saveGame(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, "data/save.txt");
         running = false;
     }
 }
 
-void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Mining &mining, const Smithing &smithing, const std::string &filename)
+void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Cooking &cooking, const Mining &mining, const Smithing &smithing, const std::string &filename)
 {
     std::ofstream file(filename);
     if (!file.is_open())
@@ -219,6 +219,15 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing
         file << firemaking.getProgress() << ' ';
     file << "\n\n";
 
+    // cooking
+    file << "[Cooking]\n";
+    file << "level=" << cooking.getLevel() << '\n';
+    file << "xp=" << cooking.getXP() << '\n';
+    file << "progress=";
+    for (int i = 0; i < 8; i++)
+        file << cooking.getProgress() << ' ';
+    file << "\n\n";
+
     // mining
     file << "[Mining]\n";
     file << "level=" << mining.getLevel() << '\n';
@@ -253,7 +262,7 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing
     std::cout << "Game saved!\n";
 }
 
-void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemaking &firemaking, Mining &mining, Smithing &smithing, const std::string &filename)
+void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemaking &firemaking, Cooking &cooking, Mining &mining, Smithing &smithing, const std::string &filename)
 {
     // open the file
     std::ifstream file(filename);
@@ -265,7 +274,10 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemak
 
     // preparation for reading the file (line by line and by sections of data)
     std::string line;
-    enum class Section { None, Currency, Woodcutting, Fishing, Firemaking, Mining, Smithing, Inventory };
+    enum class Section 
+    { 
+        None, Currency, Woodcutting, Fishing, Firemaking, Cooking, Mining, Smithing, Inventory 
+    };
     Section currentSection = Section::None;
 
     // clear inventory slots
@@ -297,6 +309,11 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemak
         if (line == "[Firemaking]")
         {
             currentSection = Section::Firemaking;
+            continue;
+        }
+        if (line == "[Cooking]")
+        {
+            currentSection = Section::Cooking;
             continue;
         }
         if (line == "[Mining]")
@@ -394,6 +411,27 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemak
             {
                 for (int i = 0; i < 8; i++)
                     ss >> firemaking.getProgress();
+            }
+        }
+        else if (currentSection == Section::Cooking)
+        {
+            if (key == "level")
+            {
+                int lvl;
+                ss >> lvl;
+                cooking.setLevel(lvl);
+            }
+            else if (key == "xp")
+            {
+                int xp;
+                ss >> xp;
+                cooking.setXP(xp);
+                cooking.updateXPBar(0);
+            }
+            else if (key == "progress")
+            {
+                for (int i = 0; i < 8; i++)
+                    ss >> cooking.getProgress();
             }
         }
         else if (currentSection == Section::Mining)
@@ -509,7 +547,7 @@ int main()
     mining.getWindowSize(winDimensions[0], winDimensions[1]);
 
     inventory.loadTextures();
-    loadGame(inventory, woodcutting, fishing, firemaking, mining, smithing, "data/save.txt");
+    loadGame(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, "data/save.txt");
 
     // variable declarations
     int scale{4};
@@ -590,7 +628,7 @@ int main()
 
     if (!running || WindowShouldClose())
     {
-        saveGame(inventory, woodcutting, fishing, firemaking, mining, smithing, "data/save.txt");
+        saveGame(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, "data/save.txt");
         std::cout << "Game saved!\n";
     }
     ItemDatabase::unloadItems();

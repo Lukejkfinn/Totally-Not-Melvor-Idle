@@ -11,8 +11,8 @@ void Cooking::drawDropdown(Dropdown& dd, const std::vector<std::string>& options
     Vector2 mouse = GetMousePosition();
 
     // clamp selected index to highest unlocked
-    //int maxUnlocked = getUnlockedSkillIndex();
-    //dd.selectedIndex = Clamp(dd.selectedIndex, 0, maxUnlocked);
+    int maxUnlocked = getUnlockedSkillIndex();
+    dd.selectedIndex = Clamp(dd.selectedIndex, 0, maxUnlocked);
 
     // main box
     DrawRectangleRec(dd.bounds, LIGHTGRAY);
@@ -108,8 +108,8 @@ void Cooking::drawTemplate(float contentY)
     Rectangle requirementsPreviewPanel{650, 325 + padding + (contentY - 100), 305, 100};
     DrawRectangleRounded(requirementsPreviewPanel, .05f, 16, GRAY);
 
-    // "XP:" text
-    DrawText("XP:", requirementsPreviewPanel.x + 30, 325 + textSpacing + (contentY - 100), 20, WHITE);
+    // "Requires:" text
+    DrawText("Requires:", requirementsPreviewPanel.x + 30, 325 + textSpacing + (contentY - 100), 20, WHITE);
 
     // "You have:" text
     DrawText("You Have:", requirementsPreviewPanel.x + requirementsPreviewPanel.width - 125, 325 + textSpacing + (contentY - 100), 20, WHITE);
@@ -117,6 +117,16 @@ void Cooking::drawTemplate(float contentY)
     // production panel
     Rectangle producesPreviewPanel{650, 430 + padding + (contentY - 100), 305, 100};
     DrawRectangleRounded(producesPreviewPanel, .05f, 16, GRAY);
+
+    // "Produces:" text
+    DrawText("Produces:", producesPreviewPanel.x + 30, 440 + (contentY - 100), 20, WHITE);
+
+    // "XP:" text
+    DrawText("XP:", producesPreviewPanel.x + 210, 440 + (contentY - 100), 20, WHITE);
+
+    // xp amount value
+    std::string xpAmount = std::to_string(xpPerFood[itemDropdown.selectedIndex]);
+    DrawText(xpAmount.c_str(), producesPreviewPanel.x + 215, 460 + (contentY - 100), 20, WHITE);
 
     // creation panel
     Rectangle creationPreviewPanel{650, 535 + padding + (contentY - 100), 305, 100};
@@ -144,9 +154,7 @@ void Cooking::drawTemplate(float contentY)
     // icon position
     DrawTextureEx(foodIcon.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
 
-    // xp amount value
-    std::string xpAmount = std::to_string(xpPerFood[itemDropdown.selectedIndex]);
-    DrawText(xpAmount.c_str(), requirementsPreviewPanel.x + 30, 355 + (contentY - 100), 20, WHITE);
+
 
     // draw item name string
     DrawText(dropdownOptions[selectedIndex].c_str(), namePreviewPanel.x + padding, 270 + (contentY - 100), 20, WHITE);
@@ -157,29 +165,83 @@ void Cooking::drawTemplate(float contentY)
 
 void Cooking::drawInfoPanel(float contentY, int foodID, int foodAmount)
 {
-    Item food = itemDatabase.getItemByName("cooking", foodID);    
+    Item rawFoodTex = itemDatabase.getItemByName("fishing", foodID);    
+    Item cookedFoodTex = itemDatabase.getItemByName("cooking", foodID);    
 
-    float foodScaleW = iconTargetW / (float)food.getTexture().width;
-    float foodScaleH = iconTargetH / (float)food.getTexture().height;
+    float foodScaleW = iconTargetW / (float)rawFoodTex.getTexture().width;
+    float foodScaleH = iconTargetH / (float)rawFoodTex.getTexture().height;
     float scale = std::min(foodScaleW, foodScaleH);
 
-    // draws the right food and amount below the food
-    Vector2 foodLocation{860, 365 + (contentY -100)};
-    DrawTextureEx(food.getTexture(), foodLocation, 1, scale, WHITE);
+    // draws the left raw food and amount below the food
+    Vector2 foodLocationLeft{700, 365 + (contentY -100)};
+    DrawTextureEx(rawFoodTex.getTexture(), foodLocationLeft, 1, scale, WHITE);
+    DrawText("1", 710, 400 + (contentY-100), 20, WHITE); // requires 1 raw food
+    
+    // draws the right raw food and amount below the food
+    Vector2 foodLocationRight{860, 365 + (contentY -100)};
+    DrawTextureEx(rawFoodTex.getTexture(), foodLocationRight, 1, scale, WHITE);
+    int rawFood = inventory.getItemAmount("fishing", foodID); // get raw food amount from inventory
+    DrawText(std::to_string(rawFood).c_str(), 870, 400 + (contentY-100), 20, WHITE);
 
-    int invfish = inventory.getItemAmount("cooking", foodID); // get fish amount from inventory
-    DrawText(std::to_string(invfish).c_str(), 870, 400 + (contentY-100), 20, WHITE);
+    // draws the bottom left cooked food and ammount below the food
+    Vector2 foodLocationProduced{700, 465 + (contentY -100)};
+    DrawTextureEx(cookedFoodTex.getTexture(), foodLocationProduced, 1, scale, WHITE);
+    DrawText("1", 710, 500 + (contentY-100), 20, WHITE); // requires 1 raw food
+
+}
+
+
+int Cooking::getNodeLevel(int index) const
+{
+    static int nodeLvls[MAX_FOOD]{1, 5, 10, 15, 20, 35, 40, 50, 50, 55, 60, 65, 70, 75, 85, 95};
+    return nodeLvls[index];
+}
+
+int Cooking::getUnlockedSkillIndex() const
+{
+    int highest = 0;
+    for (size_t i = 0; i < dropdownOptions.size(); i++)
+    {
+        if (curLvl >= getNodeLevel(static_cast<int>(i)))
+            highest = i;
+    }
+    return highest;
+}
+
+bool Cooking::canCookSelected(int index) const
+{
+    index += 1; // itemdatabase starts at 1, not 0
+
+    if (inventory.getItemAmount("fishing", index) >= 1) // check to see if we have at least 1 fish
+        return inventory.getItemAmount("fishing", index);
+    else
+    {
+        Item rawFishingItem = ItemDatabase::getItemByName("fishing", index);
+        std::cout << "You have none of this food to cook: " << rawFishingItem.name << '\n';
+    }
+    return false;
 }
 
 void Cooking::onCompleted()
 {
     int index = itemDropdown.selectedIndex;
     index += 1; // dropdown index starts at 0, but the IDs start at 1
-    std::cout << "Cooking ID: " << index << '\n';
-    
-    // add a fish to inventory
-    Item createItem = ItemDatabase::getItemByName("cooking", index);
-    inventory.addItem(createItem);
+
+    // attempts to remove 1 fish from the inventory
+    bool itemRemoval = inventory.removeItem("fishing", index, 1);
+
+    if (itemRemoval)
+    {
+        // add a food to inventory
+        Item createItem = ItemDatabase::getItemByName("cooking", index);
+        inventory.addItem(createItem);
+    }
+    else
+    {
+        // if failed, put back any removed items
+        if (itemRemoval) inventory.addItem(ItemDatabase::getItemByName("fishing", index));
+        std::cout << "Not enough food to cook!\n";
+    }
 }
 
 void Cooking::createButton(float contentY)
@@ -188,9 +250,9 @@ void Cooking::createButton(float contentY)
     Rectangle createButton{700, 580 + (contentY-100), 200 , 50};
     if (BaseSkill::rbtn(createButton, "Start Cooking"))
     {
-        if (!isRunning)
+        if (!isRunning && canCookSelected(itemDropdown.selectedIndex))
         {
-            isRunning = true;   // start smelting
+            isRunning = true;   // start
         }
         else
         {
@@ -220,6 +282,17 @@ void Cooking::createButton(float contentY)
             
             BaseSkill::updateXPBar(xpAccumulated);
             onCompleted();
+
+            if (canCookSelected(itemDropdown.selectedIndex))
+            {
+                // continue cooking
+                isRunning = true;
+            }
+            else
+            {
+                // out of resources
+                resetSkillProgress();
+            }
         }
     }
 }

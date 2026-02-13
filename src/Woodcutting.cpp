@@ -53,15 +53,15 @@ void Woodcutting::initTreeDetails()
 
     const char *xpAmount[] =
     {
-        "10 XP/",
-        "15 XP/",
-        "22 XP/",
-        "30 XP/",
-        "40 XP/",
-        "61 XP/",
-        "81 XP/",
+        "11 XP/",
+        "17 XP/",
+        "25 XP/",
+        "35 XP/",
+        "47 XP/",
+        "70 XP/",
+        "94 XP/",
         "100 XP/",
-        "150 XP/"
+        "180 XP/"
     };
 
     for (int i = 0; i < MAX_TREES; i++)

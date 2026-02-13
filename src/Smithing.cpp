@@ -292,7 +292,7 @@ void Smithing::beginSmithing(float contentY)
     {
         if (!isRunning && canSmeltSelected())
         {
-            isRunning = !isRunning;   // start smelting
+            isRunning = !isRunning;   // start
         }
         else
         {
@@ -331,7 +331,7 @@ void Smithing::beginSmithing(float contentY)
             }
             else
             {
-                // out of ores
+                // out of resources
                 resetSkillProgress();
             }
         }
@@ -414,8 +414,8 @@ void Smithing::drawOreSingularPanel(float contentY, int oreID, int oreAmount)
     // draws the left ore and amount below the ore
     Vector2 oreLocationLeft{400, 365 + (contentY-100)};
     DrawTextureEx(ore.getTexture(), oreLocationLeft, 1, scale, WHITE);
-    const char* oreAmountString = std::to_string(oreAmount).c_str(); // convert the int to a char
-    DrawText(oreAmountString, 410, 396 + (contentY-100), 20, WHITE);
+    std::string oreAmountString = std::to_string(oreAmount); // convert the int to a char
+    DrawText(oreAmountString.c_str(), 410, 396 + (contentY-100), 20, WHITE);
 
     // draws the right ore and amount below the ore
     Vector2 oreLocationRight{555, 365 + (contentY -100)};
@@ -429,13 +429,13 @@ void Smithing::oreCombination(int ore1Amount, int ore1, int ore2Amount, int ore2
 {
     const std::string oreType = "mining";
     const std::string barType = "smithing";
-    // Attempt to remove 1 Ore from two different types of ore
+    // attempt to remove 1 Ore from two different types of ore
     bool removeOre1 = inventory.removeItem(oreType, ore1, ore1Amount);
     bool removedOre2 = inventory.removeItem(oreType, ore2, ore2Amount);
     
     if (removeOre1 && removedOre2)
     {
-        // Add Bronze Bar to inventory
+        // add Bronze Bar to inventory
         Item createBar = ItemDatabase::getItemByName(barType, bar);
         inventory.addItem(createBar);
         
@@ -445,7 +445,7 @@ void Smithing::oreCombination(int ore1Amount, int ore1, int ore2Amount, int ore2
     }
     else
     {
-        // If combination failed, put back any removed items
+        // if combination failed, put back any removed items
         if (removeOre1) inventory.addItem(ItemDatabase::getItemByName(oreType, ore1));
         if (removedOre2) inventory.addItem(ItemDatabase::getItemByName(oreType, ore2));
 
@@ -458,12 +458,12 @@ void Smithing::oreSmelt(int oreAmount, int ore, int bar)
     const std::string oreType = "mining";
     const std::string barType = "smithing";
 
-    // Attempt to remove 1 Ore from two different types of ore
+    // attempt to remove 1 Ore from two different types of ore
     bool removeOre = inventory.removeItem(oreType, ore, oreAmount);
 
     if (removeOre)
     {
-        // Add Bronze Bar to inventory
+        // add Bronze Bar to inventory
         Item createBar = ItemDatabase::getItemByName(barType, bar);
         inventory.addItem(createBar);
 
@@ -472,7 +472,7 @@ void Smithing::oreSmelt(int oreAmount, int ore, int bar)
     }
     else
     {
-        // If combination failed, put back any removed items
+        // if combination failed, put back any removed items
         if (removeOre) inventory.addItem(ItemDatabase::getItemByName(oreType, ore));
         std::cout << "Not enough ores to combine!\n";
     }
