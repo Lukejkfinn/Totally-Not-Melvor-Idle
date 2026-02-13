@@ -46,7 +46,7 @@ void Fishing::drawDropdown(Dropdown& dd, const std::vector<std::string>& options
             };
 
             bool hover = CheckCollisionPointRec(mouse, itemRect);
-            bool unlocked = curLvl >= getNodeLevel(i);
+            bool unlocked = getLevel() >= getNodeLevel(i);
 
             Color bgColor = unlocked
                 ? (hover ? GRAY : RAYWHITE)
@@ -183,7 +183,7 @@ int Fishing::getUnlockedSkillIndex() const
     int highest = 0;
     for (size_t i = 0; i < dropdownOptions.size(); i++)
     {
-        if (curLvl >= getNodeLevel(static_cast<int>(i)))
+        if (getLevel() >= getNodeLevel(static_cast<int>(i)))
             highest = i;
     }
     return highest;

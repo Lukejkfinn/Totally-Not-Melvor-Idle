@@ -2,6 +2,8 @@
 
 Cooking::Cooking(Inventory &inv) : inventory(inv)
 {
+    background = cookingBG;
+
     itemDropdown.selectedIndex = Clamp(itemDropdown.selectedIndex, 0, (int)dropdownOptions.size() - 1);
     itemDropdown.bounds = { 1010, 100, 230, 36 };
 }

@@ -82,7 +82,7 @@ void Woodcutting::drawTemplate(float contentY)
         // draw background and XP bar
         DrawRectangleRec(skillBg[i], GRAY); // gray padding
 
-        if (curLvl < getNodeLevel(i))
+        if (getLevel() < getNodeLevel(i))
         {
             // drawing the locked text on the backgrounds
             const char *lockedText = "Locked";
@@ -151,6 +151,7 @@ void Woodcutting::useNode(int i)
         xpBar[i].width = 0.f;
 
         xpAccumulated = xpPerTree[i];
+        //std::cout << "XP: " << xpAccumulated << " | " << xpPerTree[i] << '\n';
         BaseSkill::updateXPBar(xpAccumulated);
 
     int treeID = i + 1;         // (i + 1) (node index 1 = Tree iD 1)
@@ -180,7 +181,7 @@ void Woodcutting::tick(float deltaTime, float contentY)
 
     for (int i = 0; i < MAX_TREES; i++)
     {
-        if (curLvl < getNodeLevel(i))
+        if (getLevel() < getNodeLevel(i))
             continue;
 
         // Use the skillBg[i] rectangle for button placement
@@ -193,7 +194,7 @@ void Woodcutting::tick(float deltaTime, float contentY)
         };
 
         // check if button pressed
-        if (BaseSkill::rbtn(button, "Chop Tree") && curLvl >= getNodeLevel(i))
+        if (BaseSkill::rbtn(button, "Chop Tree") && getLevel() >= getNodeLevel(i))
         {
             index = (index == i) ? -1 : i;
         }

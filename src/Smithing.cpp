@@ -124,7 +124,7 @@ void Smithing::drawTemplate(float contentY)
 
             DrawRectangleRoundedLinesEx(buttons[i], 0.f, 0, 1, WHITE);
 
-            bool unlocked = curLvl >= getNodeLevel(i);
+            bool unlocked = getLevel() >= getNodeLevel(i);
 
             // ---------------- LOCKED ----------------
             if (!unlocked)
@@ -494,7 +494,7 @@ void Smithing::tick(float deltaTime, float contentY)
      // draw XP bars
     for (int i = 0; i < MAX_BARS; i++)
     {
-        if (curLvl < getNodeLevel(i)) // node level index numRows * numCols
+        if (getLevel() < getNodeLevel(i)) // node level index numRows * numCols
         {
             // drawing the locked text on the backgrounds
             const char *lockedText = "Locked";

@@ -46,6 +46,7 @@ private:
 
     std::vector<std::optional<Item>> slots; // each slot may contain an item
     Texture2D slotTexture{};                // slot background
+    
     bool infoPanelVisible{false};
     int currentSlotIndex{-1}; // currently selected slot
     int gold{500};

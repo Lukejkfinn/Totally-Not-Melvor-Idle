@@ -85,7 +85,7 @@ void Mining::drawTemplate(float contentY)
         // draw background and XP bar
         DrawRectangleRec(skillBg[i], GRAY);
         
-        if (curLvl < getNodeLevel(i))
+        if (getLevel() < getNodeLevel(i))
         {
             // drawing the locked text on the backgrounds
             const char *lockedText = "Locked";
@@ -124,7 +124,7 @@ void Mining::drawTemplate(float contentY)
 
 int Mining::getNodeLevel(int index) const
 {
-    static int nodeLvls[MAX_ROCKS]{1, 10, 25, 35, 40, 55, 60, 75, 80, 90};
+    static int nodeLvls[MAX_ROCKS]{1, 1, 15, 30, 30, 40, 50, 70, 80, 95};
     return nodeLvls[index];
 }
 
@@ -184,7 +184,7 @@ void Mining::tick(float deltaTime, float contentY)
 
     for (int i = 0; i < MAX_ROCKS; i++)
     {
-        if (curLvl < getNodeLevel(i))
+        if (getLevel() < getNodeLevel(i))
             continue;
 
         // use the skillBg[i] rectangle for button placement
@@ -196,7 +196,7 @@ void Mining::tick(float deltaTime, float contentY)
         };
 
         // check if button pressed
-        if (BaseSkill::rbtn(button, "Mine Ore") && curLvl >= getNodeLevel(i))
+        if (BaseSkill::rbtn(button, "Mine Ore") && getLevel() >= getNodeLevel(i))
         {
             index = (index == i) ? -1 : i;
         }

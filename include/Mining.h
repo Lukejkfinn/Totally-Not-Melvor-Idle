@@ -22,7 +22,6 @@ public:
     void onNodeComplete(const int &id);
     virtual void tick(float deltaTime, float contentY) override;
 
-    
     // save/load helpers
     // non-const getters for writing
     float *getProgressArray() { return progress; }
@@ -36,6 +35,7 @@ protected:
 
 private:
     static constexpr int MAX_ROCKS{10};
+    
     float runningTime[MAX_ROCKS] = {0};
     float progress[MAX_ROCKS]{0};
     float maxWidth[MAX_ROCKS]{0};

@@ -2,7 +2,24 @@
 
 BaseSkill::BaseSkill()
 {
+    buildXPTable();
 };
+
+void BaseSkill::buildXPTable()
+{
+    xpTable.resize(100);   // 1–99
+    xpTable[1] = 0; // level 1 requires 0 xp
+
+    double total = 0.0;
+
+    // xp requirements for levels 2-99
+    for (int level = 2; level <= 99; ++level)
+    {
+        // floor( (level-1) + 300 * 2^((level-1)/7) )
+        total += floor((level - 1) + 300.0 * pow(2.0, (level - 1) / 7.0));
+        xpTable[level] = static_cast<int>(floor(total / 4.0));
+    }
+}
 
 bool BaseSkill::rbtn(Rectangle bounds, const char *text)
 {
@@ -62,40 +79,92 @@ void BaseSkill::getWindowSize(int width, int height)
     winHeight = height;
 }
 
-void BaseSkill::updateXPBar(int currentXP)
+std::string BaseSkill::formatNumber(int value)
 {
-    xp += currentXP; // accumulate XP
-    float xpBarMaxWidth = xpBarWidth - 2; // available width for bar
+    std::string num = std::to_string(value);
+    int insertPosition = num.length() - 3;
 
-    // level up loop in case XP exceeds max
-    while (xp >= maxXP)
+    // inserts commas every 3 digits from right to left
+    while (insertPosition > 0)
     {
-        xp -= maxXP;    // carry over excess XP
-        curLvl++;       // increase level
-        maxXP *= 1.1f;  // optional: increase maxXP for next level
+        num.insert(insertPosition, ",");
+        insertPosition -= 3;
     }
-    
-    // map XP to width of bar
-    float ratio = xp / maxXP;
-    ratio = Clamp(ratio, 0.f, 1.f);
-    xpBarFill = {325, 40, xpBarMaxWidth * ratio, 50};
+
+    return num;
+}
+
+void BaseSkill::updateXPBar(int gainedXP)
+{
+    totalXP += gainedXP; // add xp to total accumulated xp
+
+    // increase level while player has enough xp
+    while (curLvl < 99 && totalXP >= xpTable[curLvl + 1])
+    {
+        curLvl++; // level up
+    }
+
+    float xpBarMaxWidth = xpBarWidth - 2.f;
+
+    // if max level, fill xp bar to max
+    if (curLvl == 99)
+    {
+        xpBarFill = {325, 40, xpBarMaxWidth, 50};
+        return;
+    }
+
+    int xpCurrentLevel = xpTable[curLvl]; // xp required for current level
+    int xpNextLevel = xpTable[curLvl + 1]; // xp required for next level
+
+    float xpIntoLevel = totalXP - xpCurrentLevel; // xp gained inside this level
+    float xpNeededForLevel = xpNextLevel - xpCurrentLevel; // total xp needed to complete this level
+
+    float ratio = xpIntoLevel / xpNeededForLevel; // convert to 0-1 percentage
+    ratio = Clamp(ratio, 0.f, 1.f); // clamp to prevent overflow
+
+    xpBarFill = {325, 40, xpBarMaxWidth * ratio, 50}; // set to visual width of the xp bar
 }
 
 void BaseSkill::drawXPBar()
 {
-    // draw the background around the text and xp bar
     Rectangle xpBarBorder{324, 0, xpBarWidth, 91};
     DrawRectangleRec(xpBarBorder, BLACK);
-    
-    // draw the text above the xp bar
+
     DrawText("XP Bar", 330, 10, 30, WHITE);
-    
-    // draw the background of the xp bar
-    Rectangle xpBarBG{325, 40, xpBarWidth -2.f, 50};
+
+    Rectangle xpBarBG{325, 40, xpBarWidth - 2.f, 50};
     DrawRectangleRec(xpBarBG, DARKGRAY);
-  
-    // draw the fill for the xp bar
+
     DrawRectangleRec(xpBarFill, BLUE);
+
+    std::string xpText;
+
+    if (curLvl < 99)
+    {
+        int xpCurrentLevel = xpTable[curLvl];
+        int xpNextLevel = xpTable[curLvl + 1];
+
+        int xpIntoLevel = totalXP - xpCurrentLevel;
+        int xpNeeded = xpNextLevel - xpCurrentLevel;
+
+        xpText = "Level " + std::to_string(curLvl) + " (" +
+                 formatNumber(xpIntoLevel) + " / " +
+                 formatNumber(xpNeeded) + ")";
+    }
+    else
+    {
+        xpText = "Level 99 (MAX)";
+    }
+
+    int fontSize = 20;
+    int textWidth = MeasureText(xpText.c_str(), fontSize);
+
+    DrawText(
+        xpText.c_str(),
+        325 + (xpBarWidth - textWidth) / 2,
+        55,
+        fontSize,
+        WHITE);
 }
 
 void BaseSkill::drawTemplate(float contentY)
