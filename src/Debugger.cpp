@@ -7,6 +7,11 @@ Debugger::Debugger(Inventory &inv, Woodcutting &wc, Fishing &fish, Firemaking &f
 {
 }
 
+Debugger::~Debugger()
+{
+    UnloadTexture(debuggerBG);
+}
+
 bool Debugger::btn(Rectangle bounds, const char *text)
 {
     Vector2 mouse = GetMousePosition();
@@ -155,11 +160,14 @@ void Debugger::drawObjectsTemplate()
         "All Cooking items",
         "All Mining ores:",
         "All Smithing bars",
+        "All Thieving items",
+        "All Fletching items",
+        "All Crafting items",
         "Clear Inventory:"
     };
 
     // map each row to a SkillType (last entry has no skill)
-    SkillType skillMap[] = { SkillType::Woodcutting, SkillType::Fishing, SkillType::Firemaking, SkillType::Cooking, SkillType::Mining, SkillType::Smithing };
+    SkillType skillMap[] = { SkillType::Woodcutting, SkillType::Fishing, SkillType::Firemaking, SkillType::Cooking, SkillType::Mining, SkillType::Smithing, SkillType::Thieving, SkillType::Fletching, SkillType::Crafting };
 
     int numLabels = sizeof(labels) / sizeof(labels[0]);
 

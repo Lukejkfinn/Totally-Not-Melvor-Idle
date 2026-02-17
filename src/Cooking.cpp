@@ -156,8 +156,6 @@ void Cooking::drawTemplate(float contentY)
     // icon position
     DrawTextureEx(foodIcon.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
 
-
-
     // draw item name string
     DrawText(dropdownOptions[selectedIndex].c_str(), namePreviewPanel.x + padding, 270 + (contentY - 100), 20, WHITE);
     drawInfoPanel(contentY, selectedFoodID, 1);

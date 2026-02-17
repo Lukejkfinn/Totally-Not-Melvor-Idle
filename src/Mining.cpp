@@ -11,11 +11,24 @@ Mining::Mining(Inventory &inv) : inventory(inv)
     initRockDetails();
 }
 
+Mining::~Mining()
+{
+    for (int i = 0; i < MAX_ROCKS; ++i)
+    {
+        if (rockTextures[i].id != 0)
+        {
+            UnloadTexture(rockTextures[i]);
+            rockTextures[i].id = 0;
+        }
+    }
+}
+
 void Mining::initRockDetails()
 {
     // list of textures to load
     const char * rockTexturePaths[MAX_ROCKS] = 
     {
+        "assets/icons/mining/rune_essence.png",
         "assets/icons/mining/rock_copper.png",
         "assets/icons/mining/rock_tin.png",
         "assets/icons/mining/rock_iron.png",
@@ -41,6 +54,7 @@ void Mining::initRockDetails()
 
     const char *names[] =
     {
+        "Rune Essence",
         "Copper",
         "Tin",
         "Iron",
@@ -55,6 +69,7 @@ void Mining::initRockDetails()
 
     const char *xpAmount[] =
     {
+        "5 XP/",
         "8 XP/",
         "8 XP/",
         "16 XP/",
@@ -124,7 +139,7 @@ void Mining::drawTemplate(float contentY)
 
 int Mining::getNodeLevel(int index) const
 {
-    static int nodeLvls[MAX_ROCKS]{1, 1, 15, 30, 30, 40, 50, 70, 80, 95};
+    static int nodeLvls[MAX_ROCKS]{1, 1, 1, 15, 30, 30, 40, 50, 70, 80, 95};
     return nodeLvls[index];
 }
 

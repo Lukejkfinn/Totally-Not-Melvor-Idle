@@ -532,7 +532,7 @@ int main()
     Smithing smithing(inventory);
     Thieving thieving;
     Fletching fletching;
-    Crafting crafting;
+    Crafting crafting(inventory);
     Runecrafting runecrafting;
     Herblore herblore;
     Agility agility;
@@ -583,6 +583,8 @@ int main()
             mining.tick(GetFrameTime(), contentY);
         else if (indexPage == 6) 
             smithing.tick(GetFrameTime(), contentY);
+        else if (indexPage == 9)
+            crafting.tick(GetFrameTime(), contentY);
 
         if (debugger.debugging)
         {

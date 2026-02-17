@@ -11,7 +11,10 @@ enum class SkillType
     Firemaking,
     Cooking,
     Mining,
-    Smithing
+    Smithing,
+    Thieving,
+    Fletching,
+    Crafting
 };
 
 struct ItemData 
@@ -46,6 +49,8 @@ private:
     const static int foodMaxStack{999'999};
     const static int oresMaxStack{999'999};
     const static int barsMaxStack{999'999};
+    const static int craftingMaxStack{999'999};
+
 
 };
 

@@ -37,7 +37,7 @@ std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill, int spawnAmount)
         skillName = "firemaking";
         break;
 
-            case SkillType::Cooking:
+    case SkillType::Cooking:
         skillName = "cooking";
         break;
 
@@ -47,6 +47,10 @@ std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill, int spawnAmount)
 
     case SkillType::Smithing:
         skillName = "smithing";
+        break;
+
+    case SkillType::Crafting:
+        skillName = "crafting";
         break;
 
     default:
@@ -82,6 +86,8 @@ void ItemDatabase::loadItems()
     const static int foodAmount{1};
     const static int rockAmount{1};
     const static int barAmount{1};
+    const static int craftAmount{1};
+
 
     std::vector<ItemData> woodcuttingItems = 
     {
@@ -209,16 +215,17 @@ void ItemDatabase::loadItems()
     std::vector<ItemData> miningItems = 
     {
         // texture, name, skillType, ID, value, amount, maxStack, isStackable
-        {"assets/bank/mining/ore_copper.png", "Copper Ore", "mining", 1, 2, rockAmount, oresMaxStack, true},
-        {"assets/bank/mining/ore_tin.png", "Tin Ore", "mining", 2, 2, rockAmount, oresMaxStack, true},
-        {"assets/bank/mining/ore_iron.png", "Iron Ore", "mining", 3, 5, rockAmount, oresMaxStack, true},
-        {"assets/bank/mining/ore_coal.png", "Coal Ore", "mining", 4, 15, rockAmount, oresMaxStack, true},
-        {"assets/bank/mining/ore_silver.png", "Silver Ore", "mining", 5, 25, rockAmount, oresMaxStack, true},
-        {"assets/bank/mining/ore_gold.png", "Gold Ore", "mining", 6, 30, rockAmount, oresMaxStack, true},
-        {"assets/bank/mining/ore_mithril.png", "Mithril Ore", "mining", 7, 65, rockAmount, oresMaxStack, true},
-        {"assets/bank/mining/ore_adamantite.png", "Adamantite Ore", "mining", 8, 88, rockAmount, oresMaxStack, true},
-        {"assets/bank/mining/ore_runite.png", "Runite Ore", "mining", 9, 100, rockAmount, oresMaxStack, true},
-        {"assets/bank/mining/ore_dragonite.png", "Dragonite Ore", "mining", 10, 135, rockAmount, oresMaxStack, true}
+        {"assets/bank/mining/rune_essence.png", "Rune Essence", "mining", 1, 2, rockAmount, oresMaxStack, true},
+        {"assets/bank/mining/ore_copper.png", "Copper Ore", "mining", 2, 2, rockAmount, oresMaxStack, true},
+        {"assets/bank/mining/ore_tin.png", "Tin Ore", "mining", 3, 2, rockAmount, oresMaxStack, true},
+        {"assets/bank/mining/ore_iron.png", "Iron Ore", "mining", 4, 5, rockAmount, oresMaxStack, true},
+        {"assets/bank/mining/ore_coal.png", "Coal Ore", "mining", 5, 15, rockAmount, oresMaxStack, true},
+        {"assets/bank/mining/ore_silver.png", "Silver Ore", "mining", 6, 25, rockAmount, oresMaxStack, true},
+        {"assets/bank/mining/ore_gold.png", "Gold Ore", "mining", 7, 30, rockAmount, oresMaxStack, true},
+        {"assets/bank/mining/ore_mithril.png", "Mithril Ore", "mining", 8, 65, rockAmount, oresMaxStack, true},
+        {"assets/bank/mining/ore_adamantite.png", "Adamantite Ore", "mining", 9, 88, rockAmount, oresMaxStack, true},
+        {"assets/bank/mining/ore_runite.png", "Runite Ore", "mining", 10, 100, rockAmount, oresMaxStack, true},
+        {"assets/bank/mining/ore_dragonite.png", "Dragonite Ore", "mining", 11, 135, rockAmount, oresMaxStack, true}
     };
 
     // loading mining items
@@ -249,6 +256,36 @@ void ItemDatabase::loadItems()
 
     // loading smithing items
     for (const auto& itemData : smithingItems) // loop through all items
+    {
+        Texture2D texture = LoadTexture(itemData.texturePath.c_str());
+        if (texture.id == 0)
+            std::cerr << "Failed to load texture for " << itemData.itemName << std::endl;
+        else
+            items.push_back(Item(texture, itemData.amount, itemData.stackable, itemData.stackAmount, 
+                                 itemData.itemName, itemData.skillType, itemData.id, itemData.value));
+    }
+
+
+        std::vector<ItemData> craftingItems = 
+    {
+        // texture, name, skillType, ID, value, amount, maxStack, isStackable
+        {"assets/bank/crafting/armour_leather_gloves.png", "Leather Gloves", "crafting", 1, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_leather_boots.png", "Leather Boots", "crafting", 2, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_leather_cowl.png", "Leather Cowl", "crafting", 3, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_leather_vambraces.png", "Leather Vambraces", "crafting", 4, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_leather_body.png", "Leather Body", "crafting", 5, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_leather_chaps.png", "Leather Chaps", "crafting", 6, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_hard_leather_gloves.png", "Hard Leather Gloves", "crafting", 7, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_hard_leather_boots.png", "Hard Leather Boots", "crafting", 8, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_hard_leather_cowl.png", "Hard Leather Cowl", "crafting", 9, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_hard_leather_vambraces.png", "Hard Leather Vambraces", "crafting", 10, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_hard_leather_body.png", "Hard Leather Body", "crafting", 11, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/armour_hard_leather_chaps.png", "Hard Leather Chaps", "crafting", 12, 75, craftAmount, craftingMaxStack, true},
+        {"assets/bank/crafting/leather.png", "Leather", "crafting", 13, 50, craftAmount, craftingMaxStack, true}
+    };
+
+    // loading crafting items
+    for (const auto& itemData : craftingItems) // loop through all items
     {
         Texture2D texture = LoadTexture(itemData.texturePath.c_str());
         if (texture.id == 0)

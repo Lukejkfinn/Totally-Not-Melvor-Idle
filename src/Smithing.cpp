@@ -13,20 +13,13 @@ int Smithing::getNodeLevel(int index) const
 
 void Smithing::drawTemplate(float contentY)
 {
-    
-    // ensure texture is loaded once and not every frame
-    if (previewIcon.id == 0) {
-        std::cerr << "Texture not loaded!" << std::endl;
-        return;
-    }
-
     // set target size for the icon
     int targetWidth = 64;
     int targetHeight = 64;
 
     // calculate scale factor based on the desired target size
-    float scaleX = targetWidth / (float)previewIcon.width;
-    float scaleY = targetHeight / (float)previewIcon.height;
+    float scaleX = targetWidth / (float)512;
+    float scaleY = targetHeight / (float)512;
     float scale = std::min(scaleX, scaleY);  // Maintain aspect ratio
 
     // smithing panel
@@ -78,7 +71,6 @@ void Smithing::drawTemplate(float contentY)
     //Rectangle skillXpBar{390, 545 + (contentY-100), xpBar.width , 20};
     DrawRectangleRounded(xpBar, .8f, 16, GREEN);
 
-
     const float startX{660.f};
     const float startY{220.f + (contentY-100)};
     const float buttonWidth{285.f};
@@ -113,9 +105,8 @@ void Smithing::drawTemplate(float contentY)
         {
             int i = row * numCols + col;
 
-            if(i == sizeOfSmithing-1) // we have 9, not 10. Skip laste
+            if(i == sizeOfSmithing-1) // we have 9, not 10. Skip last
                 continue;
-
 
             buttons[i].width = buttonWidth;
             buttons[i].height = buttonHeight;
@@ -145,7 +136,7 @@ void Smithing::drawTemplate(float contentY)
             // ---------------- UNLOCKED ----------------
             Item smithingItem = itemDatabase.getItemByName("smithing", index);
 
-            if (BaseSkill::sbtn(buttons[i], barNames[i]))
+            if (BaseSkill::sbtn(buttons[i], barNames[i], 20))
             {
                 if (selectedItemIndex != index)
                 {
@@ -171,7 +162,7 @@ void Smithing::drawTemplate(float contentY)
             drawSmithingPanelInfo(contentY, i);
 
             // xp amount value
-            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex]);
+            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex-1]);
             DrawText(xpAmount.c_str(), producesPreviewPanel.x + 210, 460 + (contentY - 100), 20, WHITE);
 
             if (selectedItemIndex == sizeOfSmithing-3) // needed as the const array has loads of spaces for this particular bar
@@ -207,47 +198,47 @@ void Smithing::drawSmithingPanelInfo(float contentY, int index)
 {
     if (index == 0) // copper bar requirements
     {
-        drawOreCombinationPanel(contentY, 1, 1, 2, 1); // IDs for copper and tin 
+        drawOreCombinationPanel(contentY, 2, 1, 3, 1); // IDs for copper and tin 
         drawProductionPanel(contentY, index+1, 1);
     }
     else if (index == 1) // iron bar requirements
     {
-        drawOreSingularPanel(contentY, 3, 1);
+        drawOreSingularPanel(contentY, 4, 1);
         drawProductionPanel(contentY, index+1, 1);
     }
     else if (index == 2) // steel bar requirements
     {
-        drawOreCombinationPanel(contentY, 3, 1, 4, 2);
+        drawOreCombinationPanel(contentY, 4, 1, 5, 2);
         drawProductionPanel(contentY, index+1, 1);
     }
     else if (index == 3) // silver bar requirements
     {
-        drawOreSingularPanel(contentY, 5, 1);
+        drawOreSingularPanel(contentY, 6, 1);
         drawProductionPanel(contentY, index+1, 1);
     }
     else if (index == 4) // gold bar requirements
     {
-        drawOreSingularPanel(contentY, 6, 1);
+        drawOreSingularPanel(contentY, 7, 1);
         drawProductionPanel(contentY, index+1, 1);
     }
     else if (index == 5) // mithril bar requirements
     {
-        drawOreCombinationPanel(contentY, 7, 1, 4, 4);
+        drawOreCombinationPanel(contentY, 8, 1, 5, 4);
         drawProductionPanel(contentY, index+1, 1);
     }
     else if (index == 6) // adamantite bar requirements
     {
-        drawOreCombinationPanel(contentY, 8, 1, 4, 6);
+        drawOreCombinationPanel(contentY, 9, 1, 5, 6);
         drawProductionPanel(contentY, index+1, 1);
     }
     else if (index == 7) // runeite bar requirements
     {
-        drawOreCombinationPanel(contentY, 9, 1, 4, 8);
+        drawOreCombinationPanel(contentY, 10, 1, 5, 8);
         drawProductionPanel(contentY, index+1, 1);
     }
     else if (index == 8) // dragonite bare requirements
     {
-        drawOreCombinationPanel(contentY, 10, 1, 4, 10);
+        drawOreCombinationPanel(contentY, 11, 1, 5, 10);
         drawProductionPanel(contentY, index+1, 1);
     }  
 }
@@ -290,9 +281,10 @@ void Smithing::beginSmithing(float contentY)
     Rectangle createButton{400, 575 + (contentY-100), 200 , 50};
     if (BaseSkill::rbtn(createButton, "Create") && selectedItemIndex != -1)
     {
-        if (!isRunning && canSmeltSelected())
+        
+        if (!isRunning && canCreateSelected())
         {
-            isRunning = !isRunning;   // start
+            isRunning = true;   // start
         }
         else
         {
@@ -322,9 +314,9 @@ void Smithing::beginSmithing(float contentY)
             
             BaseSkill::updateXPBar(xpAccumulated);
 
-            onSmeltCompleted();
+            onCompleted();
 
-            if (canSmeltSelected())
+            if (canCreateSelected())
             {
                 // continue smelting
                 isRunning = true;
@@ -338,66 +330,67 @@ void Smithing::beginSmithing(float contentY)
     }
 }
 
-bool Smithing::canSmeltSelected() const
+bool Smithing::canCreateSelected() const
 {
+    std::cout << "SelectedItemIndex: " << selectedItemIndex << '\n';
     switch (selectedItemIndex)
     {
         case 1: // bronze
-            return inventory.getItemAmount("mining", 1) >= 1 &&
-                   inventory.getItemAmount("mining", 2) >= 1;
+            return inventory.getItemAmount("mining", 2) >= 1 &&
+                   inventory.getItemAmount("mining", 3) >= 1;
 
         case 2: // iron
-            return inventory.getItemAmount("mining", 3) >= 1;
+            return inventory.getItemAmount("mining", 4) >= 1;
 
         case 3: // steel
-            return inventory.getItemAmount("mining", 3) >= 1 &&
-                   inventory.getItemAmount("mining", 4) >= 2;
+            return inventory.getItemAmount("mining", 4) >= 1 &&
+                   inventory.getItemAmount("mining", 5) >= 2;
 
         case 4: // silver
-            return inventory.getItemAmount("mining", 5) >= 1;
-
-        case 5: // gold
             return inventory.getItemAmount("mining", 6) >= 1;
 
+        case 5: // gold
+            return inventory.getItemAmount("mining", 7) >= 1;
+
         case 6: // mithril
-            return inventory.getItemAmount("mining", 7) >= 1 &&
-                   inventory.getItemAmount("mining", 4) >= 4;
+            return inventory.getItemAmount("mining", 8) >= 1 &&
+                   inventory.getItemAmount("mining", 5) >= 4;
 
         case 7: // adamantite
-            return inventory.getItemAmount("mining", 8) >= 1 &&
-                   inventory.getItemAmount("mining", 4) >= 6;
+            return inventory.getItemAmount("mining", 9) >= 1 &&
+                   inventory.getItemAmount("mining", 5) >= 6;
 
         case 8: // runite
-            return inventory.getItemAmount("mining", 9) >= 1 &&
-                   inventory.getItemAmount("mining", 4) >= 8;
+            return inventory.getItemAmount("mining", 10) >= 1 &&
+                   inventory.getItemAmount("mining", 5) >= 8;
 
         case 9: // dragonite
-            return inventory.getItemAmount("mining", 10) >= 1 &&
-                   inventory.getItemAmount("mining", 4) >= 10;
+            return inventory.getItemAmount("mining", 11) >= 1 &&
+                   inventory.getItemAmount("mining", 5) >= 10;
     }
     return false;
 }
 
-void Smithing::onSmeltCompleted()
+void Smithing::onCompleted()
 {
     if(selectedItemIndex == 1)
-        oreCombination(1, 1, 1, 2, 1);      // (1) copper ore (ID=1), (1) tin (ID=2) = (1) bronze bar (ID=1)
+        oreCombination(1, 2, 1, 3, 1);      // (1) copper ore (ID=2), (1) tin (ID=3) = (1) bronze bar (ID=1)
     else if(selectedItemIndex == 2)
-        oreSmelt(1, 3, 2);                  // (1) iron ore (ID=3) = (1) iron bar (ID=2)  
+        oreSmelt(1, 4, 2);                  // (1) iron ore (ID=4) = (1) iron bar (ID=2)  
     else if(selectedItemIndex == 3)
-        oreCombination(1, 3, 2, 4, 3);      // (1) iron ore (ID=3), (2) coal (ID=4) = (1) steel bar (ID=3) 
+        oreCombination(1, 4, 2, 5, 3);      // (1) iron ore (ID=4), (2) coal (ID=5) = (1) steel bar (ID=3) 
     else if(selectedItemIndex == 4)
-        oreSmelt(1, 5, 4);                  // (1) silver ore (ID=5) = (1) silver bar (ID=4) 
+        oreSmelt(1, 6, 4);                  // (1) silver ore (ID=6) = (1) silver bar (ID=4) 
     else if(selectedItemIndex == 5)
-        oreSmelt(1, 6, 5);                  // (1) gold ore (ID=6) = (1) gold bar (ID=5) 
+        oreSmelt(1, 7, 5);                  // (1) gold ore (ID=7) = (1) gold bar (ID=5) 
     else if(selectedItemIndex == 6)
-        oreCombination(1, 7, 4, 4, 6);      // (1) mithril ore (ID=7), (4) coal (ID=4) = (1) mithril bar (ID=6) 
+        oreCombination(1, 8, 4, 5, 6);      // (1) mithril ore (ID=8), (4) coal (ID=5) = (1) mithril bar (ID=6) 
     else if(selectedItemIndex == 7)
-        oreCombination(1, 8, 6, 4, 7);      // (1) adamantite ore (ID=8), (6) coal (ID=4) = (1) adamantite bar (ID=7)
+        oreCombination(1, 9, 6, 5, 7);      // (1) adamantite ore (ID=9), (6) coal (ID=5) = (1) adamantite bar (ID=7)
     else if(selectedItemIndex == 8)
-        oreCombination(1, 9, 8, 4, 8);      // (1) runite ore (ID=9), (8) coal (ID=4) = (1) runite bar(ID=8) 
+        oreCombination(1, 10, 8, 5, 8);      // (1) runite ore (ID=10), (8) coal (ID=5) = (1) runite bar(ID=8) 
     else if(selectedItemIndex == 9)
-        oreCombination(1, 10, 10, 4, 9);    // (1) dragonite ore (ID=10), (10) coal (ID=4) = (1) dragonite bar (ID=9) 
+        oreCombination(1, 11, 10, 5, 9);    // (1) dragonite ore (ID=11), (10) coal (ID=5) = (1) dragonite bar (ID=9) 
 }
 
 void Smithing::drawOreSingularPanel(float contentY, int oreID, int oreAmount)
@@ -482,7 +475,7 @@ void Smithing::resetSkillProgress()
 {
     BaseSkill::resetSkillProgress();
 
-    //xpBar.width = BaseSkill::singleXpBar.width;
+    xpBar.width = BaseSkill::singleXpBar.width;
 }
 
 void Smithing::tick(float deltaTime, float contentY)

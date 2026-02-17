@@ -19,8 +19,9 @@ class BaseSkill
 {
 public:
     BaseSkill();
+    ~BaseSkill();
     bool rbtn(Rectangle bounds, const char *text);
-    bool sbtn(Rectangle bounds, const char *text);
+    bool sbtn(Rectangle bounds, const char *text, int fontSize);
     void getWindowSize(int width, int height);
     void drawXPBar();
     void updateXPBar(int xpAmount);
@@ -42,13 +43,13 @@ protected:
     Texture2D cookingBG{LoadTexture("assets/ui/cookingBG.jpg")};
     Texture2D miningBG{LoadTexture("assets/ui/miningBG.jpg")};
     Texture2D smithingBG{LoadTexture("assets/ui/smithingBG.jpg")};
+    Texture2D craftingBG{LoadTexture("assets/ui/craftingBG.jpg")};
     Rectangle skillBg[12]; // 3 rows * 4 cols
     Rectangle xpBar[12];   // XP bars
     Rectangle xpBarBG[12]; // XP bar backgrounds
     Rectangle singleXpBar;
 
     int curLvl{1};
-
     float progress{0};
     bool isRunning{false};
     float runningTime = {0};

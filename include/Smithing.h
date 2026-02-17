@@ -13,8 +13,8 @@ class Smithing : public BaseSkill
 public:
     Smithing(Inventory &invetory);
     virtual void drawTemplate(float contentY) override;
-    bool canSmeltSelected() const;
-    void onSmeltCompleted();
+    bool canCreateSelected() const;
+    void onCompleted();
     void drawSmithingPanelInfo(float contentY, int index);
     void drawOreCombinationPanel(float contentY, int ore1ID, int ore1Amount, int ore2ID, int ore2Amount);
     void beginSmithing(float contentY);
@@ -36,31 +36,23 @@ protected:
 
 private:
     ItemDatabase itemDatabase;
-    Texture2D previewIcon = LoadTexture("assets/bank/smithing/bronze_bar.png");
     
+    static constexpr int numCols{2};
+    static constexpr int numRows{5};
+    static constexpr int sizeOfSmithing{numCols * numRows};
     static constexpr int MAX_BARS{9};
-    static constexpr int maxLvl{99};
+
+    Rectangle xpBar;
+    Rectangle xpBarBG;
+    Rectangle buttons[sizeOfSmithing];
+    
     int selectedItemIndex{-1};
     int targetW{32};
     int targetH{32};
-    float runningTime = {0};
     float maxWidth{0};
     int xpAccumulated{0};
     float barTimer{1.9f};
-    int xpPerBar[MAX_BARS]{5, 8, 12, 15, 20, 35, 42, 51, 61};
-    bool isRunning{false};
-    int nodeLvl[maxLvl]{};
-    Rectangle xpBar;
-    Rectangle xpBarBG;
-    
-    static constexpr int numCols = 2;
-    static constexpr int numRows = 5;
-    static constexpr int sizeOfSmithing{numCols * numRows};
-    Rectangle buttons[sizeOfSmithing];
-    
-
-
-    float progress{0};
+    int xpPerBar[MAX_BARS]{5, 8, 12, 15, 20, 35, 42, 50, 60};
 };
 
 

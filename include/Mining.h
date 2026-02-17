@@ -15,6 +15,7 @@ class Mining : public BaseSkill
     Inventory &inventory;
 public:
     Mining(Inventory &inv);
+    ~Mining();
     void initRockDetails();
     virtual void drawTemplate(float contentY) override;
     int getNodeLevel(int index) const override;
@@ -34,15 +35,15 @@ public:
 protected:
 
 private:
-    static constexpr int MAX_ROCKS{10};
+    static constexpr int MAX_ROCKS{11};
     
     float runningTime[MAX_ROCKS] = {0};
     float progress[MAX_ROCKS]{0};
     float maxWidth[MAX_ROCKS]{0};
     int xpAccumulated{0};
     int index = -1;
-    float rockTimer[MAX_ROCKS]{2.1f, 2.8f, 3.5f, 4.2f, 5.6f, 7.f, 8.4f, 10.f, 15.f, 20.f};
-    int xpPerRock[MAX_ROCKS]{8, 8, 16, 20, 28, 32, 74, 81, 98, 116};
+    float rockTimer[MAX_ROCKS]{1.5f, 2.1f, 2.8f, 3.5f, 4.2f, 5.6f, 7.f, 8.4f, 10.f, 15.f, 20.f};
+    int xpPerRock[MAX_ROCKS]{5, 8, 8, 16, 20, 28, 32, 74, 81, 98, 116};
     std::string xpPerRockString[MAX_ROCKS];
     std::string rockNames[MAX_ROCKS];
     std::string timeToMineRocks[MAX_ROCKS];

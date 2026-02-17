@@ -5,6 +5,16 @@ BaseSkill::BaseSkill()
     buildXPTable();
 };
 
+BaseSkill::~BaseSkill()
+{
+    if (background.id != 0)     { UnloadTexture(background); background.id = 0; }
+    if (woodcuttingBG.id != 0)  { UnloadTexture(woodcuttingBG); woodcuttingBG.id = 0; }
+    if (fishingBG.id != 0)      { UnloadTexture(fishingBG); fishingBG.id = 0; }
+    if (cookingBG.id != 0)      { UnloadTexture(cookingBG); cookingBG.id = 0; }
+    if (miningBG.id != 0)       { UnloadTexture(miningBG); miningBG.id = 0; }
+    if (craftingBG.id != 0)     { UnloadTexture(craftingBG); craftingBG.id = 0; }
+}
+
 void BaseSkill::buildXPTable()
 {
     xpTable.resize(100);   // 1–99
@@ -47,7 +57,7 @@ bool BaseSkill::rbtn(Rectangle bounds, const char *text)
     return hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
 }
 
-bool BaseSkill::sbtn(Rectangle bounds, const char *text)
+bool BaseSkill::sbtn(Rectangle bounds, const char *text, int fontSize)
 {
     Vector2 mouse = GetMousePosition();
     bool hovered = CheckCollisionPointRec(mouse, bounds);
@@ -58,8 +68,8 @@ bool BaseSkill::sbtn(Rectangle bounds, const char *text)
     // draw button
     DrawRectangleRec(bounds, bgColor);
 
-    // center text
-    int fontSize = 20;
+    // centre text
+    //int fontSize = 20;
     int textWidth = MeasureText(text, fontSize);
 
     DrawText(
@@ -225,5 +235,4 @@ void BaseSkill::resetSkillProgress()
 void BaseSkill::tick(float deltaTime, float contentY)
 {
     DrawTextureEx(background, Vector2{bgPosX, 0}, 0, 1, WHITE);
-
 }

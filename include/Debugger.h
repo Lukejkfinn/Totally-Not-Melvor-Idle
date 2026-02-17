@@ -46,6 +46,7 @@ class Debugger
 public:
     Debugger(Inventory &inv, Woodcutting &wc, Fishing &fish, Firemaking &fm, Cooking &cook, Mining &mine, Smithing &smith, Thieving &thieving, 
         Fletching &fletch, Crafting &craft, Runecrafting &rc, Herblore &herb, Agility &agility, Summoning &summon, Astrology &astro);
+    ~Debugger();
     bool btn(Rectangle bounds, const char *text);
     void drawSkillsTemplate();
     void drawObjectsTemplate();
