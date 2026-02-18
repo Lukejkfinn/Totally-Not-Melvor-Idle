@@ -163,11 +163,16 @@ void Debugger::drawObjectsTemplate()
         "All Thieving items",
         "All Fletching items",
         "All Crafting items",
+        "All Runecrafting items",
         "Clear Inventory:"
     };
 
     // map each row to a SkillType (last entry has no skill)
-    SkillType skillMap[] = { SkillType::Woodcutting, SkillType::Fishing, SkillType::Firemaking, SkillType::Cooking, SkillType::Mining, SkillType::Smithing, SkillType::Thieving, SkillType::Fletching, SkillType::Crafting };
+    SkillType skillMap[] = 
+    { 
+        SkillType::Woodcutting, SkillType::Fishing, SkillType::Firemaking, SkillType::Cooking, SkillType::Mining, SkillType::Smithing, SkillType::Thieving, 
+        SkillType::Fletching, SkillType::Crafting, SkillType::Runecrafting 
+    };
 
     int numLabels = sizeof(labels) / sizeof(labels[0]);
 

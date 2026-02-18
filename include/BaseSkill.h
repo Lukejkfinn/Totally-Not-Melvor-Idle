@@ -44,6 +44,7 @@ protected:
     Texture2D miningBG{LoadTexture("assets/ui/miningBG.jpg")};
     Texture2D smithingBG{LoadTexture("assets/ui/smithingBG.jpg")};
     Texture2D craftingBG{LoadTexture("assets/ui/craftingBG.jpg")};
+    Texture2D runecraftingBG{LoadTexture("assets/ui/runecraftingBG.jpg")};
     Rectangle skillBg[12]; // 3 rows * 4 cols
     Rectangle xpBar[12];   // XP bars
     Rectangle xpBarBG[12]; // XP bar backgrounds

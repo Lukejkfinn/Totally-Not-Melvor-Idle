@@ -13,11 +13,20 @@ public:
     void setPanelInfo(float contentY, int index);
     void drawRequiresPanel(float contentY, int itemID, int itemAmount);
     void drawProductionPanel(float contentY, int itemType, int itemAmount);
+    int getNodeLevel(int index) const;
     void createButton(float contentY);
     bool canCreateSelected() const;
     void onCompleted();
     virtual void resetSkillProgress();
     virtual void tick(float deltaTime, float contentY) override;
+
+    // save/load helpers
+    // non-const getters for writing
+    float& getProgress() { return progress; }
+
+    // const getters for read-only access
+    const float& getProgress() const { return progress; }
+    
 protected:
 
 private:

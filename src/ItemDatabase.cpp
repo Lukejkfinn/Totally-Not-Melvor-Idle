@@ -52,6 +52,10 @@ std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill, int spawnAmount)
     case SkillType::Crafting:
         skillName = "crafting";
         break;
+    
+    case SkillType::Runecrafting:
+        skillName = "runecrafting";
+        break;
 
     default:
         std::cerr << "Unknown skill in ItemSpawner!\n";
@@ -87,7 +91,7 @@ void ItemDatabase::loadItems()
     const static int rockAmount{1};
     const static int barAmount{1};
     const static int craftAmount{1};
-
+    const static int runecraftingAmount{1};
 
     std::vector<ItemData> woodcuttingItems = 
     {
@@ -265,8 +269,7 @@ void ItemDatabase::loadItems()
                                  itemData.itemName, itemData.skillType, itemData.id, itemData.value));
     }
 
-
-        std::vector<ItemData> craftingItems = 
+    std::vector<ItemData> craftingItems = 
     {
         // texture, name, skillType, ID, value, amount, maxStack, isStackable
         {"assets/bank/crafting/armour_leather_gloves.png", "Leather Gloves", "crafting", 1, 75, craftAmount, craftingMaxStack, true},
@@ -286,6 +289,42 @@ void ItemDatabase::loadItems()
 
     // loading crafting items
     for (const auto& itemData : craftingItems) // loop through all items
+    {
+        Texture2D texture = LoadTexture(itemData.texturePath.c_str());
+        if (texture.id == 0)
+            std::cerr << "Failed to load texture for " << itemData.itemName << std::endl;
+        else
+            items.push_back(Item(texture, itemData.amount, itemData.stackable, itemData.stackAmount, 
+                                 itemData.itemName, itemData.skillType, itemData.id, itemData.value));
+    }
+
+    std::vector<ItemData> runecraftingItems = 
+    {
+        // texture,                                 name,       skillType,              ID, value, amount,      maxStack, isStackable
+        {"assets/bank/runecrafting/rune_air.png", "Rune Air", "runecrafting",           1, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_mind.png", "Rune mind", "runecrafting",         2, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_water.png", "Rune Water", "runecrafting",       3, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_earth.png", "Rune Earth", "runecrafting",       4, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_mist.png", "Rune Mist", "runecrafting",         5, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_fire.png", "Rune Fire", "runecrafting",         6, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_light.png", "Rune Light", "runecrafting",       7, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_body.png", "Rune Body", "runecrafting",         8, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_dust.png", "Rune Dust", "runecrafting",         9, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_mud.png", "Rune Mud", "runecrafting",           10, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_chaos.png", "Rune Chaos", "runecrafting",       11, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_nature.png", "Rune Nature", "runecrafting",     12, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_smoke.png", "Rune Smoke", "runecrafting",       13, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_havoc.png", "Rune Havoc", "runecrafting",       14, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_steam.png", "Rune Steam", "runecrafting",       15, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_lava.png", "Rune Lava", "runecrafting",         16, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_death.png", "Rune Death", "runecrafting",       17, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_blood.png", "Rune Blood", "runecrafting",       18, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_spirit.png", "Rune Spirit", "runecrafting",     19, 75, runecraftingAmount, runecraftingMaxStack, true},
+        {"assets/bank/runecrafting/rune_ancient.png", "Rune Ancient", "runecrafting",   20, 75, runecraftingAmount, runecraftingMaxStack, true}
+    };
+
+    // loading runecrafting items
+    for (const auto& itemData : runecraftingItems) // loop through all items
     {
         Texture2D texture = LoadTexture(itemData.texturePath.c_str());
         if (texture.id == 0)

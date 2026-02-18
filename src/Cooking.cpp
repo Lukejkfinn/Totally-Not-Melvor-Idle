@@ -190,7 +190,6 @@ void Cooking::drawInfoPanel(float contentY, int foodID, int foodAmount)
 
 }
 
-
 int Cooking::getNodeLevel(int index) const
 {
     static int nodeLvls[MAX_FOOD]{1, 5, 10, 15, 20, 35, 40, 50, 50, 55, 60, 65, 70, 75, 85, 95};

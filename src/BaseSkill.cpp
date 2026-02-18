@@ -13,6 +13,8 @@ BaseSkill::~BaseSkill()
     if (cookingBG.id != 0)      { UnloadTexture(cookingBG); cookingBG.id = 0; }
     if (miningBG.id != 0)       { UnloadTexture(miningBG); miningBG.id = 0; }
     if (craftingBG.id != 0)     { UnloadTexture(craftingBG); craftingBG.id = 0; }
+    if (runecraftingBG.id != 0) { UnloadTexture(runecraftingBG); runecraftingBG.id = 0; }
+
 }
 
 void BaseSkill::buildXPTable()

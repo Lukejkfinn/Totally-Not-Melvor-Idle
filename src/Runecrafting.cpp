@@ -1,11 +1,11 @@
-#include "Crafting.h"
+#include "Runecrafting.h"
 
-Crafting::Crafting(Inventory &inv) : inventory(inv)
+Runecrafting::Runecrafting(Inventory &inv) : inventory(inv)
 {
-    background = craftingBG;
+    background = runecraftingBG;
 }
 
-void Crafting::drawTemplate(float contentY)
+void Runecrafting::drawTemplate(float contentY)
 {
     // set target size for the icon
     int targetWidth = 64;
@@ -72,36 +72,52 @@ void Crafting::drawTemplate(float contentY)
     const float buttonHeight{75.f};
     const float padding{10.f};
 
-    const char* barNames[sizeOfCrafting] = 
+    const char* barNames[sizeOfRunecrafting] = 
     {
-        "   Leather Gloves",
-        "   Leather Boots",
-        "   Leather Cowl",
-        "       Leather Vambraces",
-        "   Leather Body",
-        "   Leather Chaps",
-        "       Hard Leather Gloves", 
-        "       Hard Leather Boots",
-        "       Hard Leather Cowl",
-        "           Hard Leather Vambraces",
-        "       Hard Leather Body",
-        "       Hard Leather Chaps"
+        "Air Rune",
+        "Mind Rune",
+        "Water Rune",
+        "Earth Rune",
+        "Mist Rune",
+        "Fire Rune",
+        "Light Rune", 
+        "Body Rune",
+        "Dust Rune",
+        "Mud Rune",
+        "Chaos Rune",
+        "   Nature Rune",
+        "Smoke Rune",
+        "Havoc Rune",
+        "Steam Rune",
+        "Lava Rune",
+        "Death Rune",
+        "Blood Rune",
+        "Spirit Rune",
+        "   Ancient Rune"
     };
 
-    const char* previewBarNames[sizeOfCrafting] = 
+    const char* previewBarNames[sizeOfRunecrafting] = 
     {
-        "Leather Gloves",
-        "Leather Boots",
-        "Leather Cowl",
-        "Leather \nVambraces",
-        "Leather Body",
-        "Leather Chaps",
-        "Hard Leather \nGloves", 
-        "Hard Leather \nBoots",
-        "Hard Leather \nCowl",
-        "Hard Leather \nVambraces",
-        "Hard Leather \nBody",
-        "Hard Leather \nChaps"
+        "Air Rune",
+        "Mind Rune",
+        "Water Rune",
+        "Earth Rune",
+        "Mist Rune",
+        "Fire Rune",
+        "Light Rune", 
+        "Body Rune",
+        "Dust Rune",
+        "Mud Rune",
+        "Chaos Rune",
+        "Nature Rune",
+        "Smoke Rune",
+        "Havoc Rune",
+        "Steam Rune",
+        "Lava Rune",
+        "Death Rune",
+        "Blood Rune",
+        "Spirit Rune",
+        "Ancient Rune"
     };
 
     int index = 0;
@@ -145,9 +161,9 @@ void Crafting::drawTemplate(float contentY)
             }
 
             // ---------------- UNLOCKED ----------------
-            Item craftingItem = itemDatabase.getItemByName("crafting", index+1);
+            Item craftingItem = itemDatabase.getItemByName("runecrafting", index+1);
 
-            if (BaseSkill::sbtn(buttons[i], barNames[i], 15))
+            if (BaseSkill::sbtn(buttons[i], barNames[i], 20))
             {
                 if (selectedItemIndex != index)
                 {
@@ -162,9 +178,9 @@ void Crafting::drawTemplate(float contentY)
     }
     
     // draws resources on left panel
-    for (int i = 0; i < sizeOfCrafting; i++)
+    for (int i = 0; i < sizeOfRunecrafting; i++)
     {
-        craftingItem = itemDatabase.getItemByName("crafting", selectedItemIndex+1);
+        craftingItem = itemDatabase.getItemByName("runecrafting", selectedItemIndex+1);
 
         if (selectedItemIndex == i)
         {
@@ -181,25 +197,21 @@ void Crafting::drawTemplate(float contentY)
     createButton(contentY);
 }
 
-void Crafting::setPanelInfo(float contentY, int index)
+void Runecrafting::setPanelInfo(float contentY, int index)
 {
-    for (int i = 0; i < sizeOfCrafting; i++)
+    for (int i = 0; i < sizeOfRunecrafting; i++)
     {
-        if (index >= 6)
-            drawRequiresPanel(contentY, 13, 3); // 13 is leather ID
-        else
-            drawRequiresPanel(contentY, 13, 1); // 13 is leather ID
-
+        drawRequiresPanel(contentY, 1, 1); // 1 is rune essence ID
         drawProductionPanel(contentY, index+1, 1);
     }
 }
 
-void Crafting::drawRequiresPanel(float contentY, int itemID, int itemAmount)
+void Runecrafting::drawRequiresPanel(float contentY, int itemID, int itemAmount)
 {
     int targetW = 32;
     int targetH = 32;   
 
-    Item item = itemDatabase.getItemByName("crafting", itemID);    
+    Item item = itemDatabase.getItemByName("mining", itemID);    
 
     float scaleW = targetW / (float)item.getTexture().width;
     float scaleH = targetH / (float)item.getTexture().height;
@@ -215,13 +227,13 @@ void Crafting::drawRequiresPanel(float contentY, int itemID, int itemAmount)
     Vector2 itemLocationRight{555, 365 + (contentY -100)};
     DrawTextureEx(item.getTexture(), itemLocationRight, 1, scale, WHITE);
 
-    int invItem = inventory.getItemAmount("crafting", itemID); // get item amount from inventory
+    int invItem = inventory.getItemAmount("mining", itemID); // get item amount from inventory
     DrawText(std::to_string(invItem).c_str(), 565, 400 + (contentY-100), 20, WHITE);
 }
 
-void Crafting::drawProductionPanel(float contentY, int itemType, int itemAmount)
+void Runecrafting::drawProductionPanel(float contentY, int itemType, int itemAmount)
 {
-    Item item = itemDatabase.getItemByName("crafting", itemType);
+    Item item = itemDatabase.getItemByName("runecrafting", itemType);
 
     float ScaleW = targetW / (float)item.getTexture().width;
     float ScaleH = targetH / (float)item.getTexture().height;
@@ -234,13 +246,13 @@ void Crafting::drawProductionPanel(float contentY, int itemType, int itemAmount)
     DrawText(itemAmountString, 410, 500 + (contentY -100), 20, WHITE);
 }
 
-int Crafting::getNodeLevel(int index) const
+int Runecrafting::getNodeLevel(int index) const
 {
-    static int nodeLvls[MAX_CRAFTS]{1, 7, 9, 11, 14, 18, 24, 28, 33, 39, 44, 50};
+    static int nodeLvls[MAX_RC]{1, 7, 9, 11, 14, 18, 24, 28, 33, 39, 44, 50};
     return nodeLvls[index];
 }
 
-void Crafting::createButton(float contentY)
+void Runecrafting::createButton(float contentY)
 {
     // button for creating the item
     Rectangle createButton{400, 575 + (contentY-100), 200 , 50};
@@ -293,46 +305,42 @@ void Crafting::createButton(float contentY)
     }
 }
 
-bool Crafting::canCreateSelected() const
+bool Runecrafting::canCreateSelected() const
 {
-    if (selectedItemIndex < 6 && selectedItemIndex >= 0)
-        return inventory.getItemAmount("crafting", 13) >= 1;
-    else if (selectedItemIndex >= 6)
-        return inventory.getItemAmount("crafting", 13) >= 3;
+    if (selectedItemIndex >= 0)
+        return inventory.getItemAmount("mining", 1) >= 1;
+
     return false;
 }
 
-void Crafting::onCompleted()
+void Runecrafting::onCompleted()
 {
-    bool itemRemoval;
+
     // attempts to remove 1 item from the inventory
-    if (selectedItemIndex < 6 && selectedItemIndex >= 0)
-        itemRemoval = inventory.removeItem("crafting", 13, 1);
-    else if (selectedItemIndex >= 6)
-        itemRemoval = inventory.removeItem("crafting", 13, 3);
+    bool itemRemoval = inventory.removeItem("mining", 1, 1);
 
     if (itemRemoval)
     {
         // add a item to inventory
-        Item createItem = ItemDatabase::getItemByName("crafting", selectedItemIndex+1);
+        Item createItem = ItemDatabase::getItemByName("runecrafting", selectedItemIndex+1);
         inventory.addItem(createItem);
     }
     else
     {
         // if failed, put back any removed items
-        if (itemRemoval) inventory.addItem(ItemDatabase::getItemByName("crafting", selectedItemIndex+1));
+        if (itemRemoval) inventory.addItem(ItemDatabase::getItemByName("runecrafting", selectedItemIndex+1));
         std::cout << "Not enough leather to craft item!\n";
     }
 }
 
-void Crafting::resetSkillProgress()
+void Runecrafting::resetSkillProgress()
 {
     BaseSkill::resetSkillProgress();
 
     xpBar.width = BaseSkill::singleXpBar.width;
 }
 
-void Crafting::tick(float deltaTime, float contentY)
+void Runecrafting::tick(float deltaTime, float contentY)
 {
     BaseSkill::tick(deltaTime, contentY);
     drawTemplate(contentY);
