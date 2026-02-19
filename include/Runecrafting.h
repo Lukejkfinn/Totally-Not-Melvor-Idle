@@ -12,11 +12,12 @@ public:
     Runecrafting(Inventory &inventory);
     void drawTemplate(float contentY);
     void setPanelInfo(float contentY, int index);
-    void drawRequiresPanel(float contentY, int itemID, int itemAmount);
+    void drawRequiresPanel(float contentY, int itemID1, int itemID2, int itemID3, int itemAmount);
     void drawProductionPanel(float contentY, int itemType, int itemAmount);
     int getNodeLevel(int index) const;
     void createButton(float contentY);
     bool canCreateSelected() const;
+    void itemCombination(int item1, int item1Amount, int item2, int item2Amount, int item3, int item3Amount, int createdItem);
     void onCompleted();
     virtual void resetSkillProgress();
     virtual void tick(float deltaTime, float contentY) override;
@@ -49,5 +50,18 @@ private:
     int xpAccumulated{0};
     int targetW{32};
     int targetH{32};
+
+    const int runeEssence{1};
+    const int airRune{1};
+    const int waterRune{3};
+    const int earthRune{4};
+    const int fireRune{6};
+
+    const int mistRune{5};
+    const int dustRune{9};
+    const int mudRune{10};
+    const int smokeRune{13};
+    const int steamRune{15};
+    const int lavaRune{16};
 
 };

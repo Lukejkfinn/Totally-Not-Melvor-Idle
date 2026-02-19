@@ -85,12 +85,16 @@ void Woodcutting::drawTemplate(float contentY)
         if (getLevel() < getNodeLevel(i))
         {
             // drawing the locked text on the backgrounds
-            const char *lockedText = "Locked";
+            std::string lockedText = "Locked";
             int fontSize = 30;
-            int textWidth = MeasureText(lockedText, fontSize);
+            int textWidth = MeasureText(lockedText.c_str(), fontSize);
             float textX = skillBg[i].x + (skillBg[i].width - textWidth) / 2;
             float textY = skillBg[i].y + (skillBg[i].height - fontSize) / 2;
-            DrawText(lockedText, textX, textY, fontSize, Fade(BLACK, 0.5f));
+            DrawText(lockedText.c_str(), textX, textY, fontSize, Fade(BLACK, 0.8f));
+
+            std::string unlockLevel = "Lvl " + std::to_string(getNodeLevel(i));
+            DrawText(unlockLevel.c_str(), textX+20, textY+25, 20, Fade(BLACK, 0.8f));
+
             continue;
         }
 

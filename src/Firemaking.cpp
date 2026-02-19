@@ -86,7 +86,7 @@ void Firemaking::drawProductionPanel(float contentY, int itemType, int amount)
     // draws the produced item and amount text
     Vector2 itemLocationLeft{395, 515 + (contentY -100)};
     DrawTextureEx(item.getTexture(), itemLocationLeft, 1, scale, WHITE);
-    std::string itemAmountString = std::to_string(amount); // convert the int to a char
+    std::string itemAmountString = std::to_string(amount);
     DrawText(itemAmountString.c_str(), 410, 546 + (contentY -100), 20, WHITE);
 }
 
@@ -183,7 +183,7 @@ void Firemaking::drawInfoPanel(float contentY, int logID, int logAmount)
     // draws the left log and amount below the log
     Vector2 logLocationLeft{400, 415 + (contentY-100)};
     DrawTextureEx(log.getTexture(), logLocationLeft, 1, scale, WHITE);
-    std::string logAmountString = std::to_string(logAmount); // convert the int to a char
+    std::string logAmountString = std::to_string(logAmount);
     DrawText(logAmountString.c_str(), 410, 450 + (contentY-100), 20, WHITE);
 
     // draws the right log and amount below the log

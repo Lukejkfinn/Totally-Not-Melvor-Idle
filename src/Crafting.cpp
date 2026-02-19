@@ -131,14 +131,17 @@ void Crafting::drawTemplate(float contentY)
             // ---------------- LOCKED ----------------
             if (!unlocked)
             {
-                const char* lockedText = "Locked";
-                int fontSize = 20;
-                int textWidth = MeasureText(lockedText, fontSize);
+                std::string lockedText = "Locked";
+                int fontSize = 30;
+                int textWidth = MeasureText(lockedText.c_str(), fontSize);
 
                 float textX = buttons[i].x + (buttons[i].width - textWidth) / 2;
                 float textY = buttons[i].y + (buttons[i].height - fontSize) / 2;
 
-                DrawText(lockedText, textX, textY, fontSize, Fade(BLACK, 0.5f));
+                DrawText(lockedText.c_str(), textX, textY, fontSize, Fade(BLACK, 0.8f));
+
+                std::string unlockLevel = "Lvl " + std::to_string(getNodeLevel(i));
+                DrawText(unlockLevel.c_str(), textX+20, textY+25, 20, Fade(BLACK, 0.8f));
 
                 index++;
                 continue;
@@ -208,7 +211,7 @@ void Crafting::drawRequiresPanel(float contentY, int itemID, int itemAmount)
     // draws the left item and amount below the item
     Vector2 itemLocationLeft{400, 365 + (contentY-100)};
     DrawTextureEx(item.getTexture(), itemLocationLeft, 1, scale, WHITE);
-    std::string itemAmountString = std::to_string(itemAmount); // convert the int to a char
+    std::string itemAmountString = std::to_string(itemAmount);
     DrawText(itemAmountString.c_str(), 410, 400 + (contentY-100), 20, WHITE);
 
     // draws the right item and amount below the item
@@ -230,8 +233,8 @@ void Crafting::drawProductionPanel(float contentY, int itemType, int itemAmount)
     // draws the produced item and amount text below the item
     Vector2 itemLocationLeft{395, 465 + (contentY -100)};
     DrawTextureEx(item.getTexture(), itemLocationLeft, 1, scale, WHITE);
-    const char* itemAmountString = std::to_string(itemAmount).c_str(); // convert the int to a char
-    DrawText(itemAmountString, 410, 500 + (contentY -100), 20, WHITE);
+    std::string itemAmountString = std::to_string(itemAmount);
+    DrawText(itemAmountString.c_str(), 410, 500 + (contentY -100), 20, WHITE);
 }
 
 int Crafting::getNodeLevel(int index) const

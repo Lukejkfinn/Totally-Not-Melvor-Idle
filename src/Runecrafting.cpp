@@ -17,7 +17,7 @@ void Runecrafting::drawTemplate(float contentY)
     float scale = std::min(scaleX, scaleY);  // Maintain aspect ratio
 
     // crafting panel
-    Rectangle craftingPanel{325, 200 + (contentY - 100), 930, 800};
+    Rectangle craftingPanel{325, 200 + (contentY - 100), 930, 880};
     DrawRectangleRounded(craftingPanel, .02f, 16, DARKGRAY);
     
     // icon preview panel
@@ -147,14 +147,17 @@ void Runecrafting::drawTemplate(float contentY)
             // ---------------- LOCKED ----------------
             if (!unlocked)
             {
-                const char* lockedText = "Locked";
-                int fontSize = 20;
-                int textWidth = MeasureText(lockedText, fontSize);
+                std::string lockedText = "Locked";
+                int fontSize = 30;
+                int textWidth = MeasureText(lockedText.c_str(), fontSize);
 
                 float textX = buttons[i].x + (buttons[i].width - textWidth) / 2;
                 float textY = buttons[i].y + (buttons[i].height - fontSize) / 2;
 
-                DrawText(lockedText, textX, textY, fontSize, Fade(BLACK, 0.5f));
+                DrawText(lockedText.c_str(), textX, textY, fontSize, Fade(BLACK, 0.8f));
+
+                std::string unlockLevel = "Lvl " + std::to_string(getNodeLevel(i));
+                DrawText(unlockLevel.c_str(), textX+20, textY+25, 20, Fade(BLACK, 0.8f));
 
                 index++;
                 continue;
@@ -199,35 +202,64 @@ void Runecrafting::drawTemplate(float contentY)
 
 void Runecrafting::setPanelInfo(float contentY, int index)
 {
-    for (int i = 0; i < sizeOfRunecrafting; i++)
-    {
-        drawRequiresPanel(contentY, 1, 1); // 1 is rune essence ID
-        drawProductionPanel(contentY, index+1, 1);
-    }
+
+    drawProductionPanel(contentY, index+1, 1);
+
+    if (selectedItemIndex+1 == mistRune)        drawRequiresPanel(contentY, runeEssence, airRune, waterRune, 2);
+    else if(selectedItemIndex+1 == dustRune)    drawRequiresPanel(contentY, runeEssence, airRune, earthRune, 2);
+    else if (selectedItemIndex+1 == mudRune)    drawRequiresPanel(contentY, runeEssence, waterRune, earthRune, 2);
+    else if (selectedItemIndex+1 == smokeRune)  drawRequiresPanel(contentY, runeEssence, airRune, fireRune, 2);
+    else if (selectedItemIndex+1 == steamRune)  drawRequiresPanel(contentY, runeEssence, waterRune, fireRune, 2);
+    else if (selectedItemIndex+1 == lavaRune)   drawRequiresPanel(contentY, runeEssence, earthRune, fireRune, 2);
+    else                                        drawRequiresPanel(contentY, runeEssence, 0, 0, 1);
 }
 
-void Runecrafting::drawRequiresPanel(float contentY, int itemID, int itemAmount)
+void Runecrafting::drawRequiresPanel(float contentY, int itemID1, int itemID2, int itemID3, int itemAmount)
 {
     int targetW = 32;
     int targetH = 32;   
 
-    Item item = itemDatabase.getItemByName("mining", itemID);    
+    Item item1 = itemDatabase.getItemByName("mining", itemID1);
+    Item item2 = itemDatabase.getItemByName("runecrafting", itemID2);
+    Item item3 = itemDatabase.getItemByName("runecrafting", itemID3);   
 
-    float scaleW = targetW / (float)item.getTexture().width;
-    float scaleH = targetH / (float)item.getTexture().height;
+
+    float scaleW = targetW / (float)item1.getTexture().width;
+    float scaleH = targetH / (float)item1.getTexture().height;
     float scale = std::min(scaleW, scaleH);
 
-    // draws the left item and amount below the item
-    Vector2 itemLocationLeft{400, 365 + (contentY-100)};
-    DrawTextureEx(item.getTexture(), itemLocationLeft, 1, scale, WHITE);
-    std::string itemAmountString = std::to_string(itemAmount); // convert the int to a char
-    DrawText(itemAmountString.c_str(), 410, 400 + (contentY-100), 20, WHITE);
+    // if a combination rune, draw the 3 combination runes
+    if (selectedItemIndex+1 == 5 || selectedItemIndex+1 == 9 || selectedItemIndex+1 == 10 || selectedItemIndex+1 == 13 || selectedItemIndex+1 == 15 || selectedItemIndex+1 == 16)
+    {
+        Vector2 itemLocationLeft1{363, 365 + (contentY-100)};
+        DrawTextureEx(item1.getTexture(), itemLocationLeft1, 1, scale, WHITE);
+        std::string itemAmountString1 = std::to_string(itemAmount); 
+        DrawText(itemAmountString1.c_str(), 375, 400 + (contentY-100), 20, WHITE);
+
+        Vector2 itemLocationLeft2{400, 365 + (contentY-100)};
+        DrawTextureEx(item2.getTexture(), itemLocationLeft2, 1, scale, WHITE);
+        std::string itemAmountString2 = std::to_string(itemAmount); 
+        DrawText(itemAmountString2.c_str(), 412, 400 + (contentY-100), 20, WHITE);
+
+        Vector2 itemLocationLeft3{437, 365 + (contentY-100)};
+        DrawTextureEx(item3.getTexture(), itemLocationLeft3, 1, scale, WHITE);
+        std::string itemAmountString3 = std::to_string(itemAmount); 
+        DrawText(itemAmountString3.c_str(), 449, 400 + (contentY-100), 20, WHITE);
+    }
+    else
+    {
+        // otherwise, draw the singular rune
+        Vector2 itemLocationLeft{400, 365 + (contentY-100)};
+        DrawTextureEx(item1.getTexture(), itemLocationLeft, 1, scale, WHITE);
+        std::string itemAmountString = std::to_string(itemAmount);
+        DrawText(itemAmountString.c_str(), 412, 400 + (contentY-100), 20, WHITE);
+    }
 
     // draws the right item and amount below the item
     Vector2 itemLocationRight{555, 365 + (contentY -100)};
-    DrawTextureEx(item.getTexture(), itemLocationRight, 1, scale, WHITE);
+    DrawTextureEx(item1.getTexture(), itemLocationRight, 1, scale, WHITE);
 
-    int invItem = inventory.getItemAmount("mining", itemID); // get item amount from inventory
+    int invItem = inventory.getItemAmount("mining", itemID1); // get item amount from inventory
     DrawText(std::to_string(invItem).c_str(), 565, 400 + (contentY-100), 20, WHITE);
 }
 
@@ -242,13 +274,13 @@ void Runecrafting::drawProductionPanel(float contentY, int itemType, int itemAmo
     // draws the produced item and amount text below the item
     Vector2 itemLocationLeft{395, 465 + (contentY -100)};
     DrawTextureEx(item.getTexture(), itemLocationLeft, 1, scale, WHITE);
-    const char* itemAmountString = std::to_string(itemAmount).c_str(); // convert the int to a char
-    DrawText(itemAmountString, 410, 500 + (contentY -100), 20, WHITE);
+    std::string itemAmountString = std::to_string(itemAmount);
+    DrawText(itemAmountString.c_str(), 410, 500 + (contentY -100), 20, WHITE);
 }
 
 int Runecrafting::getNodeLevel(int index) const
 {
-    static int nodeLvls[MAX_RC]{1, 7, 9, 11, 14, 18, 24, 28, 33, 39, 44, 50};
+    static int nodeLvls[MAX_RC]{1, 1, 5, 9, 10, 14, 15, 20, 20, 30, 35, 40, 40, 50, 50, 60, 65, 75, 80, 85};
     return nodeLvls[index];
 }
 
@@ -307,30 +339,135 @@ void Runecrafting::createButton(float contentY)
 
 bool Runecrafting::canCreateSelected() const
 {
-    if (selectedItemIndex >= 0)
+
+    if (selectedItemIndex+1 == 5) // mist rune ID(5)
+    {
+        return inventory.getItemAmount("mining", runeEssence) >= 1 &&
+        inventory.getItemAmount("runecrafting", airRune) >= 2 &&
+        inventory.getItemAmount("runecrafting", waterRune) >= 2;
+    }
+    else if(selectedItemIndex+1 == 9) // dust rune ID(9)
+    {
+        return inventory.getItemAmount("mining", runeEssence) >= 1 &&
+        inventory.getItemAmount("runecrafting", airRune) >= 2 &&
+        inventory.getItemAmount("runecrafting", earthRune) >= 2;
+    }
+    else if (selectedItemIndex+1 == 10) // mud rune ID(10)
+    {
+        return inventory.getItemAmount("mining", runeEssence) >= 1 &&
+        inventory.getItemAmount("runecrafting", waterRune) >= 2 &&
+        inventory.getItemAmount("runecrafting", earthRune) >= 2;
+    }
+    else if (selectedItemIndex+1 == 13) // smoke rune ID(13)
+    {
+        return inventory.getItemAmount("mining", runeEssence) >= 1 &&
+        inventory.getItemAmount("runecrafting", airRune) >= 2 &&
+        inventory.getItemAmount("runecrafting", fireRune) >= 2;
+    }
+    else if (selectedItemIndex+1 == 15) // steam rune ID(15)
+    {
+        return inventory.getItemAmount("mining", runeEssence) >= 1 &&
+        inventory.getItemAmount("runecrafting", waterRune) >= 2 &&
+        inventory.getItemAmount("runecrafting", fireRune) >= 2;
+    }
+    else if (selectedItemIndex+1 == 16) // lava rune ID(16)
+    {       
+        return inventory.getItemAmount("mining", runeEssence) >= 1 &&
+        inventory.getItemAmount("runecrafting", earthRune) >= 2 &&
+        inventory.getItemAmount("runecrafting", fireRune) >= 2;
+    }
+    else
         return inventory.getItemAmount("mining", 1) >= 1;
+
+    std::cout << "Not enough runes:\n" 
+        << "Rune Essence: " << inventory.getItemAmount("mining", runeEssence) 
+        << "\nAir Runes: " << inventory.getItemAmount("runecrafting", airRune) 
+        << "\nWater Runes: " << inventory.getItemAmount("runecrafting", waterRune) 
+        << "\nEarth Runes: " << inventory.getItemAmount("runecrafting", earthRune) 
+        << "\nFire Runes: " << inventory.getItemAmount("runecrafting", fireRune) 
+        << '\n';
 
     return false;
 }
 
-void Runecrafting::onCompleted()
+void Runecrafting::itemCombination(int item1, int item1Amount, int item2, int item2Amount, int item3, int item3Amount, int createdItem)
 {
+    const std::string runeEssence = "mining";
+    const std::string essenceType = "runecrafting";
 
-    // attempts to remove 1 item from the inventory
-    bool itemRemoval = inventory.removeItem("mining", 1, 1);
-
-    if (itemRemoval)
+    // attempts to remove 1 essence and two runes by an ammount
+    bool removeItem1 = inventory.removeItem(runeEssence, item1, item1Amount);
+    bool removeItem2 = inventory.removeItem(essenceType, item2, item2Amount);
+    bool removeItem3 = inventory.removeItem(essenceType, item3, item3Amount);
+    
+    if (removeItem1 && removeItem2 && removeItem3)
     {
-        // add a item to inventory
-        Item createItem = ItemDatabase::getItemByName("runecrafting", selectedItemIndex+1);
+        Item item1Name = ItemDatabase::getItemByName("mining", item1);          // rune essence
+        Item item2Name = ItemDatabase::getItemByName("runecrafting", item2);    // rune type
+        Item item3Name = ItemDatabase::getItemByName("runecrafting", item3);    // rune type
+        
+        // create combined item
+        Item createItem = ItemDatabase::getItemByName(essenceType, createdItem);
         inventory.addItem(createItem);
+        
+
+        std::cout << "Successfully combined: " << item1Name.name << " + " << item2Name.name << " + " << item3Name.name << " = " << createItem.getName() << '\n';
     }
     else
     {
-        // if failed, put back any removed items
-        if (itemRemoval) inventory.addItem(ItemDatabase::getItemByName("runecrafting", selectedItemIndex+1));
-        std::cout << "Not enough leather to craft item!\n";
+        // if combination failed, put back any removed items
+        if (removeItem1) inventory.addItem(ItemDatabase::getItemByName(runeEssence, item1));
+        if (removeItem2) inventory.addItem(ItemDatabase::getItemByName(essenceType, item2));
+        if (removeItem3) inventory.addItem(ItemDatabase::getItemByName(essenceType, item3));
+
+        // 943 need to check that this adds the correct amount back 
+        std::cout << "Not enough ores to combine!\n";
     }
+}
+
+void Runecrafting::onCompleted()
+{
+    // attempts to remove 1 item from the inventory
+    //bool itemRemoval = inventory.removeItem("mining", 1, 1);
+
+    if (selectedItemIndex+1 == mistRune) // mist rune ID(5)
+    {
+        itemCombination(runeEssence, 1, airRune, 2, waterRune, 2, mistRune);
+    }
+    else if(selectedItemIndex+1 == dustRune) // dust rune ID(9)
+    {
+        itemCombination(runeEssence, 1, airRune, 2, earthRune, 2, dustRune);
+    }
+    else if (selectedItemIndex+1 == mudRune) // mud rune ID(10)
+    {
+        itemCombination(runeEssence, 1, waterRune, 2, earthRune, 2, mudRune);
+    }
+    else if (selectedItemIndex+1 == smokeRune) // smoke rune ID(13)
+    {
+        itemCombination(runeEssence, 1, airRune, 2, fireRune, 2, smokeRune);
+    }
+    else if (selectedItemIndex+1 == steamRune) // steam rune ID(15)
+    {
+        itemCombination(runeEssence, 1, waterRune, 2, fireRune, 2, steamRune);
+    }
+    else if (selectedItemIndex+1 == lavaRune) // lava rune ID(16)
+    {       
+        itemCombination(runeEssence, 1, earthRune, 2, fireRune, 2, lavaRune);
+    }
+    
+    
+    // if (itemRemoval)
+    // {
+    //     // add a item to inventory
+    //     Item createItem = ItemDatabase::getItemByName("runecrafting", selectedItemIndex+1);
+    //     inventory.addItem(createItem);
+    // }
+    // else
+    // {
+    //     // if failed, put back any removed items
+    //     if (itemRemoval) inventory.addItem(ItemDatabase::getItemByName("runecrafting", selectedItemIndex+1));
+    //     std::cout << "Not enough leather to craft item!\n";
+    // }
 }
 
 void Runecrafting::resetSkillProgress()

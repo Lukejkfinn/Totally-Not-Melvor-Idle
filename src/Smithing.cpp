@@ -120,14 +120,17 @@ void Smithing::drawTemplate(float contentY)
             // ---------------- LOCKED ----------------
             if (!unlocked)
             {
-                const char* lockedText = "Locked";
+                std::string lockedText = "Locked";
                 int fontSize = 30;
-                int textWidth = MeasureText(lockedText, fontSize);
+                int textWidth = MeasureText(lockedText.c_str(), fontSize);
 
                 float textX = buttons[i].x + (buttons[i].width - textWidth) / 2;
                 float textY = buttons[i].y + (buttons[i].height - fontSize) / 2;
 
-                DrawText(lockedText, textX, textY, fontSize, Fade(BLACK, 0.5f));
+                DrawText(lockedText.c_str(), textX, textY, fontSize, Fade(BLACK, 0.8f));
+
+                std::string unlockLevel = "Lvl " + std::to_string(getNodeLevel(i));
+                DrawText(unlockLevel.c_str(), textX+20, textY+25, 20, Fade(BLACK, 0.8f));
 
                 index++;
                 continue;
@@ -190,8 +193,8 @@ void Smithing::drawProductionPanel(float contentY, int barType, int barAmount)
     // draws the produced bar and amount text below the bar
     Vector2 barLocationLeft{395, 465 + (contentY -100)};
     DrawTextureEx(bar.getTexture(), barLocationLeft, 1, scale, WHITE);
-    const char* barAmountString = std::to_string(barAmount).c_str(); // convert the int to a char
-    DrawText(barAmountString, 410, 496 + (contentY -100), 20, WHITE);
+    std::string barAmountString = std::to_string(barAmount); 
+    DrawText(barAmountString.c_str(), 410, 496 + (contentY -100), 20, WHITE);
 }
 
 void Smithing::drawSmithingPanelInfo(float contentY, int index)
@@ -258,10 +261,10 @@ void Smithing::drawOreCombinationPanel(float contentY, int ore1ID, int ore1Amoun
     DrawTextureEx(ore1.getTexture(), oreLocationLeft1, 1, scale, WHITE);
     DrawTextureEx(ore2.getTexture(), oreLocationLeft2, 1, scale, WHITE);
 
-    const char* ore1AmountString = std::to_string(ore1Amount).c_str(); // convert the int to a char
-    const char* ore2AmountString = std::to_string(ore2Amount).c_str(); // convert the int to a char
-    DrawText(ore1AmountString, 385, 396 + (contentY-100), 20, WHITE);
-    DrawText(ore2AmountString, 435, 396 + (contentY-100), 20, WHITE);
+    std::string ore1AmountString = std::to_string(ore1Amount); 
+    std::string ore2AmountString = std::to_string(ore2Amount); 
+    DrawText(ore1AmountString.c_str(), 385, 396 + (contentY-100), 20, WHITE);
+    DrawText(ore2AmountString.c_str(), 435, 396 + (contentY-100), 20, WHITE);
 
     // draws the two right ores and the amount text below them
     Vector2 oreLocationRight1{530, 365 + (contentY-100)};
@@ -407,7 +410,7 @@ void Smithing::drawOreSingularPanel(float contentY, int oreID, int oreAmount)
     // draws the left ore and amount below the ore
     Vector2 oreLocationLeft{400, 365 + (contentY-100)};
     DrawTextureEx(ore.getTexture(), oreLocationLeft, 1, scale, WHITE);
-    std::string oreAmountString = std::to_string(oreAmount); // convert the int to a char
+    std::string oreAmountString = std::to_string(oreAmount);
     DrawText(oreAmountString.c_str(), 410, 396 + (contentY-100), 20, WHITE);
 
     // draws the right ore and amount below the ore
@@ -483,20 +486,4 @@ void Smithing::tick(float deltaTime, float contentY)
     BaseSkill::tick(deltaTime, contentY);
     drawTemplate(contentY);
     BaseSkill::drawXPBar();
-
-     // draw XP bars
-    for (int i = 0; i < MAX_BARS; i++)
-    {
-        if (getLevel() < getNodeLevel(i)) // node level index numRows * numCols
-        {
-            // drawing the locked text on the backgrounds
-            const char *lockedText = "Locked";
-            int fontSize = 30;
-            int textWidth = MeasureText(lockedText, fontSize);
-            float textX = buttons[i].x + (buttons[i].width - textWidth) / 2;
-            float textY = buttons[i].y + (buttons[i].height - fontSize) / 2;
-            DrawText(lockedText, textX, textY, fontSize, Fade(BLACK, 0.5f));
-            continue;
-        }
-    }
 }

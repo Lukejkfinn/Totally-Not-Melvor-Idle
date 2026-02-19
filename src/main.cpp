@@ -42,7 +42,7 @@ bool Button(Rectangle bounds, const char *text)
     // draw button
     DrawRectangleRec(bounds, bgColor);
 
-    // center text
+    // centre text
     int fontSize = 20;
     int textWidth = MeasureText(text, fontSize);
 
