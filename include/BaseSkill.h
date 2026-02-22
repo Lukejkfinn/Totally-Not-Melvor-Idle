@@ -22,10 +22,12 @@ public:
     ~BaseSkill();
     bool rbtn(Rectangle bounds, const char *text);
     bool sbtn(Rectangle bounds, const char *text, int fontSize);
+    bool cbtn(Rectangle bounds, const char *text, float textPosY, int fontSize);
     void getWindowSize(int width, int height);
     void drawXPBar();
     void updateXPBar(int xpAmount);
     virtual void drawTemplate(float contentY);
+    virtual int setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, float textPosY, int fontSize);
     virtual void tick(float deltaTime, float contentY);
     virtual void resetSkillProgress();
     

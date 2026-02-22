@@ -77,7 +77,7 @@ void Smithing::drawTemplate(float contentY)
     const float buttonHeight{75.f};
     const float padding{10.f};
 
-    const char* barNames[sizeOfSmithing] = 
+    std::string barNames[sizeOfSmithing] = 
     {
         "Bronze Bar",
         "Iron Bar",
@@ -96,67 +96,68 @@ void Smithing::drawTemplate(float contentY)
     float barScaleY = buttonHeight / 512.0f;
     float barScale = std::min(barScaleX, barScaleY);
     
-    Item smithingItem;
-    
-    // draws the skill panels
-    for(int row = 0; row < numRows; row++)
-    {   
-        for (int col = 0; col < numCols; col++)
-        {
-            int i = row * numCols + col;
-
-            if(i == sizeOfSmithing-1) // we have 9, not 10. Skip last
-                continue;
-
-            buttons[i].width = buttonWidth;
-            buttons[i].height = buttonHeight;
-            buttons[i].x = startX + col * (buttonWidth + padding);
-            buttons[i].y = startY + row * (buttonHeight + padding);
-
-            DrawRectangleRoundedLinesEx(buttons[i], 0.f, 0, 1, WHITE);
-
-            bool unlocked = getLevel() >= getNodeLevel(i);
-
-            // ---------------- LOCKED ----------------
-            if (!unlocked)
+    if (selectedIndex == 0)
+    {
+        // draws the skill panels
+        for(int row = 0; row < numRows; row++)
+        {   
+            for (int col = 0; col < numCols; col++)
             {
-                std::string lockedText = "Locked";
-                int fontSize = 30;
-                int textWidth = MeasureText(lockedText.c_str(), fontSize);
+                int i = row * numCols + col;
 
-                float textX = buttons[i].x + (buttons[i].width - textWidth) / 2;
-                float textY = buttons[i].y + (buttons[i].height - fontSize) / 2;
+                if(i == sizeOfSmithing-1) // we have 9, not 10. Skip last
+                    continue;
 
-                DrawText(lockedText.c_str(), textX, textY, fontSize, Fade(BLACK, 0.8f));
+                buttons[i].width = buttonWidth;
+                buttons[i].height = buttonHeight;
+                buttons[i].x = startX + col * (buttonWidth + padding);
+                buttons[i].y = startY + row * (buttonHeight + padding);
 
-                std::string unlockLevel = "Lvl " + std::to_string(getNodeLevel(i));
-                DrawText(unlockLevel.c_str(), textX+20, textY+25, 20, Fade(BLACK, 0.8f));
+                DrawRectangleRoundedLinesEx(buttons[i], 0.f, 0, 1, WHITE);
 
-                index++;
-                continue;
-            }
+                bool unlocked = getLevel() >= getNodeLevel(i);
 
-            // ---------------- UNLOCKED ----------------
-            Item smithingItem = itemDatabase.getItemByName("smithing", index);
-
-            if (BaseSkill::sbtn(buttons[i], barNames[i], 20))
-            {
-                if (selectedItemIndex != index)
+                // ---------------- LOCKED ----------------
+                if (!unlocked)
                 {
-                    selectedItemIndex = index;
-                    resetSkillProgress();
-                }
-            }             
+                    std::string lockedText = "Locked";
+                    int fontSize = 30;
+                    int textWidth = MeasureText(lockedText.c_str(), fontSize);
 
-            DrawTextureEx(smithingItem.getTexture(), Vector2{buttons[i].x + 2, buttons[i].y}, 0.0f, barScale, WHITE);
-            index++;
+                    float textX = buttons[i].x + (buttons[i].width - textWidth) / 2;
+                    float textY = buttons[i].y + (buttons[i].height - fontSize) / 2;
+
+                    DrawText(lockedText.c_str(), textX, textY, fontSize, Fade(BLACK, 0.8f));
+
+                    std::string unlockLevel = "Lvl " + std::to_string(getNodeLevel(i));
+                    DrawText(unlockLevel.c_str(), textX+20, textY+25, 20, Fade(BLACK, 0.8f));
+
+                    index++;
+                    continue;
+                }
+
+                // ---------------- UNLOCKED ----------------
+                Item smithingItem = itemDatabase.getItemByName("smithing", index);
+
+                if (BaseSkill::sbtn(buttons[i], barNames[i].c_str(), 20))
+                {
+                    if (selectedItemIndex != index)
+                    {
+                        selectedItemIndex = index;
+                        resetSkillProgress();
+                    }
+                }             
+
+                DrawTextureEx(smithingItem.getTexture(), Vector2{buttons[i].x + 2, buttons[i].y}, 0.0f, barScale, WHITE);
+                index++;
+            }
         }
     }
     
     // draws resources on left panel
     for (int i = 0; i < sizeOfSmithing; i++)
     {
-        smithingItem = itemDatabase.getItemByName("smithing", selectedItemIndex);
+        Item smithingItem = itemDatabase.getItemByName("smithing", selectedItemIndex);
 
         if (selectedItemIndex == i+1)
         {
@@ -481,9 +482,30 @@ void Smithing::resetSkillProgress()
     xpBar.width = BaseSkill::singleXpBar.width;
 }
 
+int Smithing::setMenuBar(float contentY, std::string buttonNames[], int sizeOfButtons, float textPosY, int fontSize)
+{
+    selectedIndex = BaseSkill::setMenuBar(contentY, buttonNames, sizeOfButtons, textPosY, fontSize);
+    return selectedIndex;
+}
+
 void Smithing::tick(float deltaTime, float contentY)
 {
     BaseSkill::tick(deltaTime, contentY);
     drawTemplate(contentY);
+
+    int sizeOfButtons{8};
+    std::string buttonNames[sizeOfButtons] =
+    {
+        "Standard \nBars",
+        "Bronze \nGear",
+        "Iron \nGear",
+        "Steel \nGear",
+        "Mithril \nGear",
+        "Adamant \nGear",
+        "Rune \nGear",
+        "Dragon \nGear"
+    };
+    setMenuBar(contentY, buttonNames, sizeOfButtons, 10, 18);
+
     BaseSkill::drawXPBar();
 }

@@ -71,13 +71,38 @@ bool BaseSkill::sbtn(Rectangle bounds, const char *text, int fontSize)
     DrawRectangleRec(bounds, bgColor);
 
     // centre text
-    //int fontSize = 20;
     int textWidth = MeasureText(text, fontSize);
 
     DrawText(
         text,
         bounds.x + (bounds.width - textWidth) / 2,
         bounds.y + (bounds.height - fontSize) / 2,
+        fontSize,
+        WHITE);
+
+    // return true only when clicked
+    return hovered && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+}
+
+bool BaseSkill::cbtn(Rectangle bounds, const char *text, float textPosY, int fontSize)
+{
+    Vector2 mouse = GetMousePosition();
+    bool hovered = CheckCollisionPointRec(mouse, bounds);
+
+    // button color states
+    Color bgColor = hovered ? DARKBLUE : DARKGRAY;
+
+    // draw button
+    DrawRectangleRec(bounds, bgColor);
+
+    // centre text
+    //int fontSize = 20;
+    int textWidth = MeasureText(text, fontSize);
+
+    DrawText(
+        text,
+        bounds.x + (bounds.width - textWidth) / 2,
+        bounds.y + textPosY,
         fontSize,
         WHITE);
 
@@ -232,6 +257,38 @@ void BaseSkill::resetSkillProgress()
     runningTime = 0.f;
     progress = 0.f;
     singleXpBar.width = 0.f;
+}
+
+int BaseSkill::setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons,  float textPosY, int fontSize)
+{
+    Rectangle xpBarBorder{324, 105 + (contentY-100), 930, 81};
+    DrawRectangleRec(xpBarBorder, BLACK);
+
+    Rectangle xpBarBG{325, 106 + (contentY-100), 930 - 2.f, 79};
+    DrawRectangleRec(xpBarBG, DARKGRAY);
+
+    float startX{330.f};
+    float padding{5.f};
+    float buttonWidth{110.f};
+
+    static int selectedButtonIndex = 0;
+
+    for (int i = 0; i < sizeOfButtons; i++)
+    {
+        // define button size
+        Rectangle createButton{startX + (i * (buttonWidth + padding)), 110 + (contentY-100), buttonWidth, 60};
+        
+        // draw the button using your existing sbtn function
+        BaseSkill::cbtn(createButton, buttonNames[i].c_str(), textPosY, fontSize);
+
+        // check if the button is clicked
+        if (CheckCollisionPointRec(GetMousePosition(), createButton) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            // update the selected button index
+            selectedButtonIndex = i;
+        }
+    }
+    return selectedButtonIndex;
 }
 
 void BaseSkill::tick(float deltaTime, float contentY)

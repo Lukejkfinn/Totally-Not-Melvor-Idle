@@ -164,6 +164,7 @@ void Debugger::drawObjectsTemplate()
         "All Fletching items",
         "All Crafting items",
         "All Runecrafting items",
+        "All Herblore items",
         "Clear Inventory:"
     };
 
@@ -171,7 +172,7 @@ void Debugger::drawObjectsTemplate()
     SkillType skillMap[] = 
     { 
         SkillType::Woodcutting, SkillType::Fishing, SkillType::Firemaking, SkillType::Cooking, SkillType::Mining, SkillType::Smithing, SkillType::Thieving, 
-        SkillType::Fletching, SkillType::Crafting, SkillType::Runecrafting 
+        SkillType::Fletching, SkillType::Crafting, SkillType::Runecrafting, SkillType::Herblore 
     };
 
     int numLabels = sizeof(labels) / sizeof(labels[0]);

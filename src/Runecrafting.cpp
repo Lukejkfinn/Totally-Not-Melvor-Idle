@@ -202,7 +202,6 @@ void Runecrafting::drawTemplate(float contentY)
 
 void Runecrafting::setPanelInfo(float contentY, int index)
 {
-
     drawProductionPanel(contentY, index+1, 1);
 
     if (selectedItemIndex+1 == mistRune)        drawRequiresPanel(contentY, runeEssence, airRune, waterRune, 2);
@@ -427,9 +426,6 @@ void Runecrafting::itemCombination(int item1, int item1Amount, int item2, int it
 
 void Runecrafting::onCompleted()
 {
-    // attempts to remove 1 item from the inventory
-    //bool itemRemoval = inventory.removeItem("mining", 1, 1);
-
     if (selectedItemIndex+1 == mistRune) // mist rune ID(5)
     {
         itemCombination(runeEssence, 1, airRune, 2, waterRune, 2, mistRune);
@@ -454,20 +450,6 @@ void Runecrafting::onCompleted()
     {       
         itemCombination(runeEssence, 1, earthRune, 2, fireRune, 2, lavaRune);
     }
-    
-    
-    // if (itemRemoval)
-    // {
-    //     // add a item to inventory
-    //     Item createItem = ItemDatabase::getItemByName("runecrafting", selectedItemIndex+1);
-    //     inventory.addItem(createItem);
-    // }
-    // else
-    // {
-    //     // if failed, put back any removed items
-    //     if (itemRemoval) inventory.addItem(ItemDatabase::getItemByName("runecrafting", selectedItemIndex+1));
-    //     std::cout << "Not enough leather to craft item!\n";
-    // }
 }
 
 void Runecrafting::resetSkillProgress()

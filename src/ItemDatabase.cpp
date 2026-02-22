@@ -49,12 +49,21 @@ std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill, int spawnAmount)
         skillName = "smithing";
         break;
 
+    case SkillType::Fletching:
+        skillName = "fletching";
+        break;
+
+
     case SkillType::Crafting:
         skillName = "crafting";
         break;
     
     case SkillType::Runecrafting:
         skillName = "runecrafting";
+        break;
+
+    case SkillType::Herblore:
+        skillName = "herblore";
         break;
 
     default:
@@ -90,8 +99,10 @@ void ItemDatabase::loadItems()
     const static int foodAmount{1};
     const static int rockAmount{1};
     const static int barAmount{1};
+    const static int fletchAmount{1};
     const static int craftAmount{1};
     const static int runecraftingAmount{1};
+    const static int herbloreAmount{1};
 
     std::vector<ItemData> woodcuttingItems = 
     {
@@ -255,11 +266,35 @@ void ItemDatabase::loadItems()
         {"assets/bank/smithing/adamantite_bar.png", "Adamantite Bar", "smithing", 7, 2, barAmount, barsMaxStack, true},
         {"assets/bank/smithing/runite_bar.png", "Runite Bar", "smithing", 8, 2, barAmount, barsMaxStack, true},
         {"assets/bank/smithing/dragonite_bar.png", "Dragonite Bar", "smithing", 9, 2, barAmount, barsMaxStack, true}
-
     };
 
     // loading smithing items
     for (const auto& itemData : smithingItems) // loop through all items
+    {
+        Texture2D texture = LoadTexture(itemData.texturePath.c_str());
+        if (texture.id == 0)
+            std::cerr << "Failed to load texture for " << itemData.itemName << std::endl;
+        else
+            items.push_back(Item(texture, itemData.amount, itemData.stackable, itemData.stackAmount, 
+                                 itemData.itemName, itemData.skillType, itemData.id, itemData.value));
+    }
+
+    std::vector<ItemData> fletchingItems = 
+    {
+        // texture,                                     name,           skillType,             ID, value, amount, maxStack, isStackable
+        {"assets/bank/fletching/headless_arrows.png", "Arrow Shafts", "fletching",              1, 2, fletchAmount, fletchingMaxStack, true},
+        {"assets/bank/fletching/arrowshaft.png", "Headless Arrows", "fletching",                2, 2, fletchAmount, fletchingMaxStack, true},
+        {"assets/bank/fletching/ammo_arrow_bronze.png", "Bronze Arrows", "fletching",           3, 2, fletchAmount, fletchingMaxStack, true},
+        {"assets/bank/fletching/ammo_arrow_iron.png", "Iron Arrows", "fletching",               4, 2, fletchAmount, fletchingMaxStack, true},
+        {"assets/bank/fletching/ammo_arrow_steel.png", "Steel Arrows", "fletching",             5, 2, fletchAmount, fletchingMaxStack, true},
+        {"assets/bank/fletching/ammo_arrow_mithril.png", "Mithril Arrows", "fletching",         6, 2, fletchAmount, fletchingMaxStack, true},
+        {"assets/bank/fletching/ammo_arrow_adamant.png", "Adamantite Arrows", "fletching",   7, 2, fletchAmount, fletchingMaxStack, true},
+        {"assets/bank/fletching/ammo_arrow_rune.png", "Runite Arrows", "fletching",           8, 2, fletchAmount, fletchingMaxStack, true},
+        {"assets/bank/fletching/ammo_arrow_dragon.png", "Dragon Arrows", "fletching",        9, 2, fletchAmount, fletchingMaxStack, true}
+    };
+
+    // loading fletching items
+    for (const auto& itemData : fletchingItems) // loop through all items
     {
         Texture2D texture = LoadTexture(itemData.texturePath.c_str());
         if (texture.id == 0)
@@ -325,6 +360,53 @@ void ItemDatabase::loadItems()
 
     // loading runecrafting items
     for (const auto& itemData : runecraftingItems) // loop through all items
+    {
+        Texture2D texture = LoadTexture(itemData.texturePath.c_str());
+        if (texture.id == 0)
+            std::cerr << "Failed to load texture for " << itemData.itemName << std::endl;
+        else
+            items.push_back(Item(texture, itemData.amount, itemData.stackable, itemData.stackAmount, 
+                                 itemData.itemName, itemData.skillType, itemData.id, itemData.value));
+    }
+
+        std::vector<ItemData> herbloreItems = 
+    {
+        // texture,                                 name,       skillType,                             ID, value, amount,     maxStack,        isStackable
+        {"assets/bank/herblore/potion_woodcutting_i.png", "Bird Nest Potion", "herblore",               1, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_firemaking_i.png", "Controlled Heat Potion", "herblore",          2, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_cooking_i.png", "Generous Cook Potion", "herblore",               3, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_smithing_i.png", "Seeing Gold Potion", "herblore",                4, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_fishing_i.png", "Fishermans Potion", "herblore",                  5, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_fletching_i.png", "Skilled Fletching Potion", "herblore",         6, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_thieving_i.png", "Gentle Hands Potion", "herblore",               7, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_astrology_i.png", "Secret Stardust Potion", "herblore",           8, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_crafting_i.png", "Crafting Potion", "herblore",                   9, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_mining_i.png", "Perfect Swing Potion", "herblore",                10, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_summoning_i.png", "Necromancer Potion", "herblore",               11, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_agility_i.png", "Performance Enhancing Potion", "herblore",       12, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_runecrafting_i.png", "Elemental Potion", "herblore",              13, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_herblore_i.png", "Herblore Potion", "herblore",                   14, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_farming_i.png", "Generous Harvest Potion", "herblore",            15, 75, herbloreAmount, herbloreMaxStack, true},
+
+        {"assets/bank/herblore/potion_attack_i.png", "Melee Accuracy Potion", "herblore",               16, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_defence_i.png", "Melee Evasion Potion", "herblore",               17, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_ranged_i.png", "Ranged Assistance Potion", "herblore",            18, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/hinder_potion_i.png", "Hinder Potion", "herblore",                       19, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_magic_i.png", "Magic Assistance Potion", "herblore",              20, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_hitpoints_i.png", "Regeneration Potion", "herblore",              21, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/famished_potion_i.png", "Famished Potion", "herblore",                   22, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_ranged_i.png", "Ranged Strength Potion", "herblore",              23, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_herblore_i.png", "Lucky Herb Potion", "herblore",                 24, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_prayer_i.png", "Divine Potion", "herblore",                       25, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_strength_i.png", "Melee Strength Potion", "herblore",             26, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_magic_i.png", "Magic Damage Potion", "herblore",                  27, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/lethal_toxins_potion_i.png", "Lethal Toxin Potion", "herblore",          28, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_mining_i.png", "Diamond Luck Potion", "herblore",                 29, 75, herbloreAmount, herbloreMaxStack, true},
+        {"assets/bank/herblore/potion_damage_reduction_i.png", "Damage Reduction Potion", "herblore",   30, 75, herbloreAmount, herbloreMaxStack, true}
+    };
+
+    // loading herblore items
+    for (const auto& itemData : herbloreItems) // loop through all items
     {
         Texture2D texture = LoadTexture(itemData.texturePath.c_str());
         if (texture.id == 0)

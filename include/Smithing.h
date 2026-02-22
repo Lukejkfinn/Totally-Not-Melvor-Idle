@@ -23,6 +23,7 @@ public:
     void oreCombination(int ore1Amount, int ore1, int ore2Amount, int ore2, int bar);
     void oreSmelt(int oreAmount, int ore, int bar);
     virtual void resetSkillProgress();
+    virtual int setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, float textPosY, int fontSize);
     virtual void tick(float deltaTime, float contentY) override;
     int getNodeLevel(int index) const override;
 
@@ -53,6 +54,7 @@ private:
     int xpAccumulated{0};
     float barTimer{1.9f};
     int xpPerBar[MAX_BARS]{5, 8, 12, 15, 20, 35, 42, 50, 60};
+    int selectedIndex{0};
 };
 
 

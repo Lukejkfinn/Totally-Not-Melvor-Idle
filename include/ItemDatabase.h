@@ -15,7 +15,8 @@ enum class SkillType
     Thieving,
     Fletching,
     Crafting,
-    Runecrafting
+    Runecrafting,
+    Herblore
 };
 
 struct ItemData 
@@ -50,8 +51,11 @@ private:
     const static int foodMaxStack{999'999};
     const static int oresMaxStack{999'999};
     const static int barsMaxStack{999'999};
+    const static int fletchingMaxStack{999'999};
     const static int craftingMaxStack{999'999};
     const static int runecraftingMaxStack{999'999};
+    const static int herbloreMaxStack{999'999};
+
 
 };
 
