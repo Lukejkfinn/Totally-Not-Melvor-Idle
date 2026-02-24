@@ -148,7 +148,7 @@ void Crafting::drawTemplate(float contentY)
             }
 
             // ---------------- UNLOCKED ----------------
-            Item craftingItem = itemDatabase.getItemByName("crafting", index+1);
+            Item craftingItem = itemDatabase.getItemByID("crafting", index+1);
 
             if (BaseSkill::sbtn(buttons[i], barNames[i], 15))
             {
@@ -167,7 +167,7 @@ void Crafting::drawTemplate(float contentY)
     // draws resources on left panel
     for (int i = 0; i < sizeOfCrafting; i++)
     {
-        craftingItem = itemDatabase.getItemByName("crafting", selectedItemIndex+1);
+        craftingItem = itemDatabase.getItemByID("crafting", selectedItemIndex+1);
 
         if (selectedItemIndex == i)
         {
@@ -202,7 +202,7 @@ void Crafting::drawRequiresPanel(float contentY, int itemID, int itemAmount)
     int targetW = 32;
     int targetH = 32;   
 
-    Item item = itemDatabase.getItemByName("crafting", itemID);    
+    Item item = itemDatabase.getItemByID("crafting", itemID);    
 
     float scaleW = targetW / (float)item.getTexture().width;
     float scaleH = targetH / (float)item.getTexture().height;
@@ -224,7 +224,7 @@ void Crafting::drawRequiresPanel(float contentY, int itemID, int itemAmount)
 
 void Crafting::drawProductionPanel(float contentY, int itemType, int itemAmount)
 {
-    Item item = itemDatabase.getItemByName("crafting", itemType);
+    Item item = itemDatabase.getItemByID("crafting", itemType);
 
     float ScaleW = targetW / (float)item.getTexture().width;
     float ScaleH = targetH / (float)item.getTexture().height;
@@ -317,13 +317,13 @@ void Crafting::onCompleted()
     if (itemRemoval)
     {
         // add a item to inventory
-        Item createItem = ItemDatabase::getItemByName("crafting", selectedItemIndex+1);
+        Item createItem = ItemDatabase::getItemByID("crafting", selectedItemIndex+1);
         inventory.addItem(createItem);
     }
     else
     {
         // if failed, put back any removed items
-        if (itemRemoval) inventory.addItem(ItemDatabase::getItemByName("crafting", selectedItemIndex+1));
+        if (itemRemoval) inventory.addItem(ItemDatabase::getItemByID("crafting", selectedItemIndex+1));
         std::cout << "Not enough leather to craft item!\n";
     }
 }

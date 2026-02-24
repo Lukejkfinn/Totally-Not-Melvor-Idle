@@ -167,7 +167,7 @@ void Woodcutting::useNode(int i)
 
 void Woodcutting::onNodeComplete(const int& id)
 {
-    Item nodeItem = ItemDatabase::getItemByName("woodcutting", id);
+    Item nodeItem = ItemDatabase::getItemByID("woodcutting", id);
 
     if (nodeItem.getTexture().id == 0)
     {

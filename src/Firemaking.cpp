@@ -77,7 +77,7 @@ void Firemaking::drawDropdown(Dropdown& dd, const std::vector<std::string>& opti
 
 void Firemaking::drawProductionPanel(float contentY, int itemType, int amount)
 {
-    Item item = itemDatabase.getItemByName("firemaking", itemType);
+    Item item = itemDatabase.getItemByID("firemaking", itemType);
 
     float ScaleW = iconTargetW / (float)item.getTexture().width;
     float ScaleH = iconTargetH / (float)item.getTexture().height;
@@ -108,7 +108,7 @@ void Firemaking::drawTemplate(float contentY)
     DrawRectangleRounded(iconPreviewPanel, .05f, 16, GRAY);
 
     // temp icon
-    Item logIcon = itemDatabase.getItemByName("woodcutting", 1);
+    Item logIcon = itemDatabase.getItemByID("woodcutting", 1);
     float ScaleW = targetWidth / (float)logIcon.getTexture().width;
     float ScaleH = targetHeight / (float)logIcon.getTexture().height;
     float scale = std::min(ScaleW, ScaleH);
@@ -158,7 +158,7 @@ void Firemaking::drawTemplate(float contentY)
     int selectedLogID = selectedIndex +1;
 
     // draws resources on left panel
-    logIcon = itemDatabase.getItemByName("woodcutting", selectedLogID);
+    logIcon = itemDatabase.getItemByID("woodcutting", selectedLogID);
     // icon position
     DrawTextureEx(logIcon.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
 
@@ -174,7 +174,7 @@ void Firemaking::drawTemplate(float contentY)
 
 void Firemaking::drawInfoPanel(float contentY, int logID, int logAmount)
 {
-    Item log = itemDatabase.getItemByName("woodcutting", logID);    
+    Item log = itemDatabase.getItemByID("woodcutting", logID);    
 
     float logScaleW = iconTargetW / (float)log.getTexture().width;
     float logScaleH = iconTargetH / (float)log.getTexture().height;
@@ -262,18 +262,18 @@ void Firemaking::logBurn(int logAmount, int input, int output)
     if (removeLog)
     {
         // add ashes to inventory
-        Item createItem = ItemDatabase::getItemByName(itemType, output);
+        Item createItem = ItemDatabase::getItemByID(itemType, output);
         inventory.addItem(createItem);
 
-        Item logName = ItemDatabase::getItemByName("woodcutting", input);
+        Item logName = ItemDatabase::getItemByID("woodcutting", input);
         std::cout << "Successfully burnt: " << logName.name << " into " << createItem.getName() << '\n';
     }
     else
     {
-        Item logName = ItemDatabase::getItemByName("woodcutting", input);
+        Item logName = ItemDatabase::getItemByID("woodcutting", input);
         
         // if combination failed, put back any removed items
-        if (removeLog) inventory.addItem(ItemDatabase::getItemByName(logType, input));
+        if (removeLog) inventory.addItem(ItemDatabase::getItemByID(logType, input));
         std::cout << "Not enough " << logName.name <<  " to burn!\n";
     }
 }

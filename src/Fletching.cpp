@@ -144,7 +144,7 @@ void Fletching::drawTemplate(float contentY)
             }
 
             // ---------------- UNLOCKED ----------------
-            Item craftingItem = itemDatabase.getItemByName("fletching", index+1);
+            Item craftingItem = itemDatabase.getItemByID("fletching", index+1);
 
             if (BaseSkill::sbtn(buttons[i], barNames[i], 20))
             {
@@ -163,7 +163,7 @@ void Fletching::drawTemplate(float contentY)
         // draws resources on left panel
     for (int i = 0; i < sizeOfFletching; i++)
     {
-        craftingItem = itemDatabase.getItemByName("fletching", selectedItemIndex+1);
+        craftingItem = itemDatabase.getItemByID("fletching", selectedItemIndex+1);
 
         if (selectedItemIndex == i)
         {

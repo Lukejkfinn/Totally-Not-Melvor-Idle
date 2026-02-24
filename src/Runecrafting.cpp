@@ -164,7 +164,7 @@ void Runecrafting::drawTemplate(float contentY)
             }
 
             // ---------------- UNLOCKED ----------------
-            Item craftingItem = itemDatabase.getItemByName("runecrafting", index+1);
+            Item craftingItem = itemDatabase.getItemByID("runecrafting", index+1);
 
             if (BaseSkill::sbtn(buttons[i], barNames[i], 20))
             {
@@ -183,7 +183,7 @@ void Runecrafting::drawTemplate(float contentY)
     // draws resources on left panel
     for (int i = 0; i < sizeOfRunecrafting; i++)
     {
-        craftingItem = itemDatabase.getItemByName("runecrafting", selectedItemIndex+1);
+        craftingItem = itemDatabase.getItemByID("runecrafting", selectedItemIndex+1);
 
         if (selectedItemIndex == i)
         {
@@ -218,9 +218,9 @@ void Runecrafting::drawRequiresPanel(float contentY, int itemID1, int itemID2, i
     int targetW = 32;
     int targetH = 32;   
 
-    Item item1 = itemDatabase.getItemByName("mining", itemID1);
-    Item item2 = itemDatabase.getItemByName("runecrafting", itemID2);
-    Item item3 = itemDatabase.getItemByName("runecrafting", itemID3);   
+    Item item1 = itemDatabase.getItemByID("mining", itemID1);
+    Item item2 = itemDatabase.getItemByID("runecrafting", itemID2);
+    Item item3 = itemDatabase.getItemByID("runecrafting", itemID3);   
 
 
     float scaleW = targetW / (float)item1.getTexture().width;
@@ -264,7 +264,7 @@ void Runecrafting::drawRequiresPanel(float contentY, int itemID1, int itemID2, i
 
 void Runecrafting::drawProductionPanel(float contentY, int itemType, int itemAmount)
 {
-    Item item = itemDatabase.getItemByName("runecrafting", itemType);
+    Item item = itemDatabase.getItemByID("runecrafting", itemType);
 
     float ScaleW = targetW / (float)item.getTexture().width;
     float ScaleH = targetH / (float)item.getTexture().height;
@@ -401,23 +401,22 @@ void Runecrafting::itemCombination(int item1, int item1Amount, int item2, int it
     
     if (removeItem1 && removeItem2 && removeItem3)
     {
-        Item item1Name = ItemDatabase::getItemByName("mining", item1);          // rune essence
-        Item item2Name = ItemDatabase::getItemByName("runecrafting", item2);    // rune type
-        Item item3Name = ItemDatabase::getItemByName("runecrafting", item3);    // rune type
+        Item item1Name = ItemDatabase::getItemByID("mining", item1);          // rune essence
+        Item item2Name = ItemDatabase::getItemByID("runecrafting", item2);    // rune type
+        Item item3Name = ItemDatabase::getItemByID("runecrafting", item3);    // rune type
         
         // create combined item
-        Item createItem = ItemDatabase::getItemByName(essenceType, createdItem);
+        Item createItem = ItemDatabase::getItemByID(essenceType, createdItem);
         inventory.addItem(createItem);
-        
-
+    
         std::cout << "Successfully combined: " << item1Name.name << " + " << item2Name.name << " + " << item3Name.name << " = " << createItem.getName() << '\n';
     }
     else
     {
         // if combination failed, put back any removed items
-        if (removeItem1) inventory.addItem(ItemDatabase::getItemByName(runeEssence, item1));
-        if (removeItem2) inventory.addItem(ItemDatabase::getItemByName(essenceType, item2));
-        if (removeItem3) inventory.addItem(ItemDatabase::getItemByName(essenceType, item3));
+        if (removeItem1) inventory.addItem(ItemDatabase::getItemByID(runeEssence, item1));
+        if (removeItem2) inventory.addItem(ItemDatabase::getItemByID(essenceType, item2));
+        if (removeItem3) inventory.addItem(ItemDatabase::getItemByID(essenceType, item3));
 
         // 943 need to check that this adds the correct amount back 
         std::cout << "Not enough ores to combine!\n";

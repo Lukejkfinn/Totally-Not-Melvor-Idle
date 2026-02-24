@@ -96,7 +96,7 @@ void Fishing::drawTemplate(float contentY)
     DrawRectangleRounded(iconPreviewPanel, .05f, 16, GRAY);
 
     // temp icon
-    Item fishIcon = itemDatabase.getItemByName("fishing", 1);
+    Item fishIcon = itemDatabase.getItemByID("fishing", 1);
     float ScaleW = targetWidth / (float)fishIcon.getTexture().width;
     float ScaleH = targetHeight / (float)fishIcon.getTexture().height;
     float scale = std::min(ScaleW, ScaleH);
@@ -140,7 +140,7 @@ void Fishing::drawTemplate(float contentY)
     int selectedfishID = selectedIndex +1;
 
     // draws resources on left panel
-    fishIcon = itemDatabase.getItemByName("fishing", selectedfishID);
+    fishIcon = itemDatabase.getItemByID("fishing", selectedfishID);
     
     // icon position
     DrawTextureEx(fishIcon.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
@@ -158,7 +158,7 @@ void Fishing::drawTemplate(float contentY)
 
 void Fishing::drawInfoPanel(float contentY, int fishID, int fishAmount)
 {
-    Item fish = itemDatabase.getItemByName("fishing", fishID);    
+    Item fish = itemDatabase.getItemByID("fishing", fishID);    
 
     float fishScaleW = iconTargetW / (float)fish.getTexture().width;
     float fishScaleH = iconTargetH / (float)fish.getTexture().height;
@@ -196,7 +196,7 @@ void Fishing::onCompleted()
     std::cout << "Fish ID: " << index << '\n';
     
     // add a fish to inventory
-    Item createItem = ItemDatabase::getItemByName("fishing", index);
+    Item createItem = ItemDatabase::getItemByID("fishing", index);
     inventory.addItem(createItem);
 }
 

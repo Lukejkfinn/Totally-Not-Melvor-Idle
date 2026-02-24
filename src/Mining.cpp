@@ -184,7 +184,7 @@ void Mining::useNode(int i)
 
 void Mining::onNodeComplete(const int& id)
 {
-    Item nodeItem = ItemDatabase::getItemByName("mining", id);
+    Item nodeItem = ItemDatabase::getItemByID("mining", id);
 
     if (nodeItem.getTexture().id == 0)
     {

@@ -619,7 +619,7 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemak
             int id = std::stoi(rest.substr(0, comma));
             int amount = std::stoi(rest.substr(comma + 1));
 
-            Item item = ItemDatabase::getItemByName(skillType, id);
+            Item item = ItemDatabase::getItemByID(skillType, id);
 
             if (item.getTexture().id == 0)
                 std::cerr << "Failed to load item: " << skillType << " id=" << id << '\n';

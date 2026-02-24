@@ -37,7 +37,7 @@ public:
     static std::vector<Item> ItemSpawner(SkillType skill, int spawnAmount);
     static void loadItems();                                                    // function to initialise all the predefined items
     static void unloadItems();                                                  // function to unload
-    static Item getItemByName(const std::string &name, const int &id);          // function to get an item by name (for example)
+    static Item getItemByID(const std::string &skillType, const int &id);          // function to get an item by name (for example)
     
     static std::vector<Item> items;                                             // list of all items
 

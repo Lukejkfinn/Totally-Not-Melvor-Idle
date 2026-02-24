@@ -143,32 +143,27 @@ void Herblore::drawButtonGrid(float contentY, int selectedIndex)
 
             // ---------------- UNLOCKED ----------------
             Item craftingItem;
-            if (selectedIndex == 0)
-            {
-                craftingItem = itemDatabase.getItemByName("herblore", index +16);
+            std::string* potions = nullptr;
 
-                if (BaseSkill::sbtn(buttons[i], combatPotions[i].c_str(), 20)) 
-                {
-                    if (selectedItemIndex != index) 
-                    {
-                        selectedItemIndex = index;
-                        resetSkillProgress();
-                    }
-                } 
-            }
-            else if(selectedIndex == 1)
+            if (selectedIndex == 0) // combat potions
             {
-                craftingItem = itemDatabase.getItemByName("herblore", index +1);
-                
-                if (BaseSkill::sbtn(buttons[i], skillPotions[i].c_str(), 20)) 
-                {
-                    if (selectedItemIndex != index) 
-                    {
-                        selectedItemIndex = index;
-                        resetSkillProgress();
-                    }
-                } 
+                craftingItem = itemDatabase.getItemByID("herblore", index +16);
+                potions = combatPotions;
             }
+            else if(selectedIndex == 1) // skill potions
+            {
+                craftingItem = itemDatabase.getItemByID("herblore", index +1);
+                potions = skillPotions;
+            }
+
+            if (BaseSkill::sbtn(buttons[i], potions[i].c_str(), 20)) 
+            {
+                if (selectedItemIndex != index) 
+                {
+                    selectedItemIndex = index;
+                    resetSkillProgress();
+                }
+            } 
                 
             DrawTextureEx(craftingItem.getTexture(), Vector2{buttons[i].x + 2, buttons[i].y}, 0.0f, barScale, WHITE);
             index++;
@@ -238,37 +233,34 @@ void Herblore::drawResourcePanel(float contentY, int selectedIndex)
 
     for (int i = 0; i < sizeOfHerblore; i++) 
     {
-        if (selectedItemIndex == i) 
+        if (selectedItemIndex == i && selectedIndex == 0) 
         {
             // display potion-specific text
-            if (selectedIndex == 0) 
-            {
-                Item craftingItem = itemDatabase.getItemByName("herblore", selectedItemIndex +16);
-                
-                // icon position
-                DrawTextureEx(craftingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
-                setPanelInfo(contentY, i);
+            Item craftingItem = itemDatabase.getItemByID("herblore", selectedItemIndex +16);
+            
+            // icon position
+            DrawTextureEx(craftingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
+            setPanelInfo(contentY, i);
 
-                // xp amount value
-                std::string xpAmount = std::to_string(xpPerCombatPot[selectedItemIndex]);
-                DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
+            // xp amount value
+            std::string xpAmount = std::to_string(xpPerCombatPot[selectedItemIndex]);
+            DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
 
-                DrawText(combatPotions[i].c_str(), 460, 260 + (contentY - 100), 20, WHITE);
-            } 
-            else if (selectedIndex == 1) 
-            {
-                Item craftingItem = itemDatabase.getItemByName("herblore", selectedItemIndex +1);
+            DrawText(combatPotions[i].c_str(), 460, 260 + (contentY - 100), 20, WHITE);
+        }
+        else if (selectedItemIndex == i && selectedIndex == 1) 
+        {
+            Item craftingItem = itemDatabase.getItemByID("herblore", selectedItemIndex +1);
 
-                // icon position
-                DrawTextureEx(craftingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
-                setPanelInfo(contentY, i);
+            // icon position
+            DrawTextureEx(craftingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
+            setPanelInfo(contentY, i);
 
-                // xp amount value
-                std::string xpAmount = std::to_string(xpPerSkillPot[selectedItemIndex]);
-                DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
+            // xp amount value
+            std::string xpAmount = std::to_string(xpPerSkillPot[selectedItemIndex]);
+            DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
 
-                DrawText(skillPotions[i].c_str(), 460, 260 + (contentY - 100), 20, WHITE);
-            }
+            DrawText(skillPotions[i].c_str(), 460, 260 + (contentY - 100), 20, WHITE);
         }
     }
 }

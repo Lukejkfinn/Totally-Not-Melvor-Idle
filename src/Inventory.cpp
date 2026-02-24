@@ -19,13 +19,6 @@ void Inventory::unloadTextures()
         UnloadTexture(slotTexture);
 }
 
-void Inventory::initializeInventory()
-{
-    // used for spawning items in at the start
-    // Item item = ItemDatabase::getItemByName("woodcutting", 1);
-    // addItem(item);
-}
-
 bool Inventory::button(Rectangle bounds, const char *text)
 {
     Vector2 mouse = GetMousePosition();

@@ -97,7 +97,7 @@ void Cooking::drawTemplate(float contentY)
     DrawRectangleRounded(iconPreviewPanel, .05f, 16, GRAY);
 
     // temp icon
-    Item foodIcon = itemDatabase.getItemByName("cooking", 1);
+    Item foodIcon = itemDatabase.getItemByID("cooking", 1);
     float ScaleW = targetWidth / (float)foodIcon.getTexture().width;
     float ScaleH = targetHeight / (float)foodIcon.getTexture().height;
     float scale = std::min(ScaleW, ScaleH);
@@ -151,7 +151,7 @@ void Cooking::drawTemplate(float contentY)
     int selectedFoodID = selectedIndex +1;
 
     // draws resources on left panel
-    foodIcon = itemDatabase.getItemByName("cooking", selectedFoodID);
+    foodIcon = itemDatabase.getItemByID("cooking", selectedFoodID);
     
     // icon position
     DrawTextureEx(foodIcon.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
@@ -165,8 +165,8 @@ void Cooking::drawTemplate(float contentY)
 
 void Cooking::drawInfoPanel(float contentY, int foodID, int foodAmount)
 {
-    Item rawFoodTex = itemDatabase.getItemByName("fishing", foodID);    
-    Item cookedFoodTex = itemDatabase.getItemByName("cooking", foodID);    
+    Item rawFoodTex = itemDatabase.getItemByID("fishing", foodID);    
+    Item cookedFoodTex = itemDatabase.getItemByID("cooking", foodID);    
 
     float foodScaleW = iconTargetW / (float)rawFoodTex.getTexture().width;
     float foodScaleH = iconTargetH / (float)rawFoodTex.getTexture().height;
@@ -215,7 +215,7 @@ bool Cooking::canCookSelected(int index) const
         return inventory.getItemAmount("fishing", index);
     else
     {
-        Item rawFishingItem = ItemDatabase::getItemByName("fishing", index);
+        Item rawFishingItem = ItemDatabase::getItemByID("fishing", index);
         std::cout << "You have none of this food to cook: " << rawFishingItem.name << '\n';
     }
     return false;
@@ -232,13 +232,13 @@ void Cooking::onCompleted()
     if (itemRemoval)
     {
         // add a food to inventory
-        Item createItem = ItemDatabase::getItemByName("cooking", index);
+        Item createItem = ItemDatabase::getItemByID("cooking", index);
         inventory.addItem(createItem);
     }
     else
     {
         // if failed, put back any removed items
-        if (itemRemoval) inventory.addItem(ItemDatabase::getItemByName("fishing", index));
+        if (itemRemoval) inventory.addItem(ItemDatabase::getItemByID("fishing", index));
         std::cout << "Not enough food to cook!\n";
     }
 }
