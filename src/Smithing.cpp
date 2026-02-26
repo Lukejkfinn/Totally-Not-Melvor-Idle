@@ -1,5 +1,64 @@
 #include "Smithing.h"
 
+static const int typeOffsets[] = { 0, 9, 24, 39, 54, 69, 85, 99 };
+
+struct Recipe
+{
+    int ore1ID;
+    int ore1Amount;
+    int ore2ID;
+    int ore2Amount;
+};
+
+struct GearRecipe
+{
+    int barsRequired;
+};
+
+static const Recipe barRecipes[] =
+{
+    {2, 1, 3, 1}, // Bronze  (Copper + Tin)
+    {4, 1, 0, 0}, // Iron
+    {4, 1, 5, 2}, // Steel   (Iron + Coal)
+    {6, 1, 0, 0}, // Silver
+    {7, 1, 0, 0}, // Gold
+    {8, 1, 5, 4}, // Mithril (Mithril + Coal)
+    {9, 1, 5, 6}, // Adamantite
+    {10,1, 5, 8}, // Runite
+    {11,1, 5,10}  // Dragonite
+};
+
+static const int gearBarRequirements[] =
+{
+    0,  // 0 = Nothing (unused)
+    1,  // 1 = Bronze gear requires Bronze bar (ID 1)
+    2,  // 2 = Iron gear requires Iron bar (ID 2)
+    3,  // 3 = Steel gear requires Steel bar (ID 3)
+    6,  // 4 = Mithril gear requires Mithril bar (ID 6)
+    7,  // 5 = Adamant gear requires Adamant bar (ID 7)
+    8,  // 6 = Rune gear requires Rune bar (ID 8)
+    9   // 7 = Dragon gear requires Dragon bar (ID 9)
+};
+
+static const GearRecipe gearRecipes[15] =
+{
+    {1}, // Dagger
+    {1}, // Arrowtips
+    {1}, // Throwing Knife
+    {1}, // Sword
+    {2}, // Gloves
+    {2}, // Scimitar
+    {2}, // Helmet
+    {3}, // Battleaxe
+    {2}, // Javelin Heads
+    {2}, // Boots
+    {3}, // Shield
+    {3}, // 2H Sword
+    {3}, // Crossbow Head
+    {3}, // Platelegs
+    {5}  // Platebody (adjust if needed)
+};
+
 Smithing::Smithing(Inventory &inv) : inventory(inv)
 {
     background = smithingBG;
@@ -7,6 +66,46 @@ Smithing::Smithing(Inventory &inv) : inventory(inv)
 
 int Smithing::getNodeLevel(int index) const
 {
+    if(selectedIndex == 0) // bars
+    {
+        static int nodeLvls[MAX_BARS]{1, 10, 25, 35, 40, 55, 60, 75, 90};
+        return nodeLvls[index];
+    }
+    else if(selectedIndex == 1) // bronze gear
+    {
+        static int nodeLvls[MAX_ITEMS]{1, 1, 2, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 18};
+        return nodeLvls[index];
+    }
+    else if(selectedIndex == 2) // iron gear
+    {
+        static int nodeLvls[MAX_ITEMS]{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 24, 25, 27};
+        return nodeLvls[index];
+    }
+    else if(selectedIndex == 3) // steel gear
+    {
+        static int nodeLvls[MAX_ITEMS]{25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 36, 38, 39, 40, 42};
+        return nodeLvls[index];
+    }
+    else if(selectedIndex == 4) // mithril gear
+    {
+        static int nodeLvls[MAX_ITEMS]{40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 51, 53, 54, 55, 57};
+        return nodeLvls[index];
+    }
+    else if(selectedIndex == 5) // adamant gear
+    {
+        static int nodeLvls[MAX_ITEMS]{55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 68, 69, 70, 72};
+        return nodeLvls[index];
+    }
+    else if(selectedIndex == 6) // rune gear
+    {
+        static int nodeLvls[MAX_ITEMS]{70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 81, 83, 84, 85, 87};
+        return nodeLvls[index];
+    }
+    else if(selectedIndex == 7) // dragon gear
+    {
+        static int nodeLvls[MAX_ITEMS]{85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 96, 98, 98, 99, 99};
+        return nodeLvls[index];
+    }
     static int nodeLvls[MAX_BARS]{1, 10, 25, 35, 40, 55, 60, 75, 90};
     return nodeLvls[index];
 }
@@ -309,327 +408,180 @@ void Smithing::drawButtonGrid(float contentY, int selectedIndex, std::string smi
 
 void Smithing::drawResourcePanel(float contentY, int selectedIndex, std::string barNames[])
 {
-    // set target size for the icon
-    int targetWidth = 64;
-    int targetHeight = 64;
-
-    // icon preview panel
+    // ---------------- ICON PANEL (ALWAYS DRAW) ----------------
     Rectangle iconPreviewPanel{345, 220 + (contentY - 100), 100, 100};
     DrawRectangleRounded(iconPreviewPanel, .05f, 16, GRAY);
-    
-    // calculate position to center the icon inside the preview panel
-    float iconX = iconPreviewPanel.x + (iconPreviewPanel.width - targetWidth) / 2;
-    float iconY = iconPreviewPanel.y + (iconPreviewPanel.height - targetHeight) / 2;
 
-    // preview icon
-    Vector2 iconPosition = {iconX, iconY};
-
-    // calculate scale factor based on the desired target size
-    float scaleX = targetWidth / (float)512;
-    float scaleY = targetHeight / (float)512;
-    float scale = std::min(scaleX, scaleY);  // Maintain aspect ratio
-
-    // draws resources on left panel
-    for (int i = 0; i < sizeOfSmithing; i++)
+    // if nothing selected, stop here
+    if (selectedItemIndex <= 0)
     {
-        Item smithingItem;
-
-        if (selectedItemIndex == i+1 && selectedIndex == 0)
-        {
-            smithingItem = itemDatabase.getItemByID("smithing", selectedItemIndex);
-
-            // icon position
-            DrawTextureEx(smithingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
-            drawSmithingPanelInfo(contentY, i);
-
-            // xp amount value
-            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex-1]);
-            DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
-
-            // bar names
-            DrawText(barNamesText[i].c_str(), 460 , 260 +(contentY - 100), 20, WHITE);
-        }
-        else if (selectedItemIndex == i+1 && selectedIndex == 1)
-        {  
-            smithingItem = itemDatabase.getItemByID("smithing", selectedItemIndex+9);
-
-            // icon position
-            DrawTextureEx(smithingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
-            drawSmithingPanelInfo(contentY, i);
-
-            // xp amount value
-            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex-1]);
-            DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
-
-            // bronze gear names
-            DrawText(bronzeGearNamesText[i].c_str(), 460 , 260 +(contentY - 100), 20, WHITE);
-        }
-        else if (selectedItemIndex == i+1 && selectedIndex == 2)
-        {  
-            smithingItem = itemDatabase.getItemByID("smithing", selectedItemIndex+24);
-
-            // icon position
-            DrawTextureEx(smithingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
-            drawSmithingPanelInfo(contentY, i);
-
-            // xp amount value
-            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex-1]);
-            DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
-
-            // iron gear names
-            DrawText(bronzeGearNamesText[i].c_str(), 460 , 260 +(contentY - 100), 20, WHITE);
-        }
-        else if (selectedItemIndex == i+1 && selectedIndex == 3)
-        {  
-            smithingItem = itemDatabase.getItemByID("smithing", selectedItemIndex+39);
-
-            // icon position
-            DrawTextureEx(smithingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
-            drawSmithingPanelInfo(contentY, i);
-
-            // xp amount value
-            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex-1]);
-            DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
-
-            // steel gear names
-            DrawText(bronzeGearNamesText[i].c_str(), 460 , 260 +(contentY - 100), 20, WHITE);
-        }
-        else if (selectedItemIndex == i+1 && selectedIndex == 4)
-        {  
-            smithingItem = itemDatabase.getItemByID("smithing", selectedItemIndex+54);
-
-            // icon position
-            DrawTextureEx(smithingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
-            drawSmithingPanelInfo(contentY, i);
-
-            // xp amount value
-            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex-1]);
-            DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
-
-            // mithril gear names
-            DrawText(bronzeGearNamesText[i].c_str(), 460 , 260 +(contentY - 100), 20, WHITE);
-        }
-        else if (selectedItemIndex == i+1 && selectedIndex == 5)
-        {  
-            smithingItem = itemDatabase.getItemByID("smithing", selectedItemIndex+69);
-
-            // icon position
-            DrawTextureEx(smithingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
-            drawSmithingPanelInfo(contentY, i);
-
-            // xp amount value
-            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex-1]);
-            DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
-
-            // adamant gear names
-            DrawText(bronzeGearNamesText[i].c_str(), 460 , 260 +(contentY - 100), 20, WHITE);
-        }
-        else if (selectedItemIndex == i+1 && selectedIndex == 6)
-        {  
-            smithingItem = itemDatabase.getItemByID("smithing", selectedItemIndex+84);
-
-            // icon position
-            DrawTextureEx(smithingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
-            drawSmithingPanelInfo(contentY, i);
-
-            // xp amount value
-            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex-1]);
-            DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
-
-            // rune gear names
-            DrawText(bronzeGearNamesText[i].c_str(), 460 , 260 +(contentY - 100), 20, WHITE);
-        }
-        else if (selectedItemIndex == i+1 && selectedIndex == 7)
-        {  
-            smithingItem = itemDatabase.getItemByID("smithing", selectedItemIndex+99);
-
-            // icon position
-            DrawTextureEx(smithingItem.getTexture(), Vector2{iconPosition.x, iconPosition.y}, 0.0f, scale, WHITE);
-            drawSmithingPanelInfo(contentY, i);
-
-            // xp amount value
-            std::string xpAmount = std::to_string(xpPerBar[selectedItemIndex-1]);
-            DrawText(xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
-
-            // dragon gear names
-            DrawText(bronzeGearNamesText[i].c_str(), 460 , 260 +(contentY - 100), 20, WHITE);
-        }
+        createButton(contentY);
+        return;
     }
-    beginSmithing(contentY);
+
+    // ---------------- TAB DATA ----------------
+    struct SmithingTabData
+    {
+        int itemOffset;
+        const int* xpArray;
+        const std::string* nameArray;
+    };
+
+    SmithingTabData tabData[] =
+    {
+        { 0,   xpPerBar,         barNamesText },
+        { 9,   xpPerBronzeGear,  bronzeGearNamesText },
+        { 24,  xpPerIronGear,    ironGearNamesText },
+        { 39,  xpPerSteelGear,   steelGearNamesText },
+        { 54,  xpPerMithrilGear, mithrilGearNamesText },
+        { 69,  xpPerAdamantGear, adamantGearNamesText },
+        { 84,  xpPerRuneGear,    runeGearNamesText },
+        { 99,  xpPerDragonGear,  dragonGearNamesText }
+    };
+
+    if (selectedIndex < 0 || selectedIndex >= static_cast<int>(std::size(tabData)))
+    {
+        createButton(contentY);
+        return;
+    }
+
+    const SmithingTabData& tab = tabData[selectedIndex];
+
+    int index = selectedItemIndex - 1;
+    int itemID = selectedItemIndex + tab.itemOffset;
+
+    Item smithingItem = itemDatabase.getItemByID("smithing", itemID);
+
+    // ---------------- ICON ----------------
+    int targetWidth  = 64;
+    int targetHeight = 64;
+
+    float iconX = iconPreviewPanel.x + (iconPreviewPanel.width  - targetWidth)  / 2.0f;
+    float iconY = iconPreviewPanel.y + (iconPreviewPanel.height - targetHeight) / 2.0f;
+
+    float scale = std::min(targetWidth  / 512.0f, targetHeight / 512.0f);
+
+    DrawTextureEx(smithingItem.getTexture(), {iconX, iconY}, 0.0f, scale, WHITE);
+
+    // ---------------- REQUIREMENTS + PRODUCTION ----------------
+    drawSmithingPanelInfo(contentY, index);
+
+    // ---------------- XP TEXT ----------------
+    std::string xpAmount = std::to_string(tab.xpArray[index]);
+
+    DrawText( xpAmount.c_str(), 345 + 210, 460 + (contentY - 100), 20, WHITE);
+
+    // ---------------- NAME TEXT ----------------
+    DrawText(tab.nameArray[index].c_str(), 460, 260 + (contentY - 100), 20, WHITE);
+
+    // ---------------- CREATE BUTTON ----------------
+    createButton(contentY);
 }
 
 void Smithing::drawProductionPanel(float contentY, int itemType, int itemAmount)
 {
-    Item smithingItem;
+    if (selectedIndex < 0 || selectedIndex >= static_cast<int>(std::size(typeOffsets)))
+        return;
 
-    float ScaleW = targetW / (float)smithingItem.getTexture().width;
-    float ScaleH = targetH / (float)smithingItem.getTexture().height;
-    float scale = std::min(ScaleW, ScaleH);
+    int finalItemType = itemType + typeOffsets[selectedIndex];
+    Item smithingItem = itemDatabase.getItemByID("smithing", finalItemType);
 
-    if (selectedIndex == 0)
-    {
-        smithingItem = itemDatabase.getItemByID("smithing", itemType);
+    const Texture2D& texture = smithingItem.getTexture();
 
-        // draws the produced bar and amount text below the bar
-        Vector2 itemLocationLeft{395, 465 + (contentY -100)};
-        DrawTextureEx(smithingItem.getTexture(), itemLocationLeft, 1, scale, WHITE);
-        std::string itemAmountString = std::to_string(itemAmount); 
-        DrawText(itemAmountString.c_str(), 410, 496 + (contentY -100), 20, WHITE);
-    }
-    else if (selectedIndex == 1)
-    {
-        smithingItem = itemDatabase.getItemByID("smithing", itemType+9);
+    float scaleW = targetW / static_cast<float>(texture.width);
+    float scaleH = targetH / static_cast<float>(texture.height);
+    float scale  = std::min(scaleW, scaleH);
 
-        // draws the produced bar and amount text below the bar
-        Vector2 itemLocationLeft{395, 465 + (contentY -100)};
-        DrawTextureEx(smithingItem.getTexture(), itemLocationLeft, 1, scale, WHITE);
-        std::string itemAmountString = std::to_string(itemAmount); 
-        DrawText(itemAmountString.c_str(), 410, 496 + (contentY -100), 20, WHITE);
-    }
-    else if (selectedIndex == 2)
-    {
-        smithingItem = itemDatabase.getItemByID("smithing", itemType+24);
+    float yOffset = contentY - 100.0f;
 
-        // draws the produced bar and amount text below the bar
-        Vector2 itemLocationLeft{395, 465 + (contentY -100)};
-        DrawTextureEx(smithingItem.getTexture(), itemLocationLeft, 1, scale, WHITE);
-        std::string itemAmountString = std::to_string(itemAmount); 
-        DrawText(itemAmountString.c_str(), 410, 496 + (contentY -100), 20, WHITE);
-    }
-    else if (selectedIndex == 3)
-    {
-        smithingItem = itemDatabase.getItemByID("smithing", itemType+39);
-
-        // draws the produced bar and amount text below the bar
-        Vector2 itemLocationLeft{395, 465 + (contentY -100)};
-        DrawTextureEx(smithingItem.getTexture(), itemLocationLeft, 1, scale, WHITE);
-        std::string itemAmountString = std::to_string(itemAmount); 
-        DrawText(itemAmountString.c_str(), 410, 496 + (contentY -100), 20, WHITE);
-    }
-    else if (selectedIndex == 4)
-    {
-        smithingItem = itemDatabase.getItemByID("smithing", itemType+54);
-
-        // draws the produced bar and amount text below the bar
-        Vector2 itemLocationLeft{395, 465 + (contentY -100)};
-        DrawTextureEx(smithingItem.getTexture(), itemLocationLeft, 1, scale, WHITE);
-        std::string itemAmountString = std::to_string(itemAmount); 
-        DrawText(itemAmountString.c_str(), 410, 496 + (contentY -100), 20, WHITE);
-    }
-    else if (selectedIndex == 5)
-    {
-        smithingItem = itemDatabase.getItemByID("smithing", itemType+69);
-
-        // draws the produced bar and amount text below the bar
-        Vector2 itemLocationLeft{395, 465 + (contentY -100)};
-        DrawTextureEx(smithingItem.getTexture(), itemLocationLeft, 1, scale, WHITE);
-        std::string itemAmountString = std::to_string(itemAmount); 
-        DrawText(itemAmountString.c_str(), 410, 496 + (contentY -100), 20, WHITE);
-    }
-    else if (selectedIndex == 6)
-    {
-        smithingItem = itemDatabase.getItemByID("smithing", itemType+85);
-
-        // draws the produced bar and amount text below the bar
-        Vector2 itemLocationLeft{395, 465 + (contentY -100)};
-        DrawTextureEx(smithingItem.getTexture(), itemLocationLeft, 1, scale, WHITE);
-        std::string itemAmountString = std::to_string(itemAmount); 
-        DrawText(itemAmountString.c_str(), 410, 496 + (contentY -100), 20, WHITE);
-    }
-    else if (selectedIndex == 7)
-    {
-        smithingItem = itemDatabase.getItemByID("smithing", itemType+99);
-
-        // draws the produced bar and amount text below the bar
-        Vector2 itemLocationLeft{395, 465 + (contentY -100)};
-        DrawTextureEx(smithingItem.getTexture(), itemLocationLeft, 1, scale, WHITE);
-        std::string itemAmountString = std::to_string(itemAmount); 
-        DrawText(itemAmountString.c_str(), 410, 496 + (contentY -100), 20, WHITE);
-    }
+    Vector2 itemLocation{395.0f, 465.0f + yOffset};
+    DrawTextureEx(texture, itemLocation, 0.0f, scale, WHITE);
+    DrawText(std::to_string(itemAmount).c_str(), 410, static_cast<int>(496.0f + yOffset), 20, WHITE);
 }
 
 void Smithing::drawSmithingPanelInfo(float contentY, int index)
 {
-    if (index == 0) // copper bar requirements
+    // ---------------- STANDARD BARS ----------------
+    if (selectedIndex == 0)
     {
-        drawOreCombinationPanel(contentY, 2, 1, 3, 1); // IDs for copper and tin 
-        drawProductionPanel(contentY, index+1, 1);
+        if (index >= 0 && index < static_cast<int>(std::size(barRecipes)))
+        {
+            const Recipe& recipe = barRecipes[index];
+
+            drawOreCombinationPanel(contentY, recipe.ore1ID, recipe.ore1Amount, recipe.ore2ID, recipe.ore2Amount);
+            drawProductionPanel(contentY, index + 1, 1);
+        }
+        return;
     }
-    else if (index == 1) // iron bar requirements
+
+    // ---------------- GEAR TABS ----------------
+    if (selectedIndex > 0 && selectedIndex < static_cast<int>(std::size(gearBarRequirements)))
     {
-        drawOreCombinationPanel(contentY, 4, 1, 0, 0);
-        drawProductionPanel(contentY, index+1, 1);
+        int requiredBarID = gearBarRequirements[selectedIndex];
+
+        // get how many bars this gear requires from the recipe table
+        int barsNeeded = 1; // default fallback
+        if (index >= 0 && index < static_cast<int>(std::size(gearRecipes)))
+            barsNeeded = gearRecipes[index].barsRequired;
+
+        drawOreCombinationPanel(contentY, requiredBarID, barsNeeded, 0, 0);
+        drawProductionPanel(contentY, index + 1, 1);
     }
-    else if (index == 2) // steel bar requirements
-    {
-        drawOreCombinationPanel(contentY, 4, 1, 5, 2);
-        drawProductionPanel(contentY, index+1, 1);
-    }
-    else if (index == 3) // silver bar requirements
-    {
-        drawOreCombinationPanel(contentY, 6, 1, 0, 0);
-        drawProductionPanel(contentY, index+1, 1);
-    }
-    else if (index == 4) // gold bar requirements
-    {
-        drawOreCombinationPanel(contentY, 7, 1, 0, 0);
-        drawProductionPanel(contentY, index+1, 1);
-    }
-    else if (index == 5) // mithril bar requirements
-    {
-        drawOreCombinationPanel(contentY, 8, 1, 5, 4);
-        drawProductionPanel(contentY, index+1, 1);
-    }
-    else if (index == 6) // adamantite bar requirements
-    {
-        drawOreCombinationPanel(contentY, 9, 1, 5, 6);
-        drawProductionPanel(contentY, index+1, 1);
-    }
-    else if (index == 7) // runeite bar requirements
-    {
-        drawOreCombinationPanel(contentY, 10, 1, 5, 8);
-        drawProductionPanel(contentY, index+1, 1);
-    }
-    else if (index == 8) // dragonite bare requirements
-    {
-        drawOreCombinationPanel(contentY, 11, 1, 5, 10);
-        drawProductionPanel(contentY, index+1, 1);
-    }  
 }
 
 void Smithing::drawOreCombinationPanel(float contentY, int item1, int item1Amount, int item2, int item2Amount)
 {
-    Item item1Name = itemDatabase.getItemByID("mining", item1);   
-    Item item2Name = itemDatabase.getItemByID("mining", item2);   
+    // decide which item category to use
+    const std::string itemType = (selectedIndex == 0) ? "mining" : "smithing";
 
-    float scaleW = targetW / (float)item1Name.getTexture().width;
-    float scaleH = targetH / (float)item1Name.getTexture().height;
+    // load required items
+    Item item1Obj = itemDatabase.getItemByID(itemType, item1);
+    Item item2Obj;
+
+    if (item2 != 0) // second item is always ore
+        item2Obj = itemDatabase.getItemByID("mining", item2); 
+
+    // safety check
+    if (item1Obj.getTexture().width == 0)
+        return;
+
+    // scale once
+    float scaleW = targetW / (float)item1Obj.getTexture().width;
+    float scaleH = targetH / (float)item1Obj.getTexture().height;
     float scale = std::min(scaleW, scaleH);
 
-    // draws the two left ores and the amount text below them
-    Vector2 itemLocationLeft1{375, 365 + (contentY-100)};
-    Vector2 itemLocationLeft2{425, 365 + (contentY-100)};
-    DrawTextureEx(item1Name.getTexture(), itemLocationLeft1, 1, scale, WHITE);
-    DrawTextureEx(item2Name.getTexture(), itemLocationLeft2, 1, scale, WHITE);
+    float baseY = 365 + (contentY - 100);
 
-    std::string item1AmountString = std::to_string(item1Amount); 
-    std::string item2AmountString = std::to_string(item2Amount); 
-    DrawText(item1AmountString.c_str(), 385, 396 + (contentY-100), 20, WHITE);
-    DrawText(item2AmountString.c_str(), 435, 396 + (contentY-100), 20, WHITE);
+    // --- draw REQUIRED side (left) ---
+    Vector2 left1{375, baseY};
+    DrawTextureEx(item1Obj.getTexture(), left1, 0, scale, WHITE);
+    DrawText(std::to_string(item1Amount).c_str(), 385, baseY + 31, 20, WHITE);
 
-    // draws the two right ores and the amount text below them
-    Vector2 itemLocationRight1{530, 365 + (contentY-100)};
-    Vector2 itemLocationRight2{580, 365 + (contentY-100)};
-    DrawTextureEx(item1Name.getTexture(), itemLocationRight1, 1, scale, WHITE);
-    DrawTextureEx(item2Name.getTexture(), itemLocationRight2, 1, scale, WHITE);
+    if (item2 != 0)
+    {
+        Vector2 left2{425, baseY};
+        DrawTextureEx(item2Obj.getTexture(), left2, 0, scale, WHITE);
+        DrawText(std::to_string(item2Amount).c_str(), 435, baseY + 31, 20, WHITE);
+    }
 
-    int invItem1 = inventory.getItemAmount("mining", item1); // get ore amount from inventory
-    int invItem2 = inventory.getItemAmount("mining", item2); // get ore amount from inventory
-    DrawText(std::to_string(invItem1).c_str(), 540, 396 + (contentY-100), 20, WHITE);
-    DrawText(std::to_string(invItem2).c_str(), 590, 396 + (contentY-100), 20, WHITE);
+    // --- draw INVENTORY side (right) ---
+    Vector2 right1{530, baseY};
+    DrawTextureEx(item1Obj.getTexture(), right1, 0, scale, WHITE);
+
+    int invItem1 = inventory.getItemAmount(itemType, item1);
+    DrawText(std::to_string(invItem1).c_str(), 540, baseY + 31, 20, WHITE);
+
+    if (item2 != 0) // draw item if it's needed for the combination
+    {
+        Vector2 right2{580, baseY};
+        DrawTextureEx(item2Obj.getTexture(), right2, 0, scale, WHITE);
+
+        int invItem2 = inventory.getItemAmount("mining", item2);
+        DrawText(std::to_string(invItem2).c_str(), 590, baseY + 31, 20, WHITE);
+    }
 }
 
-void Smithing::beginSmithing(float contentY)
+void Smithing::createButton(float contentY)
 {
     // button for creating the item
     Rectangle createButton{400, 575 + (contentY-100), 200 , 50};
@@ -686,116 +638,131 @@ void Smithing::beginSmithing(float contentY)
 
 bool Smithing::canCreateSelected() const
 {
-    std::cout << "SelectedItemIndex: " << selectedItemIndex << '\n';
-    switch (selectedItemIndex)
+    if (selectedItemIndex == -1) return false;
+
+    // --- smelting bars (Tab 0) - requires ores from mining ---
+    if (selectedIndex == 0)
     {
-        case 1: // bronze
-            return inventory.getItemAmount("mining", 2) >= 1 &&
-                   inventory.getItemAmount("mining", 3) >= 1;
+        int recipeIndex = selectedItemIndex - 1;
+        if (recipeIndex < 0 || recipeIndex >= static_cast<int>(std::size(barRecipes))) 
+            return false;
 
-        case 2: // iron
-            return inventory.getItemAmount("mining", 4) >= 1;
+        const Recipe& recipe = barRecipes[recipeIndex];
+        
+        // check first ore
+        bool hasOre1 = inventory.getItemAmount("mining", recipe.ore1ID) >= recipe.ore1Amount;
+        
+        // check second ore (if applicable)
+        bool hasOre2 = true;
+        if (recipe.ore2ID != 0)
+        {
+            hasOre2 = inventory.getItemAmount("mining", recipe.ore2ID) >= recipe.ore2Amount;
+        }
 
-        case 3: // steel
-            return inventory.getItemAmount("mining", 4) >= 1 &&
-                   inventory.getItemAmount("mining", 5) >= 2;
-
-        case 4: // silver
-            return inventory.getItemAmount("mining", 6) >= 1;
-
-        case 5: // gold
-            return inventory.getItemAmount("mining", 7) >= 1;
-
-        case 6: // mithril
-            return inventory.getItemAmount("mining", 8) >= 1 &&
-                   inventory.getItemAmount("mining", 5) >= 4;
-
-        case 7: // adamantite
-            return inventory.getItemAmount("mining", 9) >= 1 &&
-                   inventory.getItemAmount("mining", 5) >= 6;
-
-        case 8: // runite
-            return inventory.getItemAmount("mining", 10) >= 1 &&
-                   inventory.getItemAmount("mining", 5) >= 8;
-
-        case 9: // dragonite
-            return inventory.getItemAmount("mining", 11) >= 1 &&
-                   inventory.getItemAmount("mining", 5) >= 10;
+        return hasOre1 && hasOre2;
     }
+
+    // --- smithing gear (Tabs 1-7) - requires bars from smithing ---
+    if (selectedIndex > 0 && selectedIndex < static_cast<int>(std::size(gearBarRequirements)))
+    {
+        int gearIndex = selectedItemIndex - 1;
+        if (gearIndex < 0 || gearIndex >= static_cast<int>(std::size(gearRecipes)))
+            return false;
+
+        int requiredBarID = gearBarRequirements[selectedIndex];
+        int barsNeeded = gearRecipes[gearIndex].barsRequired;
+
+        return inventory.getItemAmount("smithing", requiredBarID) >= barsNeeded;
+    }
+
     return false;
 }
 
 void Smithing::onCompleted()
 {
-    if(selectedItemIndex == 1)
-        oreCombination(1, 2, 1, 3, 1);      // (1) copper ore (ID=2), (1) tin (ID=3) = (1) bronze bar (ID=1)
-    else if(selectedItemIndex == 2)
-        oreSmelt(1, 4, 2);                  // (1) iron ore (ID=4) = (1) iron bar (ID=2)  
-    else if(selectedItemIndex == 3)
-        oreCombination(1, 4, 2, 5, 3);      // (1) iron ore (ID=4), (2) coal (ID=5) = (1) steel bar (ID=3) 
-    else if(selectedItemIndex == 4)
-        oreSmelt(1, 6, 4);                  // (1) silver ore (ID=6) = (1) silver bar (ID=4) 
-    else if(selectedItemIndex == 5)
-        oreSmelt(1, 7, 5);                  // (1) gold ore (ID=7) = (1) gold bar (ID=5) 
-    else if(selectedItemIndex == 6)
-        oreCombination(1, 8, 4, 5, 6);      // (1) mithril ore (ID=8), (4) coal (ID=5) = (1) mithril bar (ID=6) 
-    else if(selectedItemIndex == 7)
-        oreCombination(1, 9, 6, 5, 7);      // (1) adamantite ore (ID=9), (6) coal (ID=5) = (1) adamantite bar (ID=7)
-    else if(selectedItemIndex == 8)
-        oreCombination(1, 10, 8, 5, 8);      // (1) runite ore (ID=10), (8) coal (ID=5) = (1) runite bar(ID=8) 
-    else if(selectedItemIndex == 9)
-        oreCombination(1, 11, 10, 5, 9);    // (1) dragonite ore (ID=11), (10) coal (ID=5) = (1) dragonite bar (ID=9) 
+    int index = selectedItemIndex - 1;
+
+    if (index < 0)
+        return;
+
+    // ---------------- STANDARD BARS ----------------
+    if (selectedIndex == 0)
+    {
+        if (index >= static_cast<int>(std::size(barRecipes)))
+            return;
+
+        const Recipe& recipe = barRecipes[index];
+
+        // remove required ores (always mining)
+        if (!inventory.removeItem("mining", recipe.ore1ID, recipe.ore1Amount))
+            return;
+
+        if (recipe.ore2ID != 0)
+        {
+            if (!inventory.removeItem("mining", recipe.ore2ID, recipe.ore2Amount))
+                return;
+        }
+
+        // create produced bar item from database
+        Item producedBar = itemDatabase.getItemByID("smithing", selectedItemIndex);
+        producedBar.setAmount(1);
+
+        inventory.addItem(producedBar);
+
+        return;
+    }
+
+    // ---------------- GEAR ----------------
+    if (selectedIndex > 0 && selectedIndex < static_cast<int>(std::size(gearBarRequirements)))
+    {
+        if (index < 0 || index >= static_cast<int>(std::size(gearRecipes)))
+            return;
+
+        int requiredBarID = gearBarRequirements[selectedIndex];
+        int barsNeeded = gearRecipes[index].barsRequired;
+
+        // check amount first (safe crafting)
+        if (inventory.getItemAmount("smithing", requiredBarID) < barsNeeded)
+            return;
+
+        // remove required bars
+        inventory.removeItem("smithing", requiredBarID, barsNeeded);
+
+        // calculate final gear ID
+        int finalItemType = selectedItemIndex + typeOffsets[selectedIndex];
+
+        Item producedGear = itemDatabase.getItemByID("smithing", finalItemType);
+        producedGear.setAmount(1);
+
+        inventory.addItem(producedGear);
+    }
 }
 
 void Smithing::oreCombination(int ore1Amount, int ore1, int ore2Amount, int ore2, int bar)
 {
-    const std::string oreType = "mining";
-    const std::string barType = "smithing";
+    // decide which item category to use
+    const std::string itemType = (selectedIndex == 0) ? "mining" : "smithing";
+
     // attempt to remove 1 Ore from two different types of ore
-    bool removeOre1 = inventory.removeItem(oreType, ore1, ore1Amount);
-    bool removedOre2 = inventory.removeItem(oreType, ore2, ore2Amount);
+    bool removeOre1 = inventory.removeItem(itemType, ore1, ore1Amount);
+    bool removedOre2 = inventory.removeItem(itemType, ore2, ore2Amount);
     
     if (removeOre1 && removedOre2)
     {
         // add Bronze Bar to inventory
-        Item createBar = ItemDatabase::getItemByID(barType, bar);
+        Item createBar = ItemDatabase::getItemByID(itemType, bar);
         inventory.addItem(createBar);
         
-        Item ore1Name = ItemDatabase::getItemByID("mining", ore1);
-        Item ore2Name = ItemDatabase::getItemByID("mining", ore2);
+        Item ore1Name = ItemDatabase::getItemByID(itemType, ore1);
+        Item ore2Name = ItemDatabase::getItemByID(itemType, ore2);
         std::cout << "Successfully combined: " << ore1Name.name << " + " << ore2Name.name << " = " << createBar.getName() << '\n';
     }
     else
     {
         // if combination failed, put back any removed items
-        if (removeOre1) inventory.addItem(ItemDatabase::getItemByID(oreType, ore1));
-        if (removedOre2) inventory.addItem(ItemDatabase::getItemByID(oreType, ore2));
+        if (removeOre1) inventory.addItem(ItemDatabase::getItemByID(itemType, ore1));
+        if (removedOre2) inventory.addItem(ItemDatabase::getItemByID(itemType, ore2));
 
-        std::cout << "Not enough ores to combine!\n";
-    }
-}
-
-void Smithing::oreSmelt(int oreAmount, int ore, int bar)
-{
-    const std::string oreType = "mining";
-    const std::string barType = "smithing";
-
-    // attempt to remove 1 Ore from two different types of ore
-    bool removeOre = inventory.removeItem(oreType, ore, oreAmount);
-
-    if (removeOre)
-    {
-        // add Bronze Bar to inventory
-        Item createBar = ItemDatabase::getItemByID(barType, bar);
-        inventory.addItem(createBar);
-
-        Item oreName = ItemDatabase::getItemByID("mining", ore);
-        std::cout << "Successfully combined: " << oreName.name << " = " << createBar.getName() << '\n';
-    }
-    else
-    {
-        // if combination failed, put back any removed items
-        if (removeOre) inventory.addItem(ItemDatabase::getItemByID(oreType, ore));
         std::cout << "Not enough ores to combine!\n";
     }
 }
@@ -815,9 +782,9 @@ int Smithing::setMenuBar(float contentY, std::string buttonNames[], int sizeOfBu
 
 void Smithing::rebuildGrid()
 {
-    if (selectedIndex == 0)          // Standard bars
+    if (selectedIndex == 0) // standard bars
         numRows = 5;
-    else                              // Gear tabs
+    else                    // gear tabs
         numRows = 8;
 
     sizeOfSmithing = numCols * numRows;
@@ -848,7 +815,7 @@ void Smithing::tick(float deltaTime, float contentY)
         previousMenuIndex = newIndex;
         selectedIndex = newIndex;
 
-        rebuildGrid();      // <-- we’ll create this
+        rebuildGrid();
         selectedItemIndex = -1;
         resetSkillProgress();
     }

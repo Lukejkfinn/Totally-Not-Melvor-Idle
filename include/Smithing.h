@@ -18,11 +18,10 @@ public:
     void drawProductionPanel(float contentY, int itemType, int itemAmount);
     void drawSmithingPanelInfo(float contentY, int index);
     void drawOreCombinationPanel(float contentY, int item1, int item1Amount, int item2, int item2Amount);
-    void beginSmithing(float contentY);
+    void createButton(float contentY);
     bool canCreateSelected() const;
     void onCompleted();
     void oreCombination(int ore1Amount, int ore1, int ore2Amount, int ore2, int bar);
-    void oreSmelt(int oreAmount, int ore, int bar);
     virtual void resetSkillProgress();
     virtual int setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, float textPosY, int fontSize);
     void rebuildGrid();
@@ -57,6 +56,13 @@ private:
     int xpAccumulated{0};
     float barTimer{1.9f};
     int xpPerBar[MAX_BARS]{5, 8, 12, 15, 20, 35, 42, 50, 60};
+    int xpPerBronzeGear[MAX_ITEMS]{10, 10, 10, 10, 20, 20, 20, 30, 20, 20, 30, 30, 30, 30, 50, 0};
+    int xpPerIronGear[MAX_ITEMS]{20, 20, 20, 20, 40, 40, 40, 60, 40, 40, 60, 60, 60, 60, 100, 0};
+    int xpPerSteelGear[MAX_ITEMS]{30, 30, 30, 30, 60, 60, 60, 90, 60, 60, 90, 90, 90, 90, 150, 0};
+    int xpPerMithrilGear[MAX_ITEMS]{50, 50, 50, 50, 100, 100, 100, 150, 100, 100, 150, 150, 150, 150, 250, 0};
+    int xpPerAdamantGear[MAX_ITEMS]{60, 60, 60, 60, 120, 120, 120, 180, 120, 120, 180, 180, 180, 180, 300, 0};
+    int xpPerRuneGear[MAX_ITEMS]{75, 75, 75, 75, 150, 150, 150, 225, 150, 150, 225, 225, 225, 225, 375, 0};
+    int xpPerDragonGear[MAX_ITEMS]{100, 100, 100, 100, 200, 200, 200, 300, 200, 200, 300, 300, 300, 300, 500, 0};
     int selectedIndex{0};
     int previousMenuIndex{-1};
 
