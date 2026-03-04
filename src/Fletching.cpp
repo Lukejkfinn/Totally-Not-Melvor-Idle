@@ -1,5 +1,29 @@
 #include "Fletching.h"
 
+struct Recipe
+{
+    const char* item1Type; // "woodcutting/smithing/fletching"
+    int item1;
+    int item1Amount;
+    
+    const char* item2Type; // "fletching"
+    int item2;
+    int item2Amount;
+};
+
+static const Recipe arrowRecipes[] =
+{
+    {"woodcutting", 1, 1, "none", 0, 0}, // Arrow Shafts (Normal logs)
+    {"fletching", 1, 15, "none", 0, 15}, // Headless Arrows (Arrow Shafts + Feathers) need to add feathers
+    {"smithing", 11, 15, "fletching", 2, 15}, // Bronze Arrows
+    {"smithing", 26, 15, "fletching", 2, 15}, // Iron Arrows
+    {"smithing", 41, 15, "fletching", 2, 15}, // Steel Arrows
+    {"smithing", 56, 15, "fletching", 2, 15}, // Mithril Arrows
+    {"smithing", 71, 15, "fletching", 2, 15}, // Adamant Arrows
+    {"smithing", 86, 15, "fletching", 2, 15}, // Rune Arrows
+    {"smithing", 101, 15, "fletching", 2, 15}  // Dragon Arrows
+};
+
 Fletching::Fletching(Inventory &inv) : inventory(inv)
 {
 
@@ -258,7 +282,32 @@ void Fletching::createButton(float contentY)
 
 bool Fletching::canCreateSelected() const
 {
-    return true;
+    if (selectedItemIndex == -1) return false;
+
+    // --- crafting arrows (Tab 0) ---
+    if (selectedIndex == 0)
+    {
+        int recipeIndex = selectedItemIndex;
+
+        if (recipeIndex < 0 || recipeIndex >= static_cast<int>(std::size(arrowRecipes))) 
+            return false;
+
+        const Recipe& recipe = arrowRecipes[recipeIndex];
+        
+        // check first ore
+        bool hasItem1 = inventory.getItemAmount(recipe.item1Type, recipe.item1) >= recipe.item1Amount;
+        std::cout << "Item1: " << recipe.item1 << '\n';
+
+        // check second ore (if applicable)
+        bool hasItem2 = true;
+        if (recipe.item2 != 0)
+        {
+            hasItem2 = inventory.getItemAmount(recipe.item2Type, recipe.item2) >= recipe.item2Amount;
+        }
+
+        return hasItem1 && hasItem2;
+    }
+    return false;
 }
 
 void Fletching::itemCombination(int item1, int item1Amount, int item2, int item2Amount, int item3, int item3Amount, int createdItem)
@@ -268,7 +317,36 @@ void Fletching::itemCombination(int item1, int item1Amount, int item2, int item2
 
 void Fletching::onCompleted()
 {
+    int index = selectedItemIndex;
 
+    if (index < 0)
+        return;
+
+    // ---------------- STANDARD ARROWS ----------------
+    if (selectedIndex == 0)
+    {
+        if (index >= static_cast<int>(std::size(arrowRecipes)))
+            return;
+
+        const Recipe& recipe = arrowRecipes[index];
+
+        // remove required ores (always mining)
+        if (!inventory.removeItem(recipe.item1Type, recipe.item1, recipe.item1Amount))
+            return;
+
+        if (recipe.item2 != 0)
+        {
+            if (!inventory.removeItem(recipe.item2Type, recipe.item2, recipe.item2Amount))
+                return;
+        }
+
+        // create produced item from database, +1 to line up with the arrows index
+        Item producedItem = itemDatabase.getItemByID("fletching", selectedItemIndex+1);
+        producedItem.setAmount(15);
+        inventory.addItem(producedItem);
+
+        return;
+    }
 }
 
 void Fletching::resetSkillProgress()

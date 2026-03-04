@@ -259,7 +259,7 @@ void BaseSkill::resetSkillProgress()
     singleXpBar.width = 0.f;
 }
 
-int BaseSkill::setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons,  float textPosY, int fontSize)
+int BaseSkill::setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, int currentSelected,  float textPosY, int fontSize)
 {
     Rectangle xpBarBorder{324, 105 + (contentY-100), 930, 81};
     DrawRectangleRec(xpBarBorder, BLACK);
@@ -271,7 +271,7 @@ int BaseSkill::setMenuBar (float contentY, std::string buttonNames[], int sizeOf
     float padding{5.f};
     float buttonWidth{110.f};
 
-    static int selectedButtonIndex = 0;
+    int newIndex = currentSelected;
 
     for (int i = 0; i < sizeOfButtons; i++)
     {
@@ -285,10 +285,10 @@ int BaseSkill::setMenuBar (float contentY, std::string buttonNames[], int sizeOf
         if (CheckCollisionPointRec(GetMousePosition(), createButton) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             // update the selected button index
-            selectedButtonIndex = i;
+            newIndex = i;
         }
     }
-    return selectedButtonIndex;
+    return newIndex;
 }
 
 void BaseSkill::tick(float deltaTime, float contentY)

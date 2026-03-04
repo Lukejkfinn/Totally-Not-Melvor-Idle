@@ -27,7 +27,7 @@ public:
     void drawXPBar();
     void updateXPBar(int xpAmount);
     virtual void drawTemplate(float contentY);
-    virtual int setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, float textPosY, int fontSize);
+    virtual int setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, int currentSelected, float textPosY, int fontSize);
     virtual void tick(float deltaTime, float contentY);
     virtual void resetSkillProgress();
     
@@ -58,6 +58,7 @@ protected:
     float runningTime = {0};
     int iconTargetW{32};
     int iconTargetH{32};
+    int selectedIndex{0};
     
 private:
     std::string formatNumber(int value);

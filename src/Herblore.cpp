@@ -144,6 +144,8 @@ void Herblore::drawButtonGrid(float contentY, int selectedIndex)
             // ---------------- UNLOCKED ----------------
             Item craftingItem;
             std::string* potions = nullptr;
+            if (selectedIndex > 1)
+                return;
 
             if (selectedIndex == 0) // combat potions
             {
@@ -363,9 +365,9 @@ void Herblore::resetSkillProgress()
     xpBar.width = BaseSkill::singleXpBar.width;
 }
 
-int Herblore::setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, float textPosY, int fontSize)
+int Herblore::setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, int currentSelected, float textPosY, int fontSize)
 {
-    selectedIndex = BaseSkill::setMenuBar(contentY, buttonNames, sizeOfButtons, textPosY, fontSize);
+    selectedIndex = BaseSkill::setMenuBar(contentY, buttonNames, sizeOfButtons, selectedIndex, textPosY, fontSize);
     return selectedIndex;
 }
 
@@ -380,7 +382,7 @@ void Herblore::tick(float deltaTime, float contentY)
         "Combat \nPotions",
         "Skill \nPotions"
     };
-    setMenuBar(contentY, buttonNames, sizeOfButtons, 10, 18);
+    setMenuBar(contentY, buttonNames, sizeOfButtons, selectedIndex, 10, 18);
     
     BaseSkill::drawXPBar();
 }

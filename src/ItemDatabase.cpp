@@ -402,8 +402,8 @@ void ItemDatabase::loadItems()
     std::vector<ItemData> fletchingItems = 
     {
         // texture,                                     name,           skillType,             ID, value, amount, maxStack, isStackable
-        {"assets/bank/fletching/headless_arrows.png", "Arrow Shafts", "fletching",              1, 2, fletchAmount, fletchingMaxStack, true},
-        {"assets/bank/fletching/arrowshaft.png", "Headless Arrows", "fletching",                2, 2, fletchAmount, fletchingMaxStack, true},
+        {"assets/bank/fletching/arrowshaft.png", "Arrow Shafts", "fletching",              1, 2, fletchAmount, fletchingMaxStack, true},
+        {"assets/bank/fletching/headless_arrows.png", "Headless Arrows", "fletching",                2, 2, fletchAmount, fletchingMaxStack, true},
         {"assets/bank/fletching/ammo_arrow_bronze.png", "Bronze Arrows", "fletching",           3, 2, fletchAmount, fletchingMaxStack, true},
         {"assets/bank/fletching/ammo_arrow_iron.png", "Iron Arrows", "fletching",               4, 2, fletchAmount, fletchingMaxStack, true},
         {"assets/bank/fletching/ammo_arrow_steel.png", "Steel Arrows", "fletching",             5, 2, fletchAmount, fletchingMaxStack, true},

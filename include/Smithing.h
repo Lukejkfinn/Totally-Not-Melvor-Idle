@@ -23,7 +23,7 @@ public:
     void onCompleted();
     void oreCombination(int ore1Amount, int ore1, int ore2Amount, int ore2, int bar);
     virtual void resetSkillProgress();
-    virtual int setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, float textPosY, int fontSize);
+    virtual int setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, int currentSelected, float textPosY, int fontSize);
     void rebuildGrid();
     virtual void tick(float deltaTime, float contentY) override;
     int getNodeLevel(int index) const override;
@@ -63,7 +63,7 @@ private:
     int xpPerAdamantGear[MAX_ITEMS]{60, 60, 60, 60, 120, 120, 120, 180, 120, 120, 180, 180, 180, 180, 300, 0};
     int xpPerRuneGear[MAX_ITEMS]{75, 75, 75, 75, 150, 150, 150, 225, 150, 150, 225, 225, 225, 225, 375, 0};
     int xpPerDragonGear[MAX_ITEMS]{100, 100, 100, 100, 200, 200, 200, 300, 200, 200, 300, 300, 300, 300, 500, 0};
-    int selectedIndex{0};
+    //int selectedIndex{0};
     int previousMenuIndex{-1};
 
     std::string barNamesText[MAX_ITEMS] =

@@ -1,6 +1,6 @@
 #include "Smithing.h"
 
-static const int typeOffsets[] = { 0, 9, 24, 39, 54, 69, 85, 99 };
+static const int typeOffsets[] = { 0, 9, 24, 39, 54, 69, 84, 99 };
 
 struct Recipe
 {
@@ -525,7 +525,9 @@ void Smithing::drawSmithingPanelInfo(float contentY, int index)
             barsNeeded = gearRecipes[index].barsRequired;
 
         drawOreCombinationPanel(contentY, requiredBarID, barsNeeded, 0, 0);
-        drawProductionPanel(contentY, index + 1, 1);
+        
+        int returnAmount = (selectedIndex > 0 && index == 1) ? 15 : 1;
+        drawProductionPanel(contentY, index + 1, returnAmount);
     }
 }
 
@@ -643,7 +645,7 @@ bool Smithing::canCreateSelected() const
     // --- smelting bars (Tab 0) - requires ores from mining ---
     if (selectedIndex == 0)
     {
-        int recipeIndex = selectedItemIndex - 1;
+        int recipeIndex = selectedItemIndex -1;
         if (recipeIndex < 0 || recipeIndex >= static_cast<int>(std::size(barRecipes))) 
             return false;
 
@@ -705,6 +707,7 @@ void Smithing::onCompleted()
 
         // create produced bar item from database
         Item producedBar = itemDatabase.getItemByID("smithing", selectedItemIndex);
+        
         producedBar.setAmount(1);
 
         inventory.addItem(producedBar);
@@ -733,7 +736,10 @@ void Smithing::onCompleted()
 
         Item producedGear = itemDatabase.getItemByID("smithing", finalItemType);
         producedGear.setAmount(1);
-
+        
+        // set amount to 15 when creating arrow heads
+        int returnAmount = (selectedIndex > 0 && index == 1) ? 15 : 1;
+        producedGear.setAmount(returnAmount);
         inventory.addItem(producedGear);
     }
 }
@@ -774,9 +780,9 @@ void Smithing::resetSkillProgress()
     xpBar.width = BaseSkill::singleXpBar.width;
 }
 
-int Smithing::setMenuBar(float contentY, std::string buttonNames[], int sizeOfButtons, float textPosY, int fontSize)
+int Smithing::setMenuBar(float contentY, std::string buttonNames[], int sizeOfButtons, int currentSelected, float textPosY, int fontSize)
 {
-    selectedIndex = BaseSkill::setMenuBar(contentY, buttonNames, sizeOfButtons, textPosY, fontSize);
+    selectedIndex = BaseSkill::setMenuBar(contentY, buttonNames, sizeOfButtons, selectedIndex, textPosY, fontSize);
     return selectedIndex;
 }
 
@@ -807,7 +813,7 @@ void Smithing::tick(float deltaTime, float contentY)
         "Rune \nGear",
         "Dragon \nGear"
     };
-    int newIndex = setMenuBar(contentY, buttonNames, sizeOfButtons, 10, 18);
+    int newIndex = setMenuBar(contentY, buttonNames, sizeOfButtons, selectedIndex, 10, 18);
 
     // detect change
     if (newIndex != previousMenuIndex)

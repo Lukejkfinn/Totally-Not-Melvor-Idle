@@ -22,7 +22,7 @@ public:
     void itemCombination(int item1, int item1Amount, int item2, int item2Amount, int item3, int item3Amount, int createdItem);
     void onCompleted();
     virtual void resetSkillProgress();
-    virtual int setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, float textPosY, int fontSize) override;
+    virtual int setMenuBar (float contentY, std::string buttonNames[], int sizeOfButtons, int currentSelected, float textPosY, int fontSize) override;
     virtual void tick(float deltaTime, float contentY) override;
 
     // save/load helpers
@@ -54,5 +54,5 @@ private:
     int xpAccumulated{0};
     int targetW{32};
     int targetH{32};
-    int selectedIndex{0};
+    //int selectedIndex{0};
 };
