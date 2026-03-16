@@ -28,8 +28,8 @@
 static const float contentY{};
 
 // forward declarations
-void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Cooking &cooking, const Mining &mining, const Smithing &smithing, const Fletching &fletching, const Crafting &crafting, const Runecrafting &runecrafting, const Herblore &herblore, const std::string &filename);
-void loadGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Cooking &cooking, const Mining &mining, const Smithing &smithing, const Fletching &fletching, const Crafting &crafting, const Runecrafting &runecrafting, const Herblore &herblore, const std::string &filename);
+void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Cooking &cooking, const Mining &mining, const Smithing &smithing, const Fletching &fletching, const Crafting &crafting, const Runecrafting &runecrafting, const Herblore &herblore, const Summoning &summoning, const std::string &filename);
+void loadGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Cooking &cooking, const Mining &mining, const Smithing &smithing, const Fletching &fletching, const Crafting &crafting, const Runecrafting &runecrafting, const Herblore &herblore, const Summoning &summoning, const std::string &filename);
 
 bool Button(Rectangle bounds, const char *text)
 {
@@ -172,12 +172,12 @@ void menuButtons(bool &running, bool &debugging, int &indexPage, float contentY,
     // quit button
     if (Button(Rectangle{5, 670 + (contentY-100), winWidth / scale -10, buttonHeight}, "Quit"))
     {
-        saveGame(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, fletching, crafting, runecrafting, herblore, "data/save.txt");
+        saveGame(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, fletching, crafting, runecrafting, herblore, summoning, "data/save.txt");
         running = false;
     }
 }
 
-void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Cooking &cooking, const Mining &mining, const Smithing &smithing, const Fletching &fletching, const Crafting &crafting, const Runecrafting &runecrafting, const Herblore &herblore, const std::string &filename)
+void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing &fishing, const Firemaking &firemaking, const Cooking &cooking, const Mining &mining, const Smithing &smithing, const Fletching &fletching, const Crafting &crafting, const Runecrafting &runecrafting, const Herblore &herblore, const Summoning &summoning, const std::string &filename)
 {
     std::ofstream file(filename);
     if (!file.is_open())
@@ -276,6 +276,14 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing
     file << herblore.getProgress() << ' ';
     file << "\n\n";
 
+    // summoning
+    file << "[Summoning]\n";
+    file << "level=" << summoning.getLevel() << '\n';
+    file << "xp=" << summoning.getXP() << '\n';
+    file << "progress=";
+    file << summoning.getProgress() << ' ';
+    file << "\n\n";
+
     // inventory
     file << "[Inventory]\n";
     for (const auto &slot : inventory.getSlots())
@@ -293,7 +301,7 @@ void saveGame(const Inventory &inventory, const Woodcutting &wood, const Fishing
     std::cout << "Game saved!\n";
 }
 
-void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemaking &firemaking, Cooking &cooking, Mining &mining, Smithing &smithing, Fletching &fletching, Crafting &crafting, Runecrafting &runecrafting, Herblore &herblore, const std::string &filename)
+void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemaking &firemaking, Cooking &cooking, Mining &mining, Smithing &smithing, Fletching &fletching, Crafting &crafting, Runecrafting &runecrafting, Herblore &herblore, Summoning &summoning, const std::string &filename)
 {
     // open the file
     std::ifstream file(filename);
@@ -307,7 +315,7 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemak
     std::string line;
     enum class Section 
     { 
-        None, Currency, Woodcutting, Fishing, Firemaking, Cooking, Mining, Smithing, Fletching, Crafting, Runecrafting, Herblore, Inventory 
+        None, Currency, Woodcutting, Fishing, Firemaking, Cooking, Mining, Smithing, Fletching, Crafting, Runecrafting, Herblore, Summoning, Inventory 
     };
     Section currentSection = Section::None;
 
@@ -375,6 +383,11 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemak
         if (line == "[Herblore]")
         {
             currentSection = Section::Herblore;
+            continue;
+        }
+        if (line == "[Summoning]")
+        {
+            currentSection = Section::Summoning;
             continue;
         }
         if (line == "[Inventory]")
@@ -606,6 +619,26 @@ void loadGame(Inventory &inventory, Woodcutting &wood, Fishing &fishing, Firemak
                 ss >> herblore.getProgress();
             }
         }
+        else if (currentSection == Section::Summoning)
+        {
+            if (key == "level")
+            {
+                int lvl;
+                ss >> lvl;
+                summoning.setLevel(lvl);
+            }
+            else if (key == "xp")
+            {
+                int xp;
+                ss >> xp;
+                summoning.setXP(xp);
+                summoning.updateXPBar(0);
+            }
+            else if (key == "progress")
+            {
+                ss >> summoning.getProgress();
+            }
+        }
         else if (currentSection == Section::Inventory)
         {
 
@@ -667,7 +700,7 @@ int main()
     Runecrafting runecrafting(inventory);
     Herblore herblore(inventory);
     Agility agility;
-    Summoning summoning;
+    Summoning summoning(inventory);
     Astrology astrology;
     Debugger debugger(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, thieving, fletching, crafting, runecrafting, herblore, agility, summoning, astrology);
     //BaseSkill baseSkill;
@@ -678,7 +711,7 @@ int main()
     mining.getWindowSize(winDimensions[0], winDimensions[1]);
 
     inventory.loadTextures();
-    loadGame(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, fletching, crafting, runecrafting, herblore, "data/save.txt");
+    loadGame(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, fletching, crafting, runecrafting, herblore, summoning, "data/save.txt");
 
     // variable declarations
     int scale{4};
@@ -722,6 +755,8 @@ int main()
             runecrafting.tick(GetFrameTime(), contentY);
         else if (indexPage == 11)
             herblore.tick(GetFrameTime(), contentY);
+        else if (indexPage == 13)
+            summoning.tick(GetFrameTime(), contentY);
 
         if (debugger.debugging)
         {
@@ -767,7 +802,7 @@ int main()
 
     if (!running || WindowShouldClose())
     {
-        saveGame(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, fletching, crafting, runecrafting, herblore, "data/save.txt");
+        saveGame(inventory, woodcutting, fishing, firemaking, cooking, mining, smithing, fletching, crafting, runecrafting, herblore, summoning, "data/save.txt");
         std::cout << "Game saved!\n";
     }
     ItemDatabase::unloadItems();

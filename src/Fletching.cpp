@@ -330,7 +330,7 @@ void Fletching::onCompleted()
 
         const Recipe& recipe = arrowRecipes[index];
 
-        // remove required ores (always mining)
+        // remove required item
         if (!inventory.removeItem(recipe.item1Type, recipe.item1, recipe.item1Amount))
             return;
 

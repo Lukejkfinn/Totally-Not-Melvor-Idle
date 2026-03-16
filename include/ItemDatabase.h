@@ -16,7 +16,8 @@ enum class SkillType
     Fletching,
     Crafting,
     Runecrafting,
-    Herblore
+    Herblore,
+    Summoning
 };
 
 struct ItemData 
@@ -55,8 +56,7 @@ private:
     const static int craftingMaxStack{999'999};
     const static int runecraftingMaxStack{999'999};
     const static int herbloreMaxStack{999'999};
-
-
+    const static int summoningMaxStack{999'999};
 };
 
 #endif // ITEMDATABASE_H

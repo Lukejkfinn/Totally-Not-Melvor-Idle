@@ -124,7 +124,8 @@ void Herblore::drawButtonGrid(float contentY, int selectedIndex)
             bool unlocked = getLevel() >= getNodeLevel(i);
 
             // ---------------- LOCKED ----------------
-            if (!unlocked) {
+            if (!unlocked) 
+            {
                 std::string lockedText = "Locked";
                 int fontSize = 30;
                 int textWidth = MeasureText(lockedText.c_str(), fontSize);
@@ -270,8 +271,6 @@ void Herblore::drawResourcePanel(float contentY, int selectedIndex)
 void Herblore::setPanelInfo(float contentY, int index)
 {
     drawProductionPanel(contentY, index+1, 1);
-
-
 }
 
 void Herblore::drawRequiresPanel(float contentY, int itemID1, int itemID2, int itemID3, int itemAmount)

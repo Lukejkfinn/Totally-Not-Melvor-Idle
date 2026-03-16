@@ -53,7 +53,6 @@ std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill, int spawnAmount)
         skillName = "fletching";
         break;
 
-
     case SkillType::Crafting:
         skillName = "crafting";
         break;
@@ -66,6 +65,10 @@ std::vector<Item> ItemDatabase::ItemSpawner(SkillType skill, int spawnAmount)
         skillName = "herblore";
         break;
 
+    case SkillType::Summoning:
+        skillName = "summoning";
+        break;
+        
     default:
         std::cerr << "Unknown skill in ItemSpawner!\n";
         return spawned;
@@ -103,6 +106,7 @@ void ItemDatabase::loadItems()
     const static int craftAmount{1};
     const static int runecraftingAmount{1};
     const static int herbloreAmount{1};
+    const static int summoningAmount{1};
 
     std::vector<ItemData> woodcuttingItems = 
     {
@@ -489,7 +493,7 @@ void ItemDatabase::loadItems()
                                  itemData.itemName, itemData.skillType, itemData.id, itemData.value));
     }
 
-        std::vector<ItemData> herbloreItems = 
+    std::vector<ItemData> herbloreItems = 
     {
         // texture,                                 name,       skillType,                             ID, value, amount,     maxStack,        isStackable
         {"assets/bank/herblore/potion_woodcutting_i.png", "Bird Nest Potion", "herblore",               1, 75, herbloreAmount, herbloreMaxStack, true},
@@ -527,6 +531,42 @@ void ItemDatabase::loadItems()
 
     // loading herblore items
     for (const auto& itemData : herbloreItems) // loop through all items
+    {
+        Texture2D texture = LoadTexture(itemData.texturePath.c_str());
+        if (texture.id == 0)
+            std::cerr << "Failed to load texture for " << itemData.itemName << std::endl;
+        else
+            items.push_back(Item(texture, itemData.amount, itemData.stackable, itemData.stackAmount, 
+                                 itemData.itemName, itemData.skillType, itemData.id, itemData.value));
+    }
+
+    std::vector<ItemData> summoningItems = 
+    {
+        // texture,                                 name,       skillType,             ID, value, amount,       maxStack,        isStackable
+        {"assets/bank/summoning/tablet_golbin_thief.png", "Golbin Thief", "summoning",  1, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_ent.png", "Ent", "summoning",                    2, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_occultist.png", "Occultist", "summoning",        3, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_mole.png", "Mole", "summoning",                  4, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_wolf.png", "Wolf", "summoning",                  5, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_octopus.png", "Octopus", "summoning",            6, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_minotaur.png", "Minotaur", "summoning",          7, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_pig.png", "Pig", "summoning",                    8, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_centaur.png", "Centaur", "summoning",            9, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_crow.png", "Crow", "summoning",                  10, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_witch.png", "Witch", "summoning",                11, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_leprechaun.png", "Leprechaun", "summoning",      12, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_cyclops.png", "Cyclops", "summoning",            13, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_monkey.png", "Monkey", "summoning",              14, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_yak.png", "Yak", "summoning",                    15, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_salamander.png", "Salamander", "summoning",      16, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_unicorn.png", "Unicorn", "summoning",            17, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_bear.png", "Bear", "summoning",                  18, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_dragon.png", "Dragon", "summoning",              19, 75, summoningAmount, summoningMaxStack, true},
+        {"assets/bank/summoning/tablet_devil.png", "Devil", "summoning",                20, 75, summoningAmount, summoningMaxStack, true}
+    };
+
+    // loading summoning items
+    for (const auto& itemData : summoningItems) // loop through all items
     {
         Texture2D texture = LoadTexture(itemData.texturePath.c_str());
         if (texture.id == 0)
